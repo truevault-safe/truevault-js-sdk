@@ -39,13 +39,13 @@ const TrueVaultClient = require('tv-js-sdk');
 
 Initialize a TrueVaultClient using an access token or API key
 
-```
+```javascript
 const tvClient = new TrueVaultClient(apiKeyOrAccessToken);
 ```
 
 You can also create a new TrueVaultClient by logging in:
 
-```
+```javascript
 const tvClient = await TrueVaultClient.login(accountId, username, password, mfaCode);
 ```
 
@@ -53,7 +53,7 @@ const tvClient = await TrueVaultClient.login(accountId, username, password, mfaC
 
 The methods in this SDK make asynchronous web requests to TrueVault and return Promises. We recommend using async/await in favor of Promises wherever possible for clarity and conciseness.
 
-### async/await
+#### async/await
 ```javascript
 async readTrueVaultDocument() {
     try {
@@ -65,7 +65,7 @@ async readTrueVaultDocument() {
 }
 ```
 
-### Promises
+#### Promises
 ```javascript
 readTrueVaultDocument() {
     tvClient.readDocument(vaultId, documentId).then(response => {
@@ -76,13 +76,16 @@ readTrueVaultDocument() {
 }
 ```
 
+### Example
+
+Test out the SDK with this simple [JSFiddle](https://jsfiddle.net/TrueVault/wq4em2m1/) example.
+
 ## Development
 
-Make changes to `index.js` and then bundle them into `bundle.js` with webpack:
+Make changes to `index.js` and then bundle them into `build/index.js` with webpack:
 
 `./node_modules/.bin/webpack`
 
 ## License
 
 This SDK is released under the [BSD 3-Clause License](LICENSE).
-
