@@ -3892,9 +3892,18 @@ var TrueVaultClient = function () {
 
                             case 6:
                                 response = _context10.sent;
+
+                                if (!!full) {
+                                    response.data.items = response.data.items.map(function (item) {
+                                        if (item.document) {
+                                            item.document = JSON.parse(atob(item.document));
+                                        }
+                                        return item;
+                                    });
+                                }
                                 return _context10.abrupt('return', response.data);
 
-                            case 8:
+                            case 9:
                             case 'end':
                                 return _context10.stop();
                         }

@@ -285,7 +285,15 @@ class TrueVaultClient {
             url += `&per_page=${perPage}`;
         }
         const response = await this.performRequest(url);
-        return response.data
+        if (!!full) {
+            response.data.items = response.data.items.map(item => {
+                if (item.document) {
+                    item.document = JSON.parse(atob(item.document));
+                }
+                return item;
+            });
+        }
+        return response.data;
     }
 
     /**
