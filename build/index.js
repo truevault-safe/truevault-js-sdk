@@ -3726,7 +3726,7 @@ var TrueVaultClient = function () {
          * Create a new group. See https://docs.truevault.com/groups#create-a-group.
          * @param {string} name group name.
          * @param {Object} policy group policy. See https://docs.truevault.com/groups.
-         * @param {Array} userIds user ids to add to the group.
+         * @param {Array} [userIds] user ids to add to the group.
          * @returns {Promise.<Object>}
          */
 
@@ -3834,19 +3834,23 @@ var TrueVaultClient = function () {
         /**
          * Create a new document. See https://docs.truevault.com/documents#create-a-document.
          * @param {string} vaultId vault to place the document in.
-         * @param {string} schemaId schema to associate with the document.
+         * @param {string|null} schemaId schema to associate with the document.
          * @param {Object} document document contents.
+         * @param {string|null} [ownerId] the document's owner.
          * @returns {Promise.<Object>}
          */
 
     }, {
         key: 'createDocument',
-        value: function createDocument(vaultId, schemaId, document) {
+        value: function createDocument(vaultId, schemaId, document, ownerId) {
             var formData = new FormData();
-            formData.append("document", btoa(JSON.stringify(document)));
+            formData.append('document', btoa(JSON.stringify(document)));
 
-            if (schemaId) {
-                formData.append("schema_id", schemaId);
+            if (!!schemaId) {
+                formData.append('schema_id', schemaId);
+            }
+            if (!!ownerId) {
+                formData.append('owner_id', ownerId);
             }
             return this.performRequest('vaults/' + vaultId + '/documents', {
                 method: 'POST',
@@ -3888,9 +3892,18 @@ var TrueVaultClient = function () {
 
                             case 6:
                                 response = _context10.sent;
+
+                                if (!!full) {
+                                    response.data.items = response.data.items.map(function (item) {
+                                        if (item.document) {
+                                            item.document = JSON.parse(atob(item.document));
+                                        }
+                                        return item;
+                                    });
+                                }
                                 return _context10.abrupt('return', response.data);
 
-                            case 8:
+                            case 9:
                             case 'end':
                                 return _context10.stop();
                         }

@@ -96,7 +96,7 @@ This project uses [documentationjs](http://documentation.js.org/). To generate t
 rm -rf docs && yarn documentation -- build index.js -f html -o docs
 ```
 
-The documentation is available [via GitHub Pages.](http://truevault.github.io/truevault-js-sdk)
+The documentation is available [via GitHub Pages.](https://truevault.github.io/truevault-js-sdk)
 
 ## License
 
