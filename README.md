@@ -1,6 +1,6 @@
 # TrueVault JavaScript SDK
 
-The official JavasScript SDK for TrueVault. For more information about TrueVault, check out our [website](https://www.truevault.com) and [API documentation](https://docs.truevault.com). To see how the SDK is used in a real application, check out the [TrueVault React Sample App](https://github.com/truevault/tv-react-js-sample-app).
+The official JavaScript SDK for TrueVault. For more information about TrueVault, check out our [website](https://www.truevault.com) and [API documentation](https://docs.truevault.com). To see how the SDK is used in a real application, check out the [TrueVault React Sample App](https://github.com/truevault/tv-react-js-sample-app).
 
 _Note: This SDK is only supported for the latest release of Chrome._
 
@@ -49,6 +49,8 @@ You can also create a new TrueVaultClient by logging in:
 const tvClient = await TrueVaultClient.login(accountId, username, password, mfaCode);
 ```
 
+See the [documentation](http://truevault.github.io/truevault-js-sdk) for more info.
+
 ### Asynchronous Requests
 
 The methods in this SDK make asynchronous web requests to TrueVault and return Promises. We recommend using async/await in favor of Promises wherever possible for clarity and conciseness.
@@ -84,7 +86,17 @@ Test out the SDK with this simple [JSFiddle](https://jsfiddle.net/TrueVault/wq4e
 
 Make changes to `index.js` and then bundle them into `build/index.js` with webpack:
 
-`./node_modules/.bin/webpack`
+`yarn webpack`
+
+## Documentation
+
+This project uses [documentationjs](http://documentation.js.org/). To generate the docs:
+
+```
+rm -rf docs && yarn documentation -- build index.js -f html -o docs
+```
+
+The documentation is available [via GitHub Pages.](http://truevault.github.io/truevault-js-sdk)
 
 ## License
 
