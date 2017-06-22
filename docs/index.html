@@ -903,7 +903,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>createGroup(name, policy, userIds)</span>
+            <span class='code strong strong truncate'>createGroup(name, policy, userIds?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -914,7 +914,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
   <p>Create a new group. See <a href="https://docs.truevault.com/groups#create-a-group">https://docs.truevault.com/groups#create-a-group</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>createGroup(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, policy: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, userIds: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
+  <div class='pre p1 fill-light mt0'>createGroup(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, policy: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, userIds: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
   
   
 
@@ -951,7 +951,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>userIds</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>)</code>
+            <span class='code bold'>userIds</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>?)</code>
 	    user ids to add to the group.
 
           </div>
@@ -1224,7 +1224,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>createDocument(vaultId, schemaId, document)</span>
+            <span class='code strong strong truncate'>createDocument(vaultId, schemaId, document, ownerId?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -1235,7 +1235,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
   <p>Create a new document. See <a href="https://docs.truevault.com/documents#create-a-document">https://docs.truevault.com/documents#create-a-document</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>createDocument(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, schemaId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, document: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
+  <div class='pre p1 fill-light mt0'>createDocument(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, schemaId: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null), document: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, ownerId: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
   
   
 
@@ -1261,7 +1261,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>schemaId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>schemaId</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null))</code>
 	    schema to associate with the document.
 
           </div>
@@ -1272,6 +1272,15 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
           <div>
             <span class='code bold'>document</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    document contents.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ownerId</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?)</code>
+	    the document's owner.
 
           </div>
           

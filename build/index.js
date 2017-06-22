@@ -3726,7 +3726,7 @@ var TrueVaultClient = function () {
          * Create a new group. See https://docs.truevault.com/groups#create-a-group.
          * @param {string} name group name.
          * @param {Object} policy group policy. See https://docs.truevault.com/groups.
-         * @param {Array} userIds user ids to add to the group.
+         * @param {Array} [userIds] user ids to add to the group.
          * @returns {Promise.<Object>}
          */
 
@@ -3834,9 +3834,9 @@ var TrueVaultClient = function () {
         /**
          * Create a new document. See https://docs.truevault.com/documents#create-a-document.
          * @param {string} vaultId vault to place the document in.
-         * @param {string} schemaId schema to associate with the document.
+         * @param {string|null} schemaId schema to associate with the document.
          * @param {Object} document document contents.
-         * @param {string} ownerId the document's owner.
+         * @param {string|null} [ownerId] the document's owner.
          * @returns {Promise.<Object>}
          */
 
