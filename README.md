@@ -1,6 +1,6 @@
 # TrueVault JavaScript SDK
 
-The official JavaScript SDK for TrueVault. For more information about TrueVault, check out our [website](https://www.truevault.com) and [API documentation](https://docs.truevault.com). To see how the SDK is used in a real application, check out the [TrueVault React Sample App](https://github.com/truevault/tv-react-js-sample-app).
+The official JavaScript SDK for TrueVault. For more information about TrueVault, check out our [website](https://www.truevault.com) and [API documentation](https://docs.truevault.com). To see how the SDK is used in a real application, check out the [TrueVault React Sample App](https://github.com/truevault/tv-react-js-sample-app). You can also browse the [documentation for this SDK](https://truevault.github.io/truevault-js-sdk).
 
 _Note: This SDK is only supported for the latest release of Chrome._
 
@@ -96,7 +96,7 @@ This project uses [documentationjs](http://documentation.js.org/). To generate t
 rm -rf docs && yarn documentation -- build index.js -f html -o docs
 ```
 
-The documentation is available [via GitHub Pages.](https://truevault.github.io/truevault-js-sdk)
+The documentation is available [via GitHub Pages](https://truevault.github.io/truevault-js-sdk).
 
 ## License
 
