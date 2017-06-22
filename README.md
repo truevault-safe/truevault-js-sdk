@@ -8,7 +8,7 @@ _Note: This SDK is only supported for the latest release of Chrome._
 
 Simply copy this line into your HTML:
 ```html
-<script src="https://unpkg.com/tv-js-sdk@0.1.0/build/index.js"></script>
+<script src="https://unpkg.com/truevault-js-sdk/build/index.js"></script>
 ```
 
 ## Install using yarn / npm
@@ -16,23 +16,23 @@ Simply copy this line into your HTML:
 First download the package using yarn or npm.
 
 ```
-yarn add tv-js-sdk
+yarn add truevault-js-sdk
 
 // OR
 
-npm install tv-js-sdk
+npm install truevault-js-sdk
 ```
 
 Then import the JS SDK into your project:
 
 ### ES6
 ```javascript
-import TrueVaultClient from 'tv-js-sdk';
+import TrueVaultClient from 'truevault-js-sdk';
 ```
 
 ### ES5
 ```javascript
-const TrueVaultClient = require('tv-js-sdk');
+const TrueVaultClient = require('truevault-js-sdk');
 ```
 
 ## Usage
