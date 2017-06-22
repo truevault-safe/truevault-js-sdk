@@ -246,14 +246,18 @@ class TrueVaultClient {
      * @param {string} vaultId vault to place the document in.
      * @param {string} schemaId schema to associate with the document.
      * @param {Object} document document contents.
+     * @param {string} ownerId the document's owner.
      * @returns {Promise.<Object>}
      */
-    createDocument(vaultId, schemaId, document) {
+    createDocument(vaultId, schemaId, document, ownerId) {
         const formData = new FormData();
-        formData.append("document", btoa(JSON.stringify(document)));
+        formData.append('document', btoa(JSON.stringify(document)));
 
-        if (schemaId) {
-            formData.append("schema_id", schemaId);
+        if (!!schemaId) {
+            formData.append('schema_id', schemaId);
+        }
+        if (!!ownerId) {
+            formData.append('owner_id', ownerId);
         }
         return this.performRequest(`vaults/${vaultId}/documents`, {
             method: 'POST',
