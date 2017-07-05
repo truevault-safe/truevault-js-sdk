@@ -170,6 +170,50 @@ class TrueVaultClient {
     }
 
     /**
+     * Start MFA enrollment for a user. See https://docs.truevault.com/users#start-mfa-enrollment-for-a-user.
+     * @param {string} userId user id.
+     * @param {string} issuer MFA issuer.
+     * @returns {Promise.<string>}
+     */
+    startUserMfaEnrollment(userId, issuer) {
+        return this.performRequest(`users/${userId}/mfa/start_enrollment`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({issuer})
+        });
+    }
+
+    /**
+     * Finalize MFA enrollment for a user. See https://docs.truevault.com/users#finalize-mfa-enrollment-for-a-user.
+     * @param {string} userId user id.
+     * @param {string} mfaCode1 first MFA code.
+     * @param {string} mfaCode2 second MFA code.
+     * @returns {Promise.<string>}
+     */
+    finalizeMfaEnrollment(userId, mfaCode1, mfaCode2) {
+        return this.performRequest(`users/${userId}/mfa/finalize_enrollment`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({mfa_code_1: mfaCode1, mfa_code_2: mfaCode2})
+        });
+    }
+
+    /**
+     * Unenroll a user from MFA. See #https://docs.truevault.com/users#unenroll-mfa-for-a-user.
+     * @param {string} userId user id.
+     * @param {string} mfaCode MFA code for user.
+     * @param {string} password user's password.
+     * @returns {Promise.<string>}
+     */
+    unenrollMfa(userId, mfaCode, password) {
+        return this.performRequest(`users/${userId}/mfa/unenroll`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({mfa_code: mfaCode, password: password})
+        });
+    }
+
+    /**
      * Create a new group. See https://docs.truevault.com/groups#create-a-group.
      * @param {string} name group name.
      * @param {Object} policy group policy. See https://docs.truevault.com/groups.
