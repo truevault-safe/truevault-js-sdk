@@ -1,7 +1,7 @@
 {
   "name": "truevault",
   "description": "The official TrueVault JavaScript SDK",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/truevault/truevault-js-sdk"
@@ -21,6 +21,7 @@
     "babel-loader": "^7.0.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.5.2",
-    "webpack": "^2.6.1"
+    "webpack": "^2.6.1",
+    "documentation": "^4.0.0-rc.1"
   }
 }

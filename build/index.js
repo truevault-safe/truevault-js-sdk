@@ -3332,7 +3332,18 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/**
+ * A client for the [TrueVault HTTP API](https://docs.truevault.com/).
+ *
+ * If you already have an API key or access token, use the constructor. If you have a username and password, see
+ * `login()`.
+ */
 var TrueVaultClient = function () {
+
+    /**
+     * See https://docs.truevault.com/overview#authentication for more on authentication concepts in TrueVault.
+     * @param {string} apiKeyOrAccessToken either an API key or an access token.
+     */
     function TrueVaultClient(apiKeyOrAccessToken) {
         _classCallCheck(this, TrueVaultClient);
 
@@ -3407,8 +3418,27 @@ var TrueVaultClient = function () {
 
             return performRequest;
         }()
+
+        /**
+         * Useful when you want to create a client starting from a user's username and password as opposed to an API key
+         * or access token.
+         * See https://docs.truevault.com/authentication#login-a-user.
+         * @param {string} accountId account id that the user belongs to.
+         * @param {string} username user's username.
+         * @param {string} password user's password.
+         * @param {string} [mfaCode] current MFA code, if user has MFA configured.
+         * @returns {Promise.<TrueVaultClient>}
+         */
+
     }, {
         key: 'logout',
+
+
+        /**
+         * Log the authenticated user out, which deactivates its access token. See
+         * https://docs.truevault.com/authentication#logout-a-user.
+         * @returns {Promise.<Object>}
+         */
         value: function () {
             var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
                 var response;
@@ -3439,6 +3469,12 @@ var TrueVaultClient = function () {
 
             return logout;
         }()
+
+        /**
+         * Get data about the authenticated user. See https://docs.truevault.com/authentication#verify-a-user.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'readCurrentUser',
         value: function () {
@@ -3476,6 +3512,12 @@ var TrueVaultClient = function () {
 
             return readCurrentUser;
         }()
+
+        /**
+         * List all users in the account. See https://docs.truevault.com/users#list-all-users.
+         * @returns {Promise.<Array>}
+         */
+
     }, {
         key: 'listUsers',
         value: function () {
@@ -3511,6 +3553,15 @@ var TrueVaultClient = function () {
 
             return listUsers;
         }()
+
+        /**
+         * Create a new user. See https://docs.truevault.com/users#create-a-user.
+         * @param {string} username new user's username.
+         * @param {string} password new user's password.
+         * @param {Object} [attributes] new user's attributes, if desired.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'createUser',
         value: function () {
@@ -3551,6 +3602,14 @@ var TrueVaultClient = function () {
 
             return createUser;
         }()
+
+        /**
+         * Update a user's password. See https://docs.truevault.com/users#update-a-user.
+         * @param {string} userId the user id to change.
+         * @param {string} newPassword user's new password.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'updateUserPassword',
         value: function () {
@@ -3588,6 +3647,13 @@ var TrueVaultClient = function () {
 
             return updateUserPassword;
         }()
+
+        /**
+         * Create an API key for a user. See https://docs.truevault.com/users#create-api-key-for-a-user.
+         * @param {string} userId user id.
+         * @returns {Promise.<string>}
+         */
+
     }, {
         key: 'createUserApiKey',
         value: function () {
@@ -3618,6 +3684,13 @@ var TrueVaultClient = function () {
 
             return createUserApiKey;
         }()
+
+        /**
+         * Create an access token for a user. See https://docs.truevault.com/users#create-access-token-for-a-user.
+         * @param {string} userId user id.
+         * @returns {Promise.<string>}
+         */
+
     }, {
         key: 'createUserAccessToken',
         value: function () {
@@ -3648,6 +3721,68 @@ var TrueVaultClient = function () {
 
             return createUserAccessToken;
         }()
+
+        /**
+         * Start MFA enrollment for a user. See https://docs.truevault.com/users#start-mfa-enrollment-for-a-user.
+         * @param {string} userId user id.
+         * @param {string} issuer MFA issuer.
+         * @returns {Promise.<string>}
+         */
+
+    }, {
+        key: 'startUserMfaEnrollment',
+        value: function startUserMfaEnrollment(userId, issuer) {
+            return this.performRequest('users/' + userId + '/mfa/start_enrollment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ issuer: issuer })
+            });
+        }
+
+        /**
+         * Finalize MFA enrollment for a user. See https://docs.truevault.com/users#finalize-mfa-enrollment-for-a-user.
+         * @param {string} userId user id.
+         * @param {string} mfaCode1 first MFA code.
+         * @param {string} mfaCode2 second MFA code.
+         * @returns {Promise.<string>}
+         */
+
+    }, {
+        key: 'finalizeMfaEnrollment',
+        value: function finalizeMfaEnrollment(userId, mfaCode1, mfaCode2) {
+            return this.performRequest('users/' + userId + '/mfa/finalize_enrollment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mfa_code_1: mfaCode1, mfa_code_2: mfaCode2 })
+            });
+        }
+
+        /**
+         * Unenroll a user from MFA. See #https://docs.truevault.com/users#unenroll-mfa-for-a-user.
+         * @param {string} userId user id.
+         * @param {string} mfaCode MFA code for user.
+         * @param {string} password user's password.
+         * @returns {Promise.<string>}
+         */
+
+    }, {
+        key: 'unenrollMfa',
+        value: function unenrollMfa(userId, mfaCode, password) {
+            return this.performRequest('users/' + userId + '/mfa/unenroll', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mfa_code: mfaCode, password: password })
+            });
+        }
+
+        /**
+         * Create a new group. See https://docs.truevault.com/groups#create-a-group.
+         * @param {string} name group name.
+         * @param {Object} policy group policy. See https://docs.truevault.com/groups.
+         * @param {Array} [userIds] user ids to add to the group.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'createGroup',
         value: function () {
@@ -3688,6 +3823,14 @@ var TrueVaultClient = function () {
 
             return createGroup;
         }()
+
+        /**
+         * Add users to a group. See https://docs.truevault.com/groups#add-users-to-a-group.
+         * @param {string} groupId group to add to.
+         * @param {Array} userIds user ids to add to the group.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'addUsersToGroup',
         value: function addUsersToGroup(groupId, userIds) {
@@ -3701,6 +3844,13 @@ var TrueVaultClient = function () {
                 body: JSON.stringify({ user_ids: userIds })
             });
         }
+
+        /**
+         * Create a new vault. See https://docs.truevault.com/vaults#create-a-vault.
+         * @param {string} name the name of the new vault.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'createVault',
         value: function createVault(name) {
@@ -3712,6 +3862,15 @@ var TrueVaultClient = function () {
                 body: formData
             });
         }
+
+        /**
+         * Create a new schema. See https://docs.truevault.com/schemas#create-a-schema.
+         * @param {string} vaultId the vault that should contain the schema.
+         * @param {string} name the name of the schema.
+         * @param {Array} fields field metadata for the schema. See https://docs.truevault.com/schemas.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'createSchema',
         value: function createSchema(vaultId, name, fields) {
@@ -3724,20 +3883,43 @@ var TrueVaultClient = function () {
                 body: formData
             });
         }
+
+        /**
+         * Create a new document. See https://docs.truevault.com/documents#create-a-document.
+         * @param {string} vaultId vault to place the document in.
+         * @param {string|null} schemaId schema to associate with the document.
+         * @param {Object} document document contents.
+         * @param {string|null} [ownerId] the document's owner.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'createDocument',
-        value: function createDocument(vaultId, schemaId, document) {
+        value: function createDocument(vaultId, schemaId, document, ownerId) {
             var formData = new FormData();
-            formData.append("document", btoa(JSON.stringify(document)));
+            formData.append('document', btoa(JSON.stringify(document)));
 
-            if (schemaId) {
-                formData.append("schema_id", schemaId);
+            if (!!schemaId) {
+                formData.append('schema_id', schemaId);
+            }
+            if (!!ownerId) {
+                formData.append('owner_id', ownerId);
             }
             return this.performRequest('vaults/' + vaultId + '/documents', {
                 method: 'POST',
                 body: formData
             });
         }
+
+        /**
+         * List documents in a vault. See https://docs.truevault.com/documents#list-all-documents.
+         * @param {string} vaultId vault to look in.
+         * @param {boolean} full include document contents in listing.
+         * @param {number} [page] which page to get, if pagination is needed.
+         * @param {number} [perPage] number of documents per page.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'listDocuments',
         value: function () {
@@ -3763,9 +3945,18 @@ var TrueVaultClient = function () {
 
                             case 6:
                                 response = _context10.sent;
+
+                                if (!!full) {
+                                    response.data.items = response.data.items.map(function (item) {
+                                        if (item.document) {
+                                            item.document = JSON.parse(atob(item.document));
+                                        }
+                                        return item;
+                                    });
+                                }
                                 return _context10.abrupt('return', response.data);
 
-                            case 8:
+                            case 9:
                             case 'end':
                                 return _context10.stop();
                         }
@@ -3779,6 +3970,14 @@ var TrueVaultClient = function () {
 
             return listDocuments;
         }()
+
+        /**
+         * Get the contents of one or more documents. See https://docs.truevault.com/documents#read-a-document.
+         * @param {string} vaultId vault to look in.
+         * @param {Array} documentIds document ids to retrieve.
+         * @returns {Promise.<Array>}
+         */
+
     }, {
         key: 'getDocuments',
         value: function () {
@@ -3843,6 +4042,14 @@ var TrueVaultClient = function () {
 
             return getDocuments;
         }()
+
+        /**
+         * Perform a search. See https://docs.truevault.com/documentsearch#search-documents.
+         * @param {string} vaultId vault to search in.
+         * @param {Object} searchOption search query. See https://docs.truevault.com/documentsearch#defining-search-options.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'searchDocuments',
         value: function searchDocuments(vaultId, searchOption) {
@@ -3854,6 +4061,15 @@ var TrueVaultClient = function () {
                 body: formData
             });
         }
+
+        /**
+         * Update an existing document. See https://docs.truevault.com/documents#update-a-document.
+         * @param {string} vaultId vault that contains the document.
+         * @param {string} documentId document id to update.
+         * @param {Object} document new document contents.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'updateDocument',
         value: function updateDocument(vaultId, documentId, document) {
@@ -3865,6 +4081,14 @@ var TrueVaultClient = function () {
                 body: formData
             });
         }
+
+        /**
+         * Delete a document. See https://docs.truevault.com/documents#delete-a-document.
+         * @param {string} vaultId vault that contains the document.
+         * @param {string} documentId document id to delete.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'deleteDocument',
         value: function deleteDocument(vaultId, documentId) {
@@ -3872,6 +4096,14 @@ var TrueVaultClient = function () {
                 method: 'DELETE'
             });
         }
+
+        /**
+         * Create a BLOB. See https://docs.truevault.com/blobs#create-a-blob.
+         * @param {string} vaultId vault that will contain the blob.
+         * @param {File|Blob} file the BLOB's contents.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'createBlob',
         value: function createBlob(vaultId, file) {
@@ -3883,6 +4115,15 @@ var TrueVaultClient = function () {
                 body: formData
             });
         }
+
+        /**
+         * Create a BLOB with a callback for progress updates. See https://docs.truevault.com/blobs#create-a-blob.
+         * @param {string} vaultId vault that will contain the blob.
+         * @param {File|Blob} file the BLOB's contents.
+         * @param {function} progressCallback callback for XHR's `progress` and `load` events.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'createBlobWithProgress',
         value: function createBlobWithProgress(vaultId, file, progressCallback) {
@@ -3915,6 +4156,14 @@ var TrueVaultClient = function () {
                 xhr.send(formData);
             });
         }
+
+        /**
+         * Get a BLOB's contents. See https://docs.truevault.com/blobs#read-a-blob.
+         * @param {string} vaultId the vault containing the BLOB.
+         * @param {string} blobId id of the BLOB.
+         * @returns {Promise.<*>}
+         */
+
     }, {
         key: 'getBlob',
         value: function () {
@@ -3950,6 +4199,15 @@ var TrueVaultClient = function () {
 
             return getBlob;
         }()
+
+        /**
+         * List the BLOBs in a vault. See https://docs.truevault.com/blobs#list-all-blobs.
+         * @param {string} vaultId the vault to list.
+         * @param {number} [page] if paginating, the page.
+         * @param {number} [perPage] if paginating, the number of items per page.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'listBlobs',
         value: function () {
@@ -3988,6 +4246,15 @@ var TrueVaultClient = function () {
 
             return listBlobs;
         }()
+
+        /**
+         * Update a BLOB's contents. See https://docs.truevault.com/blobs#update-a-blob.
+         * @param {string} vaultId the vault containing the BLOB.
+         * @param {string} blobId id of the BLOB.
+         * @param {File|Blob} file the BLOB's contents.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'updateBlob',
         value: function updateBlob(vaultId, blobId, file) {
@@ -3999,6 +4266,14 @@ var TrueVaultClient = function () {
                 body: formData
             });
         }
+
+        /**
+         * Delete a BLOB. See https://docs.truevault.com/blobs#delete-a-blob.
+         * @param {string} vaultId the vault containing the BLOB.
+         * @param {string} blobId the BLOB to delete.
+         * @returns {Promise.<Object>}
+         */
+
     }, {
         key: 'deleteBlob',
         value: function deleteBlob(vaultId, blobId) {
@@ -4006,6 +4281,18 @@ var TrueVaultClient = function () {
                 method: 'DELETE'
             });
         }
+
+        /**
+         * Send an email to a user via Sendgrid. See https://docs.truevault.com/email#email-a-user.
+         * @param {string} sendgridApiKey Sendgrid API key.
+         * @param {string} userId the user to send to.
+         * @param {string} sendgridTemplateId the Sendgrid template to use.
+         * @param {string} fromEmailSpecifier the specifier for the "From" address. See https://docs.truevault.com/email#value-specifiers.
+         * @param {string} toEmailSpecifier the specifier for the "To" address. See https://docs.truevault.com/email#value-specifiers.
+         * @param {Object} substitutions substitutions to use in the template. See https://docs.truevault.com/email#template-substitution.
+         * @returns {Promise.<String>}
+         */
+
     }, {
         key: 'sendEmailSendgrid',
         value: function () {
