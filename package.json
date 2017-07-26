@@ -1,27 +1,11 @@
 {
   "name": "truevault-js-sdk",
-  "description": "The official TrueVault JavaScript SDK",
-  "version": "0.2.0",
+  "description": "Deprecated TrueVault JS SDK",
+  "version": "0.3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/truevault/truevault-js-sdk"
   },
-  "keywords": [
-    "truevault",
-    "js",
-    "javascript",
-    "sdk",
-    "rest",
-    "api"
-  ],
   "license": "BSD-3-Clause",
-  "main": "build/index.js",
-  "devDependencies": {
-    "babel-core": "^6.25.0",
-    "babel-loader": "^7.0.0",
-    "babel-polyfill": "^6.23.0",
-    "babel-preset-env": "^1.5.2",
-    "webpack": "^2.6.1",
-    "documentation": "^4.0.0-rc.1"
-  }
+  "devDependencies": {}
 }
