@@ -1,5 +1,5 @@
 {
-  "name": "truevault-js-sdk",
+  "name": "truevault",
   "description": "The official TrueVault JavaScript SDK",
   "version": "0.1.2",
   "repository": {
