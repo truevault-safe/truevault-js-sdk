@@ -8,7 +8,7 @@ _Note: This SDK is only supported for the latest release of Chrome._
 
 Simply copy this line into your HTML:
 ```html
-<script src="https://unpkg.com/truevault-js-sdk/build/index.js"></script>
+<script src="https://unpkg.com/truevault/build/index.js"></script>
 ```
 
 ## Install using yarn / npm
@@ -16,23 +16,23 @@ Simply copy this line into your HTML:
 First download the package using yarn or npm.
 
 ```
-yarn add truevault-js-sdk
+yarn add truevault
 
 // OR
 
-npm install truevault-js-sdk
+npm install truevault
 ```
 
 Then import the JS SDK into your project:
 
 ### ES6
 ```javascript
-import TrueVaultClient from 'truevault-js-sdk';
+import TrueVaultClient from 'truevault';
 ```
 
 ### ES5
 ```javascript
-const TrueVaultClient = require('truevault-js-sdk');
+const TrueVaultClient = require('truevault');
 ```
 
 ## Usage
