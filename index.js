@@ -237,6 +237,59 @@ class TrueVaultClient {
     }
 
     /**
+     * Update an existing group's name and policy. See https://docs.truevault.com/groups#update-a-group.
+     * @param {string} name group name.
+     * @param {Object} policy group policy. See https://docs.truevault.com/groups.
+     * @returns {Promise.<Object>}
+     */
+    async updateGroup(groupId, name, policy) {
+        const formData = new FormData();
+        if (!!name) {
+            formData.append("name", name);
+        }
+
+        if (!!policy) {
+            formData.append("policy", btoa(JSON.stringify(policy)));
+        }
+
+        const response = await this.performRequest(`v1/groups/${groupId}`, {
+            method: 'PUT',
+            body: formData
+        });
+        return response.group;
+    }
+
+    /**
+     * Delete a group. See https://docs.truevault.com/groups#delete-a-group.
+     * @param {string} groupId group id to delete.
+     * @returns {Promise.<Object>}
+     */
+    async deleteGroup(groupId) {
+        return this.performRequest(`v1/groups/${groupId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
+     * List all groups. See https://docs.truevault.com/groups#list-all-groups.
+     * @returns {Promise.<Array>}
+     */
+    async listGroups() {
+        const response = await this.performRequest(`v1/groups`);
+        return response.groups;
+    }
+
+    /**
+     * Gets a group, including user ids. See https://docs.truevault.com/groups#read-a-group.
+     * @param {string} groupId group id to get.
+     * @returns {Promise.<Object>}
+     */
+    async getFullGroup(groupId) {
+        const response = await this.performRequest(`v1/groups/${groupId}?full=true`);
+        return response.group;
+    }
+
+    /**
      * Add users to a group. See https://docs.truevault.com/groups#add-users-to-a-group.
      * @param {string} groupId group to add to.
      * @param {Array} userIds user ids to add to the group.
@@ -252,6 +305,42 @@ class TrueVaultClient {
             headers: headers,
             body: JSON.stringify({user_ids: userIds})
         });
+    }
+
+    /**
+     * Add users to a group returning user ids. See https://docs.truevault.com/groups#update-a-group.
+     * @param {string} groupId group to add to.
+     * @param {Array} userIds user ids to add to the group.
+     * @returns {Promise.<Object>}
+     */
+    async addUsersToGroupReturnUserIds(groupId, userIds) {
+        const formData = new FormData();
+        formData.append('operation', 'APPEND');
+        formData.append('user_ids', userIds.join(','));
+
+        const response = await this.performRequest(`v1/groups/${groupId}`, {
+            method: 'PUT',
+            body: formData
+        });
+        return response.group;
+    }
+
+    /**
+     * Remove users from a group. See https://docs.truevault.com/groups#update-a-group
+     * @param {string} groupId group to remove from.
+     * @param {Array} userIds user ids to remove from the group.
+     * @returns {Promise.<Object>}
+     */
+    async removeUsersFromGroup(groupId, userIds) {
+        const formData = new FormData();
+        formData.append('operation', 'REMOVE');
+        formData.append('user_ids', userIds.join(','));
+
+        const response = await this.performRequest(`v1/groups/${groupId}`, {
+            method: 'PUT',
+            body: formData
+        });
+        return response.group;
     }
 
     /**
