@@ -3343,11 +3343,13 @@ var TrueVaultClient = function () {
     /**
      * See https://docs.truevault.com/overview#authentication for more on authentication concepts in TrueVault.
      * @param {string} apiKeyOrAccessToken either an API key or an access token.
+     * @param {string} host optional parameter specifying TV API host; defaults to https://api.truevault.com
      */
-    function TrueVaultClient(apiKeyOrAccessToken) {
+    function TrueVaultClient(apiKeyOrAccessToken, host) {
         _classCallCheck(this, TrueVaultClient);
 
         this.apiKeyOrAccessToken = apiKeyOrAccessToken;
+        this.host = host || 'https://api.truevault.com';
     }
 
     _createClass(TrueVaultClient, [{
@@ -3369,7 +3371,7 @@ var TrueVaultClient = function () {
                                     options.headers.Authorization = 'Basic ' + btoa(this.apiKeyOrAccessToken + ':');
                                 }
                                 _context.next = 3;
-                                return fetch('https://api.truevault.com/v1/' + path, options);
+                                return fetch(this.host + '/' + path, options);
 
                             case 3:
                                 response = _context.sent;
@@ -3447,7 +3449,7 @@ var TrueVaultClient = function () {
                         switch (_context2.prev = _context2.next) {
                             case 0:
                                 _context2.next = 2;
-                                return this.performRequest('auth/logout', { method: 'POST' });
+                                return this.performRequest('v1/auth/logout', { method: 'POST' });
 
                             case 2:
                                 response = _context2.sent;
@@ -3485,7 +3487,7 @@ var TrueVaultClient = function () {
                         switch (_context3.prev = _context3.next) {
                             case 0:
                                 _context3.next = 2;
-                                return this.performRequest('auth/me?full=true');
+                                return this.performRequest('v1/auth/me?full=true');
 
                             case 2:
                                 response = _context3.sent;
@@ -3528,7 +3530,7 @@ var TrueVaultClient = function () {
                         switch (_context4.prev = _context4.next) {
                             case 0:
                                 _context4.next = 2;
-                                return this.performRequest('users?full=true');
+                                return this.performRequest('v1/users?full=true');
 
                             case 2:
                                 response = _context4.sent;
@@ -3579,7 +3581,7 @@ var TrueVaultClient = function () {
                                     formData.append("attributes", btoa(JSON.stringify(attributes)));
                                 }
                                 _context5.next = 6;
-                                return this.performRequest('users', {
+                                return this.performRequest('v1/users', {
                                     method: 'POST',
                                     body: formData
                                 });
@@ -3624,7 +3626,7 @@ var TrueVaultClient = function () {
                                 formData.append("password", newPassword);
 
                                 _context6.next = 4;
-                                return this.performRequest('users/' + userId, {
+                                return this.performRequest('v1/users/' + userId, {
                                     method: 'PUT',
                                     body: formData
                                 });
@@ -3664,7 +3666,7 @@ var TrueVaultClient = function () {
                         switch (_context7.prev = _context7.next) {
                             case 0:
                                 _context7.next = 2;
-                                return this.performRequest('users/' + userId + '/api_key', { method: 'POST' });
+                                return this.performRequest('v1/users/' + userId + '/api_key', { method: 'POST' });
 
                             case 2:
                                 response = _context7.sent;
@@ -3701,7 +3703,7 @@ var TrueVaultClient = function () {
                         switch (_context8.prev = _context8.next) {
                             case 0:
                                 _context8.next = 2;
-                                return this.performRequest('users/' + userId + '/access_token', { method: 'POST' });
+                                return this.performRequest('v1/users/' + userId + '/access_token', { method: 'POST' });
 
                             case 2:
                                 response = _context8.sent;
@@ -3732,7 +3734,7 @@ var TrueVaultClient = function () {
     }, {
         key: 'startUserMfaEnrollment',
         value: function startUserMfaEnrollment(userId, issuer) {
-            return this.performRequest('users/' + userId + '/mfa/start_enrollment', {
+            return this.performRequest('v1/users/' + userId + '/mfa/start_enrollment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ issuer: issuer })
@@ -3750,7 +3752,7 @@ var TrueVaultClient = function () {
     }, {
         key: 'finalizeMfaEnrollment',
         value: function finalizeMfaEnrollment(userId, mfaCode1, mfaCode2) {
-            return this.performRequest('users/' + userId + '/mfa/finalize_enrollment', {
+            return this.performRequest('v1/users/' + userId + '/mfa/finalize_enrollment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ mfa_code_1: mfaCode1, mfa_code_2: mfaCode2 })
@@ -3768,7 +3770,7 @@ var TrueVaultClient = function () {
     }, {
         key: 'unenrollMfa',
         value: function unenrollMfa(userId, mfaCode, password) {
-            return this.performRequest('users/' + userId + '/mfa/unenroll', {
+            return this.performRequest('v1/users/' + userId + '/mfa/unenroll', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ mfa_code: mfaCode, password: password })
@@ -3800,7 +3802,7 @@ var TrueVaultClient = function () {
                                     formData.append("user_ids", userIds.join(','));
                                 }
                                 _context9.next = 6;
-                                return this.performRequest('groups', {
+                                return this.performRequest('v1/groups', {
                                     method: 'POST',
                                     body: formData
                                 });
@@ -3825,6 +3827,163 @@ var TrueVaultClient = function () {
         }()
 
         /**
+         * Update an existing group's name and policy. See https://docs.truevault.com/groups#update-a-group.
+         * @param {string} name group name.
+         * @param {Object} policy group policy. See https://docs.truevault.com/groups.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'updateGroup',
+        value: function () {
+            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(groupId, name, policy) {
+                var formData, response;
+                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                    while (1) {
+                        switch (_context10.prev = _context10.next) {
+                            case 0:
+                                formData = new FormData();
+
+                                if (!!name) {
+                                    formData.append("name", name);
+                                }
+
+                                if (!!policy) {
+                                    formData.append("policy", btoa(JSON.stringify(policy)));
+                                }
+
+                                _context10.next = 5;
+                                return this.performRequest('v1/groups/' + groupId, {
+                                    method: 'PUT',
+                                    body: formData
+                                });
+
+                            case 5:
+                                response = _context10.sent;
+                                return _context10.abrupt('return', response.group);
+
+                            case 7:
+                            case 'end':
+                                return _context10.stop();
+                        }
+                    }
+                }, _callee10, this);
+            }));
+
+            function updateGroup(_x13, _x14, _x15) {
+                return _ref10.apply(this, arguments);
+            }
+
+            return updateGroup;
+        }()
+
+        /**
+         * Delete a group. See https://docs.truevault.com/groups#delete-a-group.
+         * @param {string} groupId group id to delete.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'deleteGroup',
+        value: function () {
+            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(groupId) {
+                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                    while (1) {
+                        switch (_context11.prev = _context11.next) {
+                            case 0:
+                                return _context11.abrupt('return', this.performRequest('v1/groups/' + groupId, {
+                                    method: 'DELETE'
+                                }));
+
+                            case 1:
+                            case 'end':
+                                return _context11.stop();
+                        }
+                    }
+                }, _callee11, this);
+            }));
+
+            function deleteGroup(_x16) {
+                return _ref11.apply(this, arguments);
+            }
+
+            return deleteGroup;
+        }()
+
+        /**
+         * List all groups. See https://docs.truevault.com/groups#list-all-groups.
+         * @returns {Promise.<Array>}
+         */
+
+    }, {
+        key: 'listGroups',
+        value: function () {
+            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                    while (1) {
+                        switch (_context12.prev = _context12.next) {
+                            case 0:
+                                _context12.next = 2;
+                                return this.performRequest('v1/groups');
+
+                            case 2:
+                                response = _context12.sent;
+                                return _context12.abrupt('return', response.groups);
+
+                            case 4:
+                            case 'end':
+                                return _context12.stop();
+                        }
+                    }
+                }, _callee12, this);
+            }));
+
+            function listGroups() {
+                return _ref12.apply(this, arguments);
+            }
+
+            return listGroups;
+        }()
+
+        /**
+         * Gets a group, including user ids. See https://docs.truevault.com/groups#read-a-group.
+         * @param {string} groupId group id to get.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'getFullGroup',
+        value: function () {
+            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(groupId) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                    while (1) {
+                        switch (_context13.prev = _context13.next) {
+                            case 0:
+                                _context13.next = 2;
+                                return this.performRequest('v1/groups/' + groupId + '?full=true');
+
+                            case 2:
+                                response = _context13.sent;
+                                return _context13.abrupt('return', response.group);
+
+                            case 4:
+                            case 'end':
+                                return _context13.stop();
+                        }
+                    }
+                }, _callee13, this);
+            }));
+
+            function getFullGroup(_x17) {
+                return _ref13.apply(this, arguments);
+            }
+
+            return getFullGroup;
+        }()
+
+        /**
          * Add users to a group. See https://docs.truevault.com/groups#add-users-to-a-group.
          * @param {string} groupId group to add to.
          * @param {Array} userIds user ids to add to the group.
@@ -3838,12 +3997,104 @@ var TrueVaultClient = function () {
                 'Content-Type': 'application/json'
             };
 
-            return this.performRequest('groups/' + groupId + '/membership', {
+            return this.performRequest('v1/groups/' + groupId + '/membership', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({ user_ids: userIds })
             });
         }
+
+        /**
+         * Add users to a group returning user ids. See https://docs.truevault.com/groups#update-a-group.
+         * @param {string} groupId group to add to.
+         * @param {Array} userIds user ids to add to the group.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'addUsersToGroupReturnUserIds',
+        value: function () {
+            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(groupId, userIds) {
+                var formData, response;
+                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                    while (1) {
+                        switch (_context14.prev = _context14.next) {
+                            case 0:
+                                formData = new FormData();
+
+                                formData.append('operation', 'APPEND');
+                                formData.append('user_ids', userIds.join(','));
+
+                                _context14.next = 5;
+                                return this.performRequest('v1/groups/' + groupId, {
+                                    method: 'PUT',
+                                    body: formData
+                                });
+
+                            case 5:
+                                response = _context14.sent;
+                                return _context14.abrupt('return', response.group);
+
+                            case 7:
+                            case 'end':
+                                return _context14.stop();
+                        }
+                    }
+                }, _callee14, this);
+            }));
+
+            function addUsersToGroupReturnUserIds(_x18, _x19) {
+                return _ref14.apply(this, arguments);
+            }
+
+            return addUsersToGroupReturnUserIds;
+        }()
+
+        /**
+         * Remove users from a group. See https://docs.truevault.com/groups#update-a-group
+         * @param {string} groupId group to remove from.
+         * @param {Array} userIds user ids to remove from the group.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'removeUsersFromGroup',
+        value: function () {
+            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(groupId, userIds) {
+                var formData, response;
+                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                    while (1) {
+                        switch (_context15.prev = _context15.next) {
+                            case 0:
+                                formData = new FormData();
+
+                                formData.append('operation', 'REMOVE');
+                                formData.append('user_ids', userIds.join(','));
+
+                                _context15.next = 5;
+                                return this.performRequest('v1/groups/' + groupId, {
+                                    method: 'PUT',
+                                    body: formData
+                                });
+
+                            case 5:
+                                response = _context15.sent;
+                                return _context15.abrupt('return', response.group);
+
+                            case 7:
+                            case 'end':
+                                return _context15.stop();
+                        }
+                    }
+                }, _callee15, this);
+            }));
+
+            function removeUsersFromGroup(_x20, _x21) {
+                return _ref15.apply(this, arguments);
+            }
+
+            return removeUsersFromGroup;
+        }()
 
         /**
          * Create a new vault. See https://docs.truevault.com/vaults#create-a-vault.
@@ -3857,7 +4108,7 @@ var TrueVaultClient = function () {
             var formData = new FormData();
             formData.append("name", name);
 
-            return this.performRequest('vaults', {
+            return this.performRequest('v1/vaults', {
                 method: 'POST',
                 body: formData
             });
@@ -3878,7 +4129,7 @@ var TrueVaultClient = function () {
             var formData = new FormData();
             formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
 
-            return this.performRequest('vaults/' + vaultId + '/schemas', {
+            return this.performRequest('v1/vaults/' + vaultId + '/schemas', {
                 method: 'POST',
                 body: formData
             });
@@ -3905,7 +4156,7 @@ var TrueVaultClient = function () {
             if (!!ownerId) {
                 formData.append('owner_id', ownerId);
             }
-            return this.performRequest('vaults/' + vaultId + '/documents', {
+            return this.performRequest('v1/vaults/' + vaultId + '/documents', {
                 method: 'POST',
                 body: formData
             });
@@ -3923,13 +4174,13 @@ var TrueVaultClient = function () {
     }, {
         key: 'listDocuments',
         value: function () {
-            var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(vaultId, full, page, perPage) {
+            var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(vaultId, full, page, perPage) {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee10$(_context10) {
+                return regeneratorRuntime.wrap(function _callee16$(_context16) {
                     while (1) {
-                        switch (_context10.prev = _context10.next) {
+                        switch (_context16.prev = _context16.next) {
                             case 0:
-                                url = 'vaults/' + vaultId + '/documents?';
+                                url = 'v1/vaults/' + vaultId + '/documents?';
 
                                 if (!!full) {
                                     url += '&full=' + full;
@@ -3940,11 +4191,11 @@ var TrueVaultClient = function () {
                                 if (!!perPage) {
                                     url += '&per_page=' + perPage;
                                 }
-                                _context10.next = 6;
+                                _context16.next = 6;
                                 return this.performRequest(url);
 
                             case 6:
-                                response = _context10.sent;
+                                response = _context16.sent;
 
                                 if (!!full) {
                                     response.data.items = response.data.items.map(function (item) {
@@ -3954,18 +4205,18 @@ var TrueVaultClient = function () {
                                         return item;
                                     });
                                 }
-                                return _context10.abrupt('return', response.data);
+                                return _context16.abrupt('return', response.data);
 
                             case 9:
                             case 'end':
-                                return _context10.stop();
+                                return _context16.stop();
                         }
                     }
-                }, _callee10, this);
+                }, _callee16, this);
             }));
 
-            function listDocuments(_x13, _x14, _x15, _x16) {
-                return _ref10.apply(this, arguments);
+            function listDocuments(_x22, _x23, _x24, _x25) {
+                return _ref16.apply(this, arguments);
             }
 
             return listDocuments;
@@ -3981,20 +4232,20 @@ var TrueVaultClient = function () {
     }, {
         key: 'getDocuments',
         value: function () {
-            var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(vaultId, documentIds) {
+            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(vaultId, documentIds) {
                 var requestDocumentIds, response, documents;
-                return regeneratorRuntime.wrap(function _callee11$(_context11) {
+                return regeneratorRuntime.wrap(function _callee17$(_context17) {
                     while (1) {
-                        switch (_context11.prev = _context11.next) {
+                        switch (_context17.prev = _context17.next) {
                             case 0:
                                 requestDocumentIds = void 0;
 
                                 if (!(documentIds.length === 0)) {
-                                    _context11.next = 5;
+                                    _context17.next = 5;
                                     break;
                                 }
 
-                                return _context11.abrupt('return', []);
+                                return _context17.abrupt('return', []);
 
                             case 5:
                                 if (documentIds.length === 1) {
@@ -4008,36 +4259,36 @@ var TrueVaultClient = function () {
                                 }
 
                             case 6:
-                                _context11.next = 8;
-                                return this.performRequest('vaults/' + vaultId + '/documents/' + requestDocumentIds.join(','));
+                                _context17.next = 8;
+                                return this.performRequest('v1/vaults/' + vaultId + '/documents/' + requestDocumentIds.join(','));
 
                             case 8:
-                                response = _context11.sent;
+                                response = _context17.sent;
                                 documents = response.documents.map(function (doc) {
                                     doc.document = JSON.parse(atob(doc.document));
                                     return doc;
                                 });
 
                                 if (!(documentIds.length === 1)) {
-                                    _context11.next = 12;
+                                    _context17.next = 12;
                                     break;
                                 }
 
-                                return _context11.abrupt('return', [documents[0]]);
+                                return _context17.abrupt('return', [documents[0]]);
 
                             case 12:
-                                return _context11.abrupt('return', documents);
+                                return _context17.abrupt('return', documents);
 
                             case 13:
                             case 'end':
-                                return _context11.stop();
+                                return _context17.stop();
                         }
                     }
-                }, _callee11, this);
+                }, _callee17, this);
             }));
 
-            function getDocuments(_x17, _x18) {
-                return _ref11.apply(this, arguments);
+            function getDocuments(_x26, _x27) {
+                return _ref17.apply(this, arguments);
             }
 
             return getDocuments;
@@ -4056,7 +4307,7 @@ var TrueVaultClient = function () {
             var formData = new FormData();
             formData.append("search_option", btoa(JSON.stringify(searchOption)));
 
-            return this.performRequest('vaults/' + vaultId + '/search', {
+            return this.performRequest('v1/vaults/' + vaultId + '/search', {
                 method: 'POST',
                 body: formData
             });
@@ -4076,7 +4327,7 @@ var TrueVaultClient = function () {
             var formData = new FormData();
             formData.append("document", btoa(JSON.stringify(document)));
 
-            return this.performRequest('vaults/' + vaultId + '/documents/' + documentId, {
+            return this.performRequest('v1/vaults/' + vaultId + '/documents/' + documentId, {
                 method: 'PUT',
                 body: formData
             });
@@ -4092,7 +4343,7 @@ var TrueVaultClient = function () {
     }, {
         key: 'deleteDocument',
         value: function deleteDocument(vaultId, documentId) {
-            return this.performRequest('vaults/' + vaultId + '/documents/' + documentId, {
+            return this.performRequest('v1/vaults/' + vaultId + '/documents/' + documentId, {
                 method: 'DELETE'
             });
         }
@@ -4110,7 +4361,7 @@ var TrueVaultClient = function () {
             var formData = new FormData();
             formData.append('file', file);
 
-            return this.performRequest('vaults/' + vaultId + '/blobs', {
+            return this.performRequest('v1/vaults/' + vaultId + '/blobs', {
                 method: 'POST',
                 body: formData
             });
@@ -4138,7 +4389,7 @@ var TrueVaultClient = function () {
 
                 xhr.upload.addEventListener('progress', progressCallback);
                 xhr.upload.addEventListener('load', progressCallback);
-                xhr.open('post', 'https://api.truevault.com/v1/vaults/' + vaultId + '/blobs');
+                xhr.open('post', _this.host + '/v1/vaults/' + vaultId + '/blobs');
                 xhr.setRequestHeader('Authorization', 'Basic ' + btoa(_this.apiKeyOrAccessToken + ':'));
                 xhr.onload = function () {
                     var responseJson = JSON.parse(xhr.responseText);
@@ -4167,34 +4418,34 @@ var TrueVaultClient = function () {
     }, {
         key: 'getBlob',
         value: function () {
-            var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(vaultId, blobId) {
+            var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18(vaultId, blobId) {
                 var headers, response;
-                return regeneratorRuntime.wrap(function _callee12$(_context12) {
+                return regeneratorRuntime.wrap(function _callee18$(_context18) {
                     while (1) {
-                        switch (_context12.prev = _context12.next) {
+                        switch (_context18.prev = _context18.next) {
                             case 0:
                                 headers = {
                                     Authorization: 'Basic ' + btoa(this.apiKeyOrAccessToken + ':')
                                 };
-                                _context12.next = 3;
-                                return fetch('https://api.truevault.com/v1/vaults/' + vaultId + '/blobs/' + blobId, {
+                                _context18.next = 3;
+                                return fetch(this.host + '/v1/vaults/' + vaultId + '/blobs/' + blobId, {
                                     headers: headers
                                 });
 
                             case 3:
-                                response = _context12.sent;
-                                return _context12.abrupt('return', response.blob());
+                                response = _context18.sent;
+                                return _context18.abrupt('return', response.blob());
 
                             case 5:
                             case 'end':
-                                return _context12.stop();
+                                return _context18.stop();
                         }
                     }
-                }, _callee12, this);
+                }, _callee18, this);
             }));
 
-            function getBlob(_x19, _x20) {
-                return _ref12.apply(this, arguments);
+            function getBlob(_x28, _x29) {
+                return _ref18.apply(this, arguments);
             }
 
             return getBlob;
@@ -4211,13 +4462,13 @@ var TrueVaultClient = function () {
     }, {
         key: 'listBlobs',
         value: function () {
-            var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(vaultId, page, perPage) {
+            var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee19(vaultId, page, perPage) {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee13$(_context13) {
+                return regeneratorRuntime.wrap(function _callee19$(_context19) {
                     while (1) {
-                        switch (_context13.prev = _context13.next) {
+                        switch (_context19.prev = _context19.next) {
                             case 0:
-                                url = 'vaults/' + vaultId + '/blobs?';
+                                url = 'v1/vaults/' + vaultId + '/blobs?';
 
                                 if (!!page) {
                                     url += '&page=' + page;
@@ -4225,23 +4476,23 @@ var TrueVaultClient = function () {
                                 if (!!perPage) {
                                     url += '&per_page=' + perPage;
                                 }
-                                _context13.next = 5;
+                                _context19.next = 5;
                                 return this.performRequest(url);
 
                             case 5:
-                                response = _context13.sent;
-                                return _context13.abrupt('return', response.data);
+                                response = _context19.sent;
+                                return _context19.abrupt('return', response.data);
 
                             case 7:
                             case 'end':
-                                return _context13.stop();
+                                return _context19.stop();
                         }
                     }
-                }, _callee13, this);
+                }, _callee19, this);
             }));
 
-            function listBlobs(_x21, _x22, _x23) {
-                return _ref13.apply(this, arguments);
+            function listBlobs(_x30, _x31, _x32) {
+                return _ref19.apply(this, arguments);
             }
 
             return listBlobs;
@@ -4261,7 +4512,7 @@ var TrueVaultClient = function () {
             var formData = new FormData();
             formData.append('file', file);
 
-            return this.performRequest('vaults/' + vaultId + '/blobs/' + blobId, {
+            return this.performRequest('v1/vaults/' + vaultId + '/blobs/' + blobId, {
                 method: 'PUT',
                 body: formData
             });
@@ -4277,7 +4528,7 @@ var TrueVaultClient = function () {
     }, {
         key: 'deleteBlob',
         value: function deleteBlob(vaultId, blobId) {
-            return this.performRequest('vaults/' + vaultId + '/blobs/' + blobId, {
+            return this.performRequest('v1/vaults/' + vaultId + '/blobs/' + blobId, {
                 method: 'DELETE'
             });
         }
@@ -4296,17 +4547,17 @@ var TrueVaultClient = function () {
     }, {
         key: 'sendEmailSendgrid',
         value: function () {
-            var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14(sendgridApiKey, userId, sendgridTemplateId, fromEmailSpecifier, toEmailSpecifier, substitutions) {
+            var _ref20 = _asyncToGenerator(regeneratorRuntime.mark(function _callee20(sendgridApiKey, userId, sendgridTemplateId, fromEmailSpecifier, toEmailSpecifier, substitutions) {
                 var headers, response;
-                return regeneratorRuntime.wrap(function _callee14$(_context14) {
+                return regeneratorRuntime.wrap(function _callee20$(_context20) {
                     while (1) {
-                        switch (_context14.prev = _context14.next) {
+                        switch (_context20.prev = _context20.next) {
                             case 0:
                                 headers = {
                                     'Content-Type': 'application/json'
                                 };
-                                _context14.next = 3;
-                                return this.performRequest('users/' + userId + '/message/email', {
+                                _context20.next = 3;
+                                return this.performRequest('v1/users/' + userId + '/message/email', {
                                     method: 'POST',
                                     headers: headers,
                                     body: JSON.stringify({
@@ -4320,19 +4571,19 @@ var TrueVaultClient = function () {
                                 });
 
                             case 3:
-                                response = _context14.sent;
-                                return _context14.abrupt('return', response.provider_message_id);
+                                response = _context20.sent;
+                                return _context20.abrupt('return', response.provider_message_id);
 
                             case 5:
                             case 'end':
-                                return _context14.stop();
+                                return _context20.stop();
                         }
                     }
-                }, _callee14, this);
+                }, _callee20, this);
             }));
 
-            function sendEmailSendgrid(_x24, _x25, _x26, _x27, _x28, _x29) {
-                return _ref14.apply(this, arguments);
+            function sendEmailSendgrid(_x33, _x34, _x35, _x36, _x37, _x38) {
+                return _ref20.apply(this, arguments);
             }
 
             return sendEmailSendgrid;
@@ -4340,11 +4591,11 @@ var TrueVaultClient = function () {
     }], [{
         key: 'login',
         value: function () {
-            var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15(accountId, username, password, mfaCode) {
+            var _ref21 = _asyncToGenerator(regeneratorRuntime.mark(function _callee21(accountId, username, password, mfaCode) {
                 var formData, tvClient, response;
-                return regeneratorRuntime.wrap(function _callee15$(_context15) {
+                return regeneratorRuntime.wrap(function _callee21$(_context21) {
                     while (1) {
-                        switch (_context15.prev = _context15.next) {
+                        switch (_context21.prev = _context21.next) {
                             case 0:
                                 formData = new FormData();
 
@@ -4356,28 +4607,28 @@ var TrueVaultClient = function () {
                                 }
 
                                 tvClient = new TrueVaultClient();
-                                _context15.next = 8;
-                                return tvClient.performRequest('auth/login', {
+                                _context21.next = 8;
+                                return tvClient.performRequest('v1/auth/login', {
                                     method: 'POST',
                                     body: formData
                                 });
 
                             case 8:
-                                response = _context15.sent;
+                                response = _context21.sent;
 
                                 tvClient.apiKeyOrAccessToken = response.user.access_token;
-                                return _context15.abrupt('return', tvClient);
+                                return _context21.abrupt('return', tvClient);
 
                             case 11:
                             case 'end':
-                                return _context15.stop();
+                                return _context21.stop();
                         }
                     }
-                }, _callee15, this);
+                }, _callee21, this);
             }));
 
-            function login(_x30, _x31, _x32, _x33) {
-                return _ref15.apply(this, arguments);
+            function login(_x39, _x40, _x41, _x42) {
+                return _ref21.apply(this, arguments);
             }
 
             return login;

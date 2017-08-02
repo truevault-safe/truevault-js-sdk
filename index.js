@@ -9,9 +9,11 @@ class TrueVaultClient {
     /**
      * See https://docs.truevault.com/overview#authentication for more on authentication concepts in TrueVault.
      * @param {string} apiKeyOrAccessToken either an API key or an access token.
+     * @param {string} host optional parameter specifying TV API host; defaults to https://api.truevault.com
      */
-    constructor(apiKeyOrAccessToken) {
+    constructor(apiKeyOrAccessToken, host) {
         this.apiKeyOrAccessToken = apiKeyOrAccessToken;
+        this.host = host || 'https://api.truevault.com';
     }
 
     async performRequest(path, options) {
@@ -24,7 +26,7 @@ class TrueVaultClient {
             }
             options.headers.Authorization = `Basic ${btoa(this.apiKeyOrAccessToken + ':')}`;
         }
-        const response = await fetch(`https://api.truevault.com/v1/${path}`, options);
+        const response = await fetch(`${this.host}/${path}`, options);
         const responseBody = await response.text();
 
         let json;
@@ -63,7 +65,7 @@ class TrueVaultClient {
         }
 
         const tvClient = new TrueVaultClient();
-        const response = await tvClient.performRequest(`auth/login`, {
+        const response = await tvClient.performRequest(`v1/auth/login`, {
             method: 'POST',
             body: formData
         });
@@ -77,7 +79,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async logout() {
-        const response = await this.performRequest(`auth/logout`, {method: 'POST'});
+        const response = await this.performRequest(`v1/auth/logout`, {method: 'POST'});
         this.apiKeyOrAccessToken = null;
         return response;
     }
@@ -87,7 +89,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async readCurrentUser() {
-        const response = await this.performRequest('auth/me?full=true');
+        const response = await this.performRequest('v1/auth/me?full=true');
         const user = response.user;
         if (user.attributes === null) {
             user.attributes = {};
@@ -102,7 +104,7 @@ class TrueVaultClient {
      * @returns {Promise.<Array>}
      */
     async listUsers() {
-        const response = await this.performRequest('users?full=true');
+        const response = await this.performRequest('v1/users?full=true');
         return response.users.map(user => {
             if (user.attributes) {
                 user.attributes = JSON.parse(atob(user.attributes));
@@ -125,7 +127,7 @@ class TrueVaultClient {
         if (attributes) {
             formData.append("attributes", btoa(JSON.stringify(attributes)));
         }
-        const response = await this.performRequest('users', {
+        const response = await this.performRequest('v1/users', {
             method: 'POST',
             body: formData
         });
@@ -142,7 +144,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("password", newPassword);
 
-        const response = await this.performRequest(`users/${userId}`, {
+        const response = await this.performRequest(`v1/users/${userId}`, {
             method: 'PUT',
             body: formData
         });
@@ -155,7 +157,7 @@ class TrueVaultClient {
      * @returns {Promise.<string>}
      */
     async createUserApiKey(userId) {
-        const response = await this.performRequest(`users/${userId}/api_key`, {method: 'POST'});
+        const response = await this.performRequest(`v1/users/${userId}/api_key`, {method: 'POST'});
         return response.api_key;
     }
 
@@ -165,7 +167,7 @@ class TrueVaultClient {
      * @returns {Promise.<string>}
      */
     async createUserAccessToken(userId) {
-        const response = await this.performRequest(`users/${userId}/access_token`, {method: 'POST'});
+        const response = await this.performRequest(`v1/users/${userId}/access_token`, {method: 'POST'});
         return response.user.access_token;
     }
 
@@ -176,7 +178,7 @@ class TrueVaultClient {
      * @returns {Promise.<string>}
      */
     startUserMfaEnrollment(userId, issuer) {
-        return this.performRequest(`users/${userId}/mfa/start_enrollment`, {
+        return this.performRequest(`v1/users/${userId}/mfa/start_enrollment`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({issuer})
@@ -191,7 +193,7 @@ class TrueVaultClient {
      * @returns {Promise.<string>}
      */
     finalizeMfaEnrollment(userId, mfaCode1, mfaCode2) {
-        return this.performRequest(`users/${userId}/mfa/finalize_enrollment`, {
+        return this.performRequest(`v1/users/${userId}/mfa/finalize_enrollment`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({mfa_code_1: mfaCode1, mfa_code_2: mfaCode2})
@@ -206,7 +208,7 @@ class TrueVaultClient {
      * @returns {Promise.<string>}
      */
     unenrollMfa(userId, mfaCode, password) {
-        return this.performRequest(`users/${userId}/mfa/unenroll`, {
+        return this.performRequest(`v1/users/${userId}/mfa/unenroll`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({mfa_code: mfaCode, password: password})
@@ -227,10 +229,63 @@ class TrueVaultClient {
         if (!!userIds) {
             formData.append("user_ids", userIds.join(','));
         }
-        const response = await this.performRequest('groups', {
+        const response = await this.performRequest('v1/groups', {
             method: 'POST',
             body: formData
         });
+        return response.group;
+    }
+
+    /**
+     * Update an existing group's name and policy. See https://docs.truevault.com/groups#update-a-group.
+     * @param {string} name group name.
+     * @param {Object} policy group policy. See https://docs.truevault.com/groups.
+     * @returns {Promise.<Object>}
+     */
+    async updateGroup(groupId, name, policy) {
+        const formData = new FormData();
+        if (!!name) {
+            formData.append("name", name);
+        }
+
+        if (!!policy) {
+            formData.append("policy", btoa(JSON.stringify(policy)));
+        }
+
+        const response = await this.performRequest(`v1/groups/${groupId}`, {
+            method: 'PUT',
+            body: formData
+        });
+        return response.group;
+    }
+
+    /**
+     * Delete a group. See https://docs.truevault.com/groups#delete-a-group.
+     * @param {string} groupId group id to delete.
+     * @returns {Promise.<Object>}
+     */
+    async deleteGroup(groupId) {
+        return this.performRequest(`v1/groups/${groupId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
+     * List all groups. See https://docs.truevault.com/groups#list-all-groups.
+     * @returns {Promise.<Array>}
+     */
+    async listGroups() {
+        const response = await this.performRequest(`v1/groups`);
+        return response.groups;
+    }
+
+    /**
+     * Gets a group, including user ids. See https://docs.truevault.com/groups#read-a-group.
+     * @param {string} groupId group id to get.
+     * @returns {Promise.<Object>}
+     */
+    async getFullGroup(groupId) {
+        const response = await this.performRequest(`v1/groups/${groupId}?full=true`);
         return response.group;
     }
 
@@ -245,11 +300,47 @@ class TrueVaultClient {
             'Content-Type': 'application/json'
         };
 
-        return this.performRequest(`groups/${groupId}/membership`, {
+        return this.performRequest(`v1/groups/${groupId}/membership`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({user_ids: userIds})
         });
+    }
+
+    /**
+     * Add users to a group returning user ids. See https://docs.truevault.com/groups#update-a-group.
+     * @param {string} groupId group to add to.
+     * @param {Array} userIds user ids to add to the group.
+     * @returns {Promise.<Object>}
+     */
+    async addUsersToGroupReturnUserIds(groupId, userIds) {
+        const formData = new FormData();
+        formData.append('operation', 'APPEND');
+        formData.append('user_ids', userIds.join(','));
+
+        const response = await this.performRequest(`v1/groups/${groupId}`, {
+            method: 'PUT',
+            body: formData
+        });
+        return response.group;
+    }
+
+    /**
+     * Remove users from a group. See https://docs.truevault.com/groups#update-a-group
+     * @param {string} groupId group to remove from.
+     * @param {Array} userIds user ids to remove from the group.
+     * @returns {Promise.<Object>}
+     */
+    async removeUsersFromGroup(groupId, userIds) {
+        const formData = new FormData();
+        formData.append('operation', 'REMOVE');
+        formData.append('user_ids', userIds.join(','));
+
+        const response = await this.performRequest(`v1/groups/${groupId}`, {
+            method: 'PUT',
+            body: formData
+        });
+        return response.group;
     }
 
     /**
@@ -261,7 +352,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("name", name);
 
-        return this.performRequest('vaults', {
+        return this.performRequest('v1/vaults', {
             method: 'POST',
             body: formData
         });
@@ -279,7 +370,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
 
-        return this.performRequest(`vaults/${vaultId}/schemas`, {
+        return this.performRequest(`v1/vaults/${vaultId}/schemas`, {
             method: 'POST',
             body: formData
         });
@@ -303,7 +394,7 @@ class TrueVaultClient {
         if (!!ownerId) {
             formData.append('owner_id', ownerId);
         }
-        return this.performRequest(`vaults/${vaultId}/documents`, {
+        return this.performRequest(`v1/vaults/${vaultId}/documents`, {
             method: 'POST',
             body: formData
         });
@@ -318,7 +409,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async listDocuments(vaultId, full, page, perPage) {
-        let url = `vaults/${vaultId}/documents?`;
+        let url = `v1/vaults/${vaultId}/documents?`;
         if (!!full) {
             url += `&full=${full}`;
         }
@@ -360,7 +451,7 @@ class TrueVaultClient {
             requestDocumentIds = documentIds;
         }
 
-        const response = await this.performRequest(`vaults/${vaultId}/documents/${requestDocumentIds.join(',')}`);
+        const response = await this.performRequest(`v1/vaults/${vaultId}/documents/${requestDocumentIds.join(',')}`);
         const documents = response.documents.map(doc => {
             doc.document = JSON.parse(atob(doc.document));
             return doc;
@@ -384,7 +475,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("search_option", btoa(JSON.stringify(searchOption)));
 
-        return this.performRequest(`vaults/${vaultId}/search`, {
+        return this.performRequest(`v1/vaults/${vaultId}/search`, {
             method: 'POST',
             body: formData
         });
@@ -401,7 +492,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("document", btoa(JSON.stringify(document)));
 
-        return this.performRequest(`vaults/${vaultId}/documents/${documentId}`, {
+        return this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
             method: 'PUT',
             body: formData
         });
@@ -414,7 +505,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     deleteDocument(vaultId, documentId) {
-        return this.performRequest(`vaults/${vaultId}/documents/${documentId}`, {
+        return this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
             method: 'DELETE'
         });
     }
@@ -429,7 +520,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append('file', file);
 
-        return this.performRequest(`vaults/${vaultId}/blobs`, {
+        return this.performRequest(`v1/vaults/${vaultId}/blobs`, {
             method: 'POST',
             body: formData
         });
@@ -452,7 +543,7 @@ class TrueVaultClient {
 
             xhr.upload.addEventListener('progress', progressCallback);
             xhr.upload.addEventListener('load', progressCallback);
-            xhr.open('post', `https://api.truevault.com/v1/vaults/${vaultId}/blobs`);
+            xhr.open('post', `${this.host}/v1/vaults/${vaultId}/blobs`);
             xhr.setRequestHeader('Authorization', `Basic ${btoa(this.apiKeyOrAccessToken + ':')}`);
             xhr.onload = () => {
                 const responseJson = JSON.parse(xhr.responseText);
@@ -479,7 +570,7 @@ class TrueVaultClient {
         const headers = {
             Authorization: `Basic ${btoa(this.apiKeyOrAccessToken + ':')}`
         };
-        const response = await fetch(`https://api.truevault.com/v1/vaults/${vaultId}/blobs/${blobId}`, {
+        const response = await fetch(`${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, {
             headers: headers
         });
         return response.blob();
@@ -493,7 +584,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async listBlobs(vaultId, page, perPage) {
-        let url = `vaults/${vaultId}/blobs?`;
+        let url = `v1/vaults/${vaultId}/blobs?`;
         if (!!page) {
             url += `&page=${page}`;
         }
@@ -515,7 +606,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append('file', file);
 
-        return this.performRequest(`vaults/${vaultId}/blobs/${blobId}`, {
+        return this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
             method: 'PUT',
             body: formData
         });
@@ -528,7 +619,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     deleteBlob(vaultId, blobId) {
-        return this.performRequest(`vaults/${vaultId}/blobs/${blobId}`, {
+        return this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
             method: 'DELETE'
         });
     }
@@ -548,7 +639,7 @@ class TrueVaultClient {
         const headers = {
             'Content-Type': 'application/json'
         };
-        const response = await this.performRequest(`users/${userId}/message/email`, {
+        const response = await this.performRequest(`v1/users/${userId}/message/email`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({
