@@ -3561,13 +3561,14 @@ var TrueVaultClient = function () {
          * @param {string} username new user's username.
          * @param {string} password new user's password.
          * @param {Object} [attributes] new user's attributes, if desired.
+         * @param {Array} [groupIds] add user to the given groups, if provided.
          * @returns {Promise.<Object>}
          */
 
     }, {
         key: 'createUser',
         value: function () {
-            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(username, password, attributes) {
+            var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(username, password, attributes, groupIds) {
                 var formData, response;
                 return regeneratorRuntime.wrap(function _callee5$(_context5) {
                     while (1) {
@@ -3580,17 +3581,20 @@ var TrueVaultClient = function () {
                                 if (attributes) {
                                     formData.append("attributes", btoa(JSON.stringify(attributes)));
                                 }
-                                _context5.next = 6;
+                                if (groupIds) {
+                                    formData.append("group_ids", groupIds.join(","));
+                                }
+                                _context5.next = 7;
                                 return this.performRequest('v1/users', {
                                     method: 'POST',
                                     body: formData
                                 });
 
-                            case 6:
+                            case 7:
                                 response = _context5.sent;
                                 return _context5.abrupt('return', response.user);
 
-                            case 8:
+                            case 9:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -3598,7 +3602,7 @@ var TrueVaultClient = function () {
                 }, _callee5, this);
             }));
 
-            function createUser(_x3, _x4, _x5) {
+            function createUser(_x3, _x4, _x5, _x6) {
                 return _ref5.apply(this, arguments);
             }
 
@@ -3643,7 +3647,7 @@ var TrueVaultClient = function () {
                 }, _callee6, this);
             }));
 
-            function updateUserPassword(_x6, _x7) {
+            function updateUserPassword(_x7, _x8) {
                 return _ref6.apply(this, arguments);
             }
 
@@ -3680,7 +3684,7 @@ var TrueVaultClient = function () {
                 }, _callee7, this);
             }));
 
-            function createUserApiKey(_x8) {
+            function createUserApiKey(_x9) {
                 return _ref7.apply(this, arguments);
             }
 
@@ -3717,7 +3721,7 @@ var TrueVaultClient = function () {
                 }, _callee8, this);
             }));
 
-            function createUserAccessToken(_x9) {
+            function createUserAccessToken(_x10) {
                 return _ref8.apply(this, arguments);
             }
 
@@ -3819,7 +3823,7 @@ var TrueVaultClient = function () {
                 }, _callee9, this);
             }));
 
-            function createGroup(_x10, _x11, _x12) {
+            function createGroup(_x11, _x12, _x13) {
                 return _ref9.apply(this, arguments);
             }
 
@@ -3870,7 +3874,7 @@ var TrueVaultClient = function () {
                 }, _callee10, this);
             }));
 
-            function updateGroup(_x13, _x14, _x15) {
+            function updateGroup(_x14, _x15, _x16) {
                 return _ref10.apply(this, arguments);
             }
 
@@ -3903,7 +3907,7 @@ var TrueVaultClient = function () {
                 }, _callee11, this);
             }));
 
-            function deleteGroup(_x16) {
+            function deleteGroup(_x17) {
                 return _ref11.apply(this, arguments);
             }
 
@@ -3976,7 +3980,7 @@ var TrueVaultClient = function () {
                 }, _callee13, this);
             }));
 
-            function getFullGroup(_x17) {
+            function getFullGroup(_x18) {
                 return _ref13.apply(this, arguments);
             }
 
@@ -4043,7 +4047,7 @@ var TrueVaultClient = function () {
                 }, _callee14, this);
             }));
 
-            function addUsersToGroupReturnUserIds(_x18, _x19) {
+            function addUsersToGroupReturnUserIds(_x19, _x20) {
                 return _ref14.apply(this, arguments);
             }
 
@@ -4089,7 +4093,7 @@ var TrueVaultClient = function () {
                 }, _callee15, this);
             }));
 
-            function removeUsersFromGroup(_x20, _x21) {
+            function removeUsersFromGroup(_x21, _x22) {
                 return _ref15.apply(this, arguments);
             }
 
@@ -4215,7 +4219,7 @@ var TrueVaultClient = function () {
                 }, _callee16, this);
             }));
 
-            function listDocuments(_x22, _x23, _x24, _x25) {
+            function listDocuments(_x23, _x24, _x25, _x26) {
                 return _ref16.apply(this, arguments);
             }
 
@@ -4287,7 +4291,7 @@ var TrueVaultClient = function () {
                 }, _callee17, this);
             }));
 
-            function getDocuments(_x26, _x27) {
+            function getDocuments(_x27, _x28) {
                 return _ref17.apply(this, arguments);
             }
 
@@ -4444,7 +4448,7 @@ var TrueVaultClient = function () {
                 }, _callee18, this);
             }));
 
-            function getBlob(_x28, _x29) {
+            function getBlob(_x29, _x30) {
                 return _ref18.apply(this, arguments);
             }
 
@@ -4491,7 +4495,7 @@ var TrueVaultClient = function () {
                 }, _callee19, this);
             }));
 
-            function listBlobs(_x30, _x31, _x32) {
+            function listBlobs(_x31, _x32, _x33) {
                 return _ref19.apply(this, arguments);
             }
 
@@ -4582,7 +4586,7 @@ var TrueVaultClient = function () {
                 }, _callee20, this);
             }));
 
-            function sendEmailSendgrid(_x33, _x34, _x35, _x36, _x37, _x38) {
+            function sendEmailSendgrid(_x34, _x35, _x36, _x37, _x38, _x39) {
                 return _ref20.apply(this, arguments);
             }
 
@@ -4627,7 +4631,7 @@ var TrueVaultClient = function () {
                 }, _callee21, this);
             }));
 
-            function login(_x39, _x40, _x41, _x42) {
+            function login(_x40, _x41, _x42, _x43) {
                 return _ref21.apply(this, arguments);
             }
 

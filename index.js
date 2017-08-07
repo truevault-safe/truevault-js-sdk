@@ -118,14 +118,18 @@ class TrueVaultClient {
      * @param {string} username new user's username.
      * @param {string} password new user's password.
      * @param {Object} [attributes] new user's attributes, if desired.
+     * @param {Array} [groupIds] add user to the given groups, if provided.
      * @returns {Promise.<Object>}
      */
-    async createUser(username, password, attributes) {
+    async createUser(username, password, attributes, groupIds) {
         const formData = new FormData();
         formData.append("username", username);
         formData.append("password", password);
         if (attributes) {
             formData.append("attributes", btoa(JSON.stringify(attributes)));
+        }
+        if (groupIds) {
+            formData.append("group_ids", groupIds.join(","));
         }
         const response = await this.performRequest('v1/users', {
             method: 'POST',
