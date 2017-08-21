@@ -114,6 +114,16 @@ class TrueVaultClient {
     }
 
     /**
+     * Read a single user. See https://docs.truevault.com/users#read-a-user.
+     * @returns {Promise.<Object>}
+     */
+    async readUser(userId) {
+        const response = await this.performRequest(`v1/users/${userId}?full=true`);
+        response.user.attributes = JSON.parse(atob(response.user.attributes));
+        return response.user;
+    }    
+
+    /**
      * Create a new user. See https://docs.truevault.com/users#create-a-user.
      * @param {string} username new user's username.
      * @param {string} password new user's password.
@@ -133,6 +143,40 @@ class TrueVaultClient {
         }
         const response = await this.performRequest('v1/users', {
             method: 'POST',
+            body: formData
+        });
+        return response.user;
+    }
+
+    /**
+     * Update a user's attributes. See https://docs.truevault.com/users#update-a-user.
+     * @param {string} userId the user's userId
+     * @param {Object} attributes 
+     * @returns {Promise.<Object>}
+     */
+    async updateUserAttributes(userId, attributes) {
+        const formData = new FormData();        
+        formData.append("attributes", btoa(JSON.stringify(attributes)));
+        
+        const response = await this.performRequest(`v1/users/${userId}`, {
+            method: 'PUT',
+            body: formData
+        });
+        return response.user;
+    }
+
+    /**
+     * Update a user's status. See https://docs.truevault.com/users#update-a-user.
+     * @param {string} userId the user's userId
+     * @param {Object} status 
+     * @returns {Promise.<Object>}
+     */
+    async updateUserStatus(userId, status) {
+        const formData = new FormData();        
+        formData.append("status", status);
+
+        const response = await this.performRequest(`v1/users/${userId}`, {
+            method: 'PUT',
             body: formData
         });
         return response.user;
