@@ -4229,6 +4229,24 @@ var TrueVaultClient = function () {
         }()
 
         /**
+         * Perform a user search. See https://docs.truevault.com/documentsearch#search-users.
+         * @param {Object} searchOption search query. See https://docs.truevault.com/documentsearch#defining-search-options.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'searchUsers',
+        value: function searchUsers(searchOption) {
+            var formData = new FormData();
+            formData.append("search_option", btoa(JSON.stringify(searchOption)));
+
+            return this.performRequest('v1/users/search', {
+                method: 'POST',
+                body: formData
+            });
+        }
+
+        /**
          * Create a new vault. See https://docs.truevault.com/vaults#create-a-vault.
          * @param {string} name the name of the new vault.
          * @returns {Promise.<Object>}
