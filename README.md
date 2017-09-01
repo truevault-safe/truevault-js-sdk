@@ -37,10 +37,10 @@ const TrueVaultClient = require('truevault');
 
 ## Usage
 
-Initialize a TrueVaultClient using an access token or API key
+Initialize a TrueVaultClient using an access token or API key:
 
 ```javascript
-const tvClient = new TrueVaultClient(apiKeyOrAccessToken);
+const tvClient = new TrueVaultClient({apiKey: 'your api key'});
 ```
 
 You can also create a new TrueVaultClient by logging in:
