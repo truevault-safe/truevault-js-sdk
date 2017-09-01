@@ -716,6 +716,34 @@ class TrueVaultClient {
         });
         return response.provider_message_id;
     }
+
+    /**
+     * Create a password reset flow. See https://docs.truevault.com/PasswordResetFlow.html.
+     * @param {string} name name of this flow
+     * @param {string} sendGridTemplateId SendGrid template id to use when sending password reset emails
+     * @param {string} sendGridApiKey SendGrid API key
+     * @param {Object} userEmailValueSpec Value specifier for the "To" address. See https://docs.truevault.com/email#value-specifiers.
+     * @param {Object} fromEmailValueSpec Value specifier for the "From" address. See https://docs.truevault.com/email#value-specifiers.
+     * @param {Object} substitutions substitutions to use in the template. See https://docs.truevault.com/email#template-substitution.
+     * @returns {Promise.<Object>}
+     */
+    createPasswordResetFlow(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        return this.performRequest(`v1/password_reset_flows`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                name,
+                sg_api_key: sendGridApiKey,
+                sg_template_id: sendGridTemplateId,
+                user_email_value_spec: userEmailValueSpec,
+                from_email_value_spec: fromEmailValueSpec,
+                substitutions
+            })
+        });
+    }
 }
 
 module.exports = TrueVaultClient;
