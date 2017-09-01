@@ -754,11 +754,11 @@ class TrueVaultClient {
      * @param {Object} substitutions substitutions to use in the template. See https://docs.truevault.com/email#template-substitution.
      * @returns {Promise.<Object>}
      */
-    createPasswordResetFlow(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
+    async createPasswordResetFlow(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
         const headers = {
             'Content-Type': 'application/json'
         };
-        return this.performRequest(`v1/password_reset_flows`, {
+        const response = await this.performRequest(`v1/password_reset_flows`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({
@@ -770,6 +770,7 @@ class TrueVaultClient {
                 substitutions
             })
         });
+        return response.password_reset_flow;
     }
 
     /**

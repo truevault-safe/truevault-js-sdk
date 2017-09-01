@@ -4781,23 +4781,48 @@ var TrueVaultClient = function () {
 
     }, {
         key: 'createPasswordResetFlow',
-        value: function createPasswordResetFlow(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
-            var headers = {
-                'Content-Type': 'application/json'
-            };
-            return this.performRequest('v1/password_reset_flows', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify({
-                    name: name,
-                    sg_api_key: sendGridApiKey,
-                    sg_template_id: sendGridTemplateId,
-                    user_email_value_spec: userEmailValueSpec,
-                    from_email_value_spec: fromEmailValueSpec,
-                    substitutions: substitutions
-                })
-            });
-        }
+        value: function () {
+            var _ref24 = _asyncToGenerator(regeneratorRuntime.mark(function _callee24(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
+                var headers, response;
+                return regeneratorRuntime.wrap(function _callee24$(_context24) {
+                    while (1) {
+                        switch (_context24.prev = _context24.next) {
+                            case 0:
+                                headers = {
+                                    'Content-Type': 'application/json'
+                                };
+                                _context24.next = 3;
+                                return this.performRequest('v1/password_reset_flows', {
+                                    method: 'POST',
+                                    headers: headers,
+                                    body: JSON.stringify({
+                                        name: name,
+                                        sg_api_key: sendGridApiKey,
+                                        sg_template_id: sendGridTemplateId,
+                                        user_email_value_spec: userEmailValueSpec,
+                                        from_email_value_spec: fromEmailValueSpec,
+                                        substitutions: substitutions
+                                    })
+                                });
+
+                            case 3:
+                                response = _context24.sent;
+                                return _context24.abrupt('return', response.password_reset_flow);
+
+                            case 5:
+                            case 'end':
+                                return _context24.stop();
+                        }
+                    }
+                }, _callee24, this);
+            }));
+
+            function createPasswordResetFlow(_x45, _x46, _x47, _x48, _x49, _x50) {
+                return _ref24.apply(this, arguments);
+            }
+
+            return createPasswordResetFlow;
+        }()
 
         /**
          * Send a password reset email to a user. See https://docs.truevault.com/PasswordResetFlow.html.
@@ -4823,11 +4848,11 @@ var TrueVaultClient = function () {
     }], [{
         key: 'login',
         value: function () {
-            var _ref24 = _asyncToGenerator(regeneratorRuntime.mark(function _callee24(accountId, username, password, mfaCode, host) {
+            var _ref25 = _asyncToGenerator(regeneratorRuntime.mark(function _callee25(accountId, username, password, mfaCode, host) {
                 var formData, tvClient, response;
-                return regeneratorRuntime.wrap(function _callee24$(_context24) {
+                return regeneratorRuntime.wrap(function _callee25$(_context25) {
                     while (1) {
-                        switch (_context24.prev = _context24.next) {
+                        switch (_context25.prev = _context25.next) {
                             case 0:
                                 formData = new FormData();
 
@@ -4839,28 +4864,28 @@ var TrueVaultClient = function () {
                                 }
 
                                 tvClient = new TrueVaultClient(null, host);
-                                _context24.next = 8;
+                                _context25.next = 8;
                                 return tvClient.performRequest('v1/auth/login', {
                                     method: 'POST',
                                     body: formData
                                 });
 
                             case 8:
-                                response = _context24.sent;
+                                response = _context25.sent;
 
                                 tvClient.authHeader = TrueVaultClient._makeHeaderForUsername(response.user.access_token);
-                                return _context24.abrupt('return', tvClient);
+                                return _context25.abrupt('return', tvClient);
 
                             case 11:
                             case 'end':
-                                return _context24.stop();
+                                return _context25.stop();
                         }
                     }
-                }, _callee24, this);
+                }, _callee25, this);
             }));
 
-            function login(_x45, _x46, _x47, _x48, _x49) {
-                return _ref24.apply(this, arguments);
+            function login(_x51, _x52, _x53, _x54, _x55) {
+                return _ref25.apply(this, arguments);
             }
 
             return login;
