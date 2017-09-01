@@ -8,23 +8,49 @@ class TrueVaultClient {
 
     /**
      * See https://docs.truevault.com/overview#authentication for more on authentication concepts in TrueVault.
-     * @param {string} apiKeyOrAccessToken either an API key or an access token.
+     *
+     * To authenticate, provide one of the following styles of objects based on how you wish to authenticate:
+     *
+     * - { apiKey: 'your API key' }
+     * - { accessToken: 'your access token' }
+     * - { httpBasic: 'http basic base64 string' }
+     * - null, to indicate no authentication is to be provided to the server
+     *
+     * @param {object|null} authn Authentication info, or null if no authentication info is to be used.
      * @param {string} host optional parameter specifying TV API host; defaults to https://api.truevault.com
      */
-    constructor(apiKeyOrAccessToken, host) {
-        this.apiKeyOrAccessToken = apiKeyOrAccessToken;
+    constructor(authn, host) {
+        this.authHeader = null;
+        if (authn === null) {
+            // no auth
+            this.authHeader = null;
+        } else if (typeof authn === 'string') {
+            // old style: api key or access token
+            this.authHeader = TrueVaultClient._makeHeaderForUsername(authn);
+        } else if (typeof authn === 'object') {
+            if (authn.hasOwnProperty('apiKey')) {
+                this.authHeader = TrueVaultClient._makeHeaderForUsername(authn['apiKey'])
+            } else if (authn.hasOwnProperty('accessToken')) {
+                this.authHeader = TrueVaultClient._makeHeaderForUsername(authn['accessToken'])
+            } else if (authn.hasOwnProperty('httpBasic')) {
+                this.authHeader = `Basic ${authn['httpBasic']}`;
+            }
+        } else {
+            throw new Error('Invalid authentication method provided');
+        }
+
         this.host = host || 'https://api.truevault.com';
     }
 
     async performRequest(path, options) {
-        if (!!this.apiKeyOrAccessToken) {
+        if (!!this.authHeader) {
             if (!options) {
                 options = {};
             }
             if (!options.headers) {
                 options.headers = {};
             }
-            options.headers.Authorization = `Basic ${btoa(this.apiKeyOrAccessToken + ':')}`;
+            options.headers.Authorization = this.authHeader;
         }
         const response = await fetch(`${this.host}/${path}`, options);
         const responseBody = await response.text();
@@ -53,9 +79,10 @@ class TrueVaultClient {
      * @param {string} username user's username.
      * @param {string} password user's password.
      * @param {string} [mfaCode] current MFA code, if user has MFA configured.
+     * @param {string} [host] host optional parameter specifying TV API host; defaults to https://api.truevault.com
      * @returns {Promise.<TrueVaultClient>}
      */
-    static async login(accountId, username, password, mfaCode) {
+    static async login(accountId, username, password, mfaCode, host) {
         const formData = new FormData();
         formData.append("account_id", accountId);
         formData.append("username", username);
@@ -64,12 +91,12 @@ class TrueVaultClient {
             formData.append("mfa_code", mfaCode);
         }
 
-        const tvClient = new TrueVaultClient();
+        const tvClient = new TrueVaultClient(null, host);
         const response = await tvClient.performRequest(`v1/auth/login`, {
             method: 'POST',
             body: formData
         });
-        tvClient.apiKeyOrAccessToken = response.user.access_token;
+        tvClient.authHeader = TrueVaultClient._makeHeaderForUsername(response.user.access_token);
         return tvClient;
     }
 
@@ -80,7 +107,7 @@ class TrueVaultClient {
      */
     async logout() {
         const response = await this.performRequest(`v1/auth/logout`, {method: 'POST'});
-        this.apiKeyOrAccessToken = null;
+        this.authHeader = null;
         return response;
     }
 
@@ -121,7 +148,7 @@ class TrueVaultClient {
         const response = await this.performRequest(`v1/users/${userId}?full=true`);
         response.user.attributes = JSON.parse(atob(response.user.attributes));
         return response.user;
-    }    
+    }
 
     /**
      * Create a new user. See https://docs.truevault.com/users#create-a-user.
@@ -151,13 +178,13 @@ class TrueVaultClient {
     /**
      * Update a user's attributes. See https://docs.truevault.com/users#update-a-user.
      * @param {string} userId the user's userId
-     * @param {Object} attributes 
+     * @param {Object} attributes
      * @returns {Promise.<Object>}
      */
     async updateUserAttributes(userId, attributes) {
-        const formData = new FormData();        
+        const formData = new FormData();
         formData.append("attributes", btoa(JSON.stringify(attributes)));
-        
+
         const response = await this.performRequest(`v1/users/${userId}`, {
             method: 'PUT',
             body: formData
@@ -168,11 +195,11 @@ class TrueVaultClient {
     /**
      * Update a user's status. See https://docs.truevault.com/users#update-a-user.
      * @param {string} userId the user's userId
-     * @param {Object} status 
+     * @param {Object} status
      * @returns {Promise.<Object>}
      */
     async updateUserStatus(userId, status) {
-        const formData = new FormData();        
+        const formData = new FormData();
         formData.append("status", status);
 
         const response = await this.performRequest(`v1/users/${userId}`, {
@@ -607,7 +634,7 @@ class TrueVaultClient {
             xhr.upload.addEventListener('progress', progressCallback);
             xhr.upload.addEventListener('load', progressCallback);
             xhr.open('post', `${this.host}/v1/vaults/${vaultId}/blobs`);
-            xhr.setRequestHeader('Authorization', `Basic ${btoa(this.apiKeyOrAccessToken + ':')}`);
+            xhr.setRequestHeader('Authorization', this.authHeader);
             xhr.onload = () => {
                 const responseJson = JSON.parse(xhr.responseText);
                 if (responseJson.result === 'error') {
@@ -631,7 +658,7 @@ class TrueVaultClient {
      */
     async getBlob(vaultId, blobId) {
         const headers = {
-            Authorization: `Basic ${btoa(this.apiKeyOrAccessToken + ':')}`
+            Authorization: this.authHeader
         };
         const response = await fetch(`${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, {
             headers: headers
@@ -744,6 +771,29 @@ class TrueVaultClient {
             })
         });
     }
+
+    /**
+     * Send a password reset email to a user. See https://docs.truevault.com/PasswordResetFlow.html.
+     * @param {string} flowId the flow to use to send a password reset email
+     * @param {string} username
+     * @returns {Promise.<Object>}
+     */
+    sendPasswordResetEmail(flowId, username) {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        return this.performRequest(`v1/password_reset_flows/${flowId}/email`, {
+            method:  'POST',
+            headers: headers,
+            body:    JSON.stringify({
+                username
+            })
+        });
+    }
+
+    static _makeHeaderForUsername(username) {
+        return `Basic ${btoa(username + ':')}`;
+    };
 }
 
 module.exports = TrueVaultClient;

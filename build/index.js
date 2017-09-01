@@ -3326,6 +3326,8 @@ module.exports = g;
 "use strict";
 
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -3342,13 +3344,39 @@ var TrueVaultClient = function () {
 
     /**
      * See https://docs.truevault.com/overview#authentication for more on authentication concepts in TrueVault.
-     * @param {string} apiKeyOrAccessToken either an API key or an access token.
+     *
+     * To authenticate, provide one of the following styles of objects based on how you wish to authenticate:
+     *
+     * - { apiKey: 'your API key' }
+     * - { accessToken: 'your access token' }
+     * - { httpBasic: 'http basic base64 string' }
+     * - null, to indicate no authentication is to be provided to the server
+     *
+     * @param {object|null} authn Authentication info, or null if no authentication info is to be used.
      * @param {string} host optional parameter specifying TV API host; defaults to https://api.truevault.com
      */
-    function TrueVaultClient(apiKeyOrAccessToken, host) {
+    function TrueVaultClient(authn, host) {
         _classCallCheck(this, TrueVaultClient);
 
-        this.apiKeyOrAccessToken = apiKeyOrAccessToken;
+        this.authHeader = null;
+        if (authn === null) {
+            // no auth
+            this.authHeader = null;
+        } else if (typeof authn === 'string') {
+            // old style: api key or access token
+            this.authHeader = TrueVaultClient._makeHeaderForUsername(authn);
+        } else if ((typeof authn === 'undefined' ? 'undefined' : _typeof(authn)) === 'object') {
+            if (authn.hasOwnProperty('apiKey')) {
+                this.authHeader = TrueVaultClient._makeHeaderForUsername(authn['apiKey']);
+            } else if (authn.hasOwnProperty('accessToken')) {
+                this.authHeader = TrueVaultClient._makeHeaderForUsername(authn['accessToken']);
+            } else if (authn.hasOwnProperty('httpBasic')) {
+                this.authHeader = 'Basic ' + authn['httpBasic'];
+            }
+        } else {
+            throw new Error('Invalid authentication method provided');
+        }
+
         this.host = host || 'https://api.truevault.com';
     }
 
@@ -3361,14 +3389,14 @@ var TrueVaultClient = function () {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                if (!!this.apiKeyOrAccessToken) {
+                                if (!!this.authHeader) {
                                     if (!options) {
                                         options = {};
                                     }
                                     if (!options.headers) {
                                         options.headers = {};
                                     }
-                                    options.headers.Authorization = 'Basic ' + btoa(this.apiKeyOrAccessToken + ':');
+                                    options.headers.Authorization = this.authHeader;
                                 }
                                 _context.next = 3;
                                 return fetch(this.host + '/' + path, options);
@@ -3429,6 +3457,7 @@ var TrueVaultClient = function () {
          * @param {string} username user's username.
          * @param {string} password user's password.
          * @param {string} [mfaCode] current MFA code, if user has MFA configured.
+         * @param {string} [host] host optional parameter specifying TV API host; defaults to https://api.truevault.com
          * @returns {Promise.<TrueVaultClient>}
          */
 
@@ -3454,7 +3483,7 @@ var TrueVaultClient = function () {
                             case 2:
                                 response = _context2.sent;
 
-                                this.apiKeyOrAccessToken = null;
+                                this.authHeader = null;
                                 return _context2.abrupt('return', response);
 
                             case 5:
@@ -3650,7 +3679,7 @@ var TrueVaultClient = function () {
         /**
          * Update a user's attributes. See https://docs.truevault.com/users#update-a-user.
          * @param {string} userId the user's userId
-         * @param {Object} attributes 
+         * @param {Object} attributes
          * @returns {Promise.<Object>}
          */
 
@@ -3695,7 +3724,7 @@ var TrueVaultClient = function () {
         /**
          * Update a user's status. See https://docs.truevault.com/users#update-a-user.
          * @param {string} userId the user's userId
-         * @param {Object} status 
+         * @param {Object} status
          * @returns {Promise.<Object>}
          */
 
@@ -4540,7 +4569,7 @@ var TrueVaultClient = function () {
                 xhr.upload.addEventListener('progress', progressCallback);
                 xhr.upload.addEventListener('load', progressCallback);
                 xhr.open('post', _this.host + '/v1/vaults/' + vaultId + '/blobs');
-                xhr.setRequestHeader('Authorization', 'Basic ' + btoa(_this.apiKeyOrAccessToken + ':'));
+                xhr.setRequestHeader('Authorization', _this.authHeader);
                 xhr.onload = function () {
                     var responseJson = JSON.parse(xhr.responseText);
                     if (responseJson.result === 'error') {
@@ -4575,7 +4604,7 @@ var TrueVaultClient = function () {
                         switch (_context21.prev = _context21.next) {
                             case 0:
                                 headers = {
-                                    Authorization: 'Basic ' + btoa(this.apiKeyOrAccessToken + ':')
+                                    Authorization: this.authHeader
                                 };
                                 _context21.next = 3;
                                 return fetch(this.host + '/v1/vaults/' + vaultId + '/blobs/' + blobId, {
@@ -4769,10 +4798,32 @@ var TrueVaultClient = function () {
                 })
             });
         }
+
+        /**
+         * Send a password reset email to a user. See https://docs.truevault.com/PasswordResetFlow.html.
+         * @param {string} flowId the flow to use to send a password reset email
+         * @param {string} username
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'sendPasswordResetEmail',
+        value: function sendPasswordResetEmail(flowId, username) {
+            var headers = {
+                'Content-Type': 'application/json'
+            };
+            return this.performRequest('v1/password_reset_flows/' + flowId + '/email', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    username: username
+                })
+            });
+        }
     }], [{
         key: 'login',
         value: function () {
-            var _ref24 = _asyncToGenerator(regeneratorRuntime.mark(function _callee24(accountId, username, password, mfaCode) {
+            var _ref24 = _asyncToGenerator(regeneratorRuntime.mark(function _callee24(accountId, username, password, mfaCode, host) {
                 var formData, tvClient, response;
                 return regeneratorRuntime.wrap(function _callee24$(_context24) {
                     while (1) {
@@ -4787,7 +4838,7 @@ var TrueVaultClient = function () {
                                     formData.append("mfa_code", mfaCode);
                                 }
 
-                                tvClient = new TrueVaultClient();
+                                tvClient = new TrueVaultClient(null, host);
                                 _context24.next = 8;
                                 return tvClient.performRequest('v1/auth/login', {
                                     method: 'POST',
@@ -4797,7 +4848,7 @@ var TrueVaultClient = function () {
                             case 8:
                                 response = _context24.sent;
 
-                                tvClient.apiKeyOrAccessToken = response.user.access_token;
+                                tvClient.authHeader = TrueVaultClient._makeHeaderForUsername(response.user.access_token);
                                 return _context24.abrupt('return', tvClient);
 
                             case 11:
@@ -4808,12 +4859,17 @@ var TrueVaultClient = function () {
                 }, _callee24, this);
             }));
 
-            function login(_x45, _x46, _x47, _x48) {
+            function login(_x45, _x46, _x47, _x48, _x49) {
                 return _ref24.apply(this, arguments);
             }
 
             return login;
         }()
+    }, {
+        key: '_makeHeaderForUsername',
+        value: function _makeHeaderForUsername(username) {
+            return 'Basic ' + btoa(username + ':');
+        }
     }]);
 
     return TrueVaultClient;
