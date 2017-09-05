@@ -210,6 +210,23 @@ class TrueVaultClient {
     }
 
     /**
+     * Update a user's username. See https://docs.truevault.com/users#update-a-user.
+     * @param {string} userId the user id to change.
+     * @param {string} newUsername user's new username.
+     * @returns {Promise.<Object>}
+     */
+    async updateUserUsername(userId, newUsername) {
+        const formData = new FormData();
+        formData.append("username", newUsername);
+
+        const response = await this.performRequest(`v1/users/${userId}`, {
+            method: 'PUT',
+            body: formData
+        });
+        return response.user;
+    }
+
+    /**
      * Update a user's password. See https://docs.truevault.com/users#update-a-user.
      * @param {string} userId the user id to change.
      * @param {string} newPassword user's new password.
