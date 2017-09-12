@@ -244,6 +244,18 @@ class TrueVaultClient {
     }
 
     /**
+     * Delete a user. See https://docs.truevault.com/users#delete-a-user
+     * @param {string} userId the user id to delete.
+     * @returns {Promise.<Object>}
+     */
+    async deleteUser(userId) {
+        const response = await this.performRequest(`v1/users/${userId}`, {
+            method: 'DELETE',
+        });
+        return response.user;
+    }
+
+    /**
      * Create an API key for a user. See https://docs.truevault.com/users#create-api-key-for-a-user.
      * @param {string} userId user id.
      * @returns {Promise.<string>}
