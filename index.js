@@ -330,9 +330,10 @@ class TrueVaultClient {
 
     /**
      * Update an existing group's name and policy. See https://docs.truevault.com/groups#update-a-group.
+     * @param {string} groupId group id to update.
      * @param {string} name group name.
      * @param {Object} policy group policy. See https://docs.truevault.com/groups.
-     * @returns {Promise.<Object>}
+     * @returns {Promise.<Obje
      */
     async updateGroup(groupId, name, policy) {
         const formData = new FormData();
