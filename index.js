@@ -804,6 +804,20 @@ class TrueVaultClient {
     }
 
     /**
+     * List password reset flows. See https://docs.truevault.com/PasswordResetFlow.html.
+     * @returns {Promise.<Object>}
+     */
+    async listPasswordResetFlows() {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        const response = await this.performRequest(`v1/password_reset_flows`, {
+            headers: headers
+        });
+        return response.password_reset_flows;
+    }
+
+    /**
      * Send a password reset email to a user. See https://docs.truevault.com/PasswordResetFlow.html.
      * @param {string} flowId the flow to use to send a password reset email
      * @param {string} username
