@@ -4910,6 +4910,47 @@ var TrueVaultClient = function () {
         }()
 
         /**
+         * List password reset flows. See https://docs.truevault.com/PasswordResetFlow.html.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'listPasswordResetFlows',
+        value: function () {
+            var _ref27 = _asyncToGenerator(regeneratorRuntime.mark(function _callee27() {
+                var headers, response;
+                return regeneratorRuntime.wrap(function _callee27$(_context27) {
+                    while (1) {
+                        switch (_context27.prev = _context27.next) {
+                            case 0:
+                                headers = {
+                                    'Content-Type': 'application/json'
+                                };
+                                _context27.next = 3;
+                                return this.performRequest('v1/password_reset_flows', {
+                                    headers: headers
+                                });
+
+                            case 3:
+                                response = _context27.sent;
+                                return _context27.abrupt('return', response.password_reset_flows);
+
+                            case 5:
+                            case 'end':
+                                return _context27.stop();
+                        }
+                    }
+                }, _callee27, this);
+            }));
+
+            function listPasswordResetFlows() {
+                return _ref27.apply(this, arguments);
+            }
+
+            return listPasswordResetFlows;
+        }()
+
+        /**
          * Send a password reset email to a user. See https://docs.truevault.com/PasswordResetFlow.html.
          * @param {string} flowId the flow to use to send a password reset email
          * @param {string} username
@@ -4933,11 +4974,11 @@ var TrueVaultClient = function () {
     }], [{
         key: 'login',
         value: function () {
-            var _ref27 = _asyncToGenerator(regeneratorRuntime.mark(function _callee27(accountId, username, password, mfaCode, host) {
+            var _ref28 = _asyncToGenerator(regeneratorRuntime.mark(function _callee28(accountId, username, password, mfaCode, host) {
                 var formData, tvClient, response;
-                return regeneratorRuntime.wrap(function _callee27$(_context27) {
+                return regeneratorRuntime.wrap(function _callee28$(_context28) {
                     while (1) {
-                        switch (_context27.prev = _context27.next) {
+                        switch (_context28.prev = _context28.next) {
                             case 0:
                                 formData = new FormData();
 
@@ -4949,28 +4990,28 @@ var TrueVaultClient = function () {
                                 }
 
                                 tvClient = new TrueVaultClient(null, host);
-                                _context27.next = 8;
+                                _context28.next = 8;
                                 return tvClient.performRequest('v1/auth/login', {
                                     method: 'POST',
                                     body: formData
                                 });
 
                             case 8:
-                                response = _context27.sent;
+                                response = _context28.sent;
 
                                 tvClient.authHeader = TrueVaultClient._makeHeaderForUsername(response.user.access_token);
-                                return _context27.abrupt('return', tvClient);
+                                return _context28.abrupt('return', tvClient);
 
                             case 11:
                             case 'end':
-                                return _context27.stop();
+                                return _context28.stop();
                         }
                     }
-                }, _callee27, this);
+                }, _callee28, this);
             }));
 
             function login(_x54, _x55, _x56, _x57, _x58) {
-                return _ref27.apply(this, arguments);
+                return _ref28.apply(this, arguments);
             }
 
             return login;
