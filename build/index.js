@@ -4975,34 +4975,19 @@ var TrueVaultClient = function () {
         key: 'login',
         value: function () {
             var _ref28 = _asyncToGenerator(regeneratorRuntime.mark(function _callee28(accountId, username, password, mfaCode, host) {
-                var formData, tvClient, response;
+                var accessToken;
                 return regeneratorRuntime.wrap(function _callee28$(_context28) {
                     while (1) {
                         switch (_context28.prev = _context28.next) {
                             case 0:
-                                formData = new FormData();
+                                _context28.next = 2;
+                                return TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host);
 
-                                formData.append("account_id", accountId);
-                                formData.append("username", username);
-                                formData.append("password", password);
-                                if (!!mfaCode) {
-                                    formData.append("mfa_code", mfaCode);
-                                }
+                            case 2:
+                                accessToken = _context28.sent;
+                                return _context28.abrupt('return', new TrueVaultClient({ 'accessToken': accessToken }, host));
 
-                                tvClient = new TrueVaultClient(null, host);
-                                _context28.next = 8;
-                                return tvClient.performRequest('v1/auth/login', {
-                                    method: 'POST',
-                                    body: formData
-                                });
-
-                            case 8:
-                                response = _context28.sent;
-
-                                tvClient.authHeader = TrueVaultClient._makeHeaderForUsername(response.user.access_token);
-                                return _context28.abrupt('return', tvClient);
-
-                            case 11:
+                            case 4:
                             case 'end':
                                 return _context28.stop();
                         }
@@ -5015,6 +5000,61 @@ var TrueVaultClient = function () {
             }
 
             return login;
+        }()
+
+        /**
+         * Log in with a username and password and return the resulting access token.
+         * See https://docs.truevault.com/authentication#login-a-user.
+         * @param {string} accountId account id that the user belongs to.
+         * @param {string} username user's username.
+         * @param {string} password user's password.
+         * @param {string} [mfaCode] current MFA code, if user has MFA configured.
+         * @param {string} [host] host optional parameter specifying TV API host; defaults to https://api.truevault.com
+         * @returns {Promise.<string>}
+         */
+
+    }, {
+        key: 'generateAccessToken',
+        value: function () {
+            var _ref29 = _asyncToGenerator(regeneratorRuntime.mark(function _callee29(accountId, username, password, mfaCode, host) {
+                var formData, tvClient, response;
+                return regeneratorRuntime.wrap(function _callee29$(_context29) {
+                    while (1) {
+                        switch (_context29.prev = _context29.next) {
+                            case 0:
+                                formData = new FormData();
+
+                                formData.append("account_id", accountId);
+                                formData.append("username", username);
+                                formData.append("password", password);
+                                if (!!mfaCode) {
+                                    formData.append("mfa_code", mfaCode);
+                                }
+
+                                tvClient = new TrueVaultClient(null, host);
+                                _context29.next = 8;
+                                return tvClient.performRequest('v1/auth/login', {
+                                    method: 'POST',
+                                    body: formData
+                                });
+
+                            case 8:
+                                response = _context29.sent;
+                                return _context29.abrupt('return', response.user.access_token);
+
+                            case 10:
+                            case 'end':
+                                return _context29.stop();
+                        }
+                    }
+                }, _callee29, this);
+            }));
+
+            function generateAccessToken(_x59, _x60, _x61, _x62, _x63) {
+                return _ref29.apply(this, arguments);
+            }
+
+            return generateAccessToken;
         }()
     }, {
         key: '_makeHeaderForUsername',
