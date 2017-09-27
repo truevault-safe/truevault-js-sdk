@@ -101,3 +101,12 @@ The documentation is available [via GitHub Pages](https://truevault.github.io/tr
 ## License
 
 This SDK is released under the [BSD 3-Clause License](LICENSE).
+
+## Releasing a new version
+
+- Rebuild `build/index.js`; see above
+- Rebuild documentation; see above
+- Update version in `package.json`
+- Commit
+- `npm publish`
+- Tag
