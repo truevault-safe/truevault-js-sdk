@@ -247,6 +247,12 @@
                       </a></li>
                       
                       <li><a
+                        href='#TrueVaultClient#updateDocumentOwner'
+                        class='regular pre-open'>
+                        #updateDocumentOwner
+                      </a></li>
+                      
+                      <li><a
                         href='#TrueVaultClient#deleteDocument'
                         class='regular pre-open'>
                         #deleteDocument
@@ -280,6 +286,12 @@
                         href='#TrueVaultClient#updateBlob'
                         class='regular pre-open'>
                         #updateBlob
+                      </a></li>
+                      
+                      <li><a
+                        href='#TrueVaultClient#updateBlobOwner'
+                        class='regular pre-open'>
+                        #updateBlobOwner
                       </a></li>
                       
                       <li><a
@@ -2949,7 +2961,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>updateDocument(vaultId, documentId, document)</span>
+            <span class='code strong strong truncate'>updateDocument(vaultId, documentId, document, ownerId?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -2960,7 +2972,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
   <p>Update an existing document. See <a href="https://docs.truevault.com/documents#update-a-document">https://docs.truevault.com/documents#update-a-document</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>updateDocument(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, documentId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, document: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
+  <div class='pre p1 fill-light mt0'>updateDocument(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, documentId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, document: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, ownerId: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
   
   
 
@@ -2997,6 +3009,109 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
           <div>
             <span class='code bold'>document</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    new document contents.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ownerId</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?)</code>
+	    the new document owner.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></code>:
+        
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='TrueVaultClient#updateDocumentOwner'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>updateDocumentOwner(vaultId, documentId, ownerId, document)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Update a document's owner. See <a href="https://docs.truevault.com/documents#update-a-document-s-owner">https://docs.truevault.com/documents#update-a-document-s-owner</a>.</p>
+
+
+  <div class='pre p1 fill-light mt0'>updateDocumentOwner(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, documentId: any, ownerId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, document: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>vaultId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    the vault containing the document.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>documentId</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ownerId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    the new document owner, or '' to remove owner.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>document</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    id of the document.
 
           </div>
           
@@ -3112,7 +3227,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>createBlob(vaultId, file)</span>
+            <span class='code strong strong truncate'>createBlob(vaultId, file, ownerId?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -3123,7 +3238,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
   <p>Create a BLOB. See <a href="https://docs.truevault.com/blobs#create-a-blob">https://docs.truevault.com/blobs#create-a-blob</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>createBlob(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, file: (File | <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>)): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
+  <div class='pre p1 fill-light mt0'>createBlob(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, file: (File | <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>), ownerId: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
   
   
 
@@ -3151,6 +3266,15 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
           <div>
             <span class='code bold'>file</span> <code class='quiet'>((File | <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>))</code>
 	    the BLOB's contents.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ownerId</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?)</code>
+	    the BLOB's owner.
 
           </div>
           
@@ -3189,7 +3313,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>createBlobWithProgress(vaultId, file, progressCallback)</span>
+            <span class='code strong strong truncate'>createBlobWithProgress(vaultId, file, progressCallback, ownerId?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -3200,7 +3324,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
   <p>Create a BLOB with a callback for progress updates. See <a href="https://docs.truevault.com/blobs#create-a-blob">https://docs.truevault.com/blobs#create-a-blob</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>createBlobWithProgress(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, file: (File | <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>), progressCallback: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">function</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
+  <div class='pre p1 fill-light mt0'>createBlobWithProgress(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, file: (File | <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>), progressCallback: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">function</a>, ownerId: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
   
   
 
@@ -3241,6 +3365,15 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
  and 
 <code>load</code>
  events.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ownerId</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?)</code>
+	    the BLOB's owner.
 
           </div>
           
@@ -3442,7 +3575,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>updateBlob(vaultId, blobId, file)</span>
+            <span class='code strong strong truncate'>updateBlob(vaultId, blobId, file, ownerId?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -3453,7 +3586,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
   <p>Update a BLOB's contents. See <a href="https://docs.truevault.com/blobs#update-a-blob">https://docs.truevault.com/blobs#update-a-blob</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>updateBlob(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, blobId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, file: (File | <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>)): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
+  <div class='pre p1 fill-light mt0'>updateBlob(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, blobId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, file: (File | <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>), ownerId: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
   
   
 
@@ -3490,6 +3623,101 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
           <div>
             <span class='code bold'>file</span> <code class='quiet'>((File | <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>))</code>
 	    the BLOB's contents.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ownerId</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?)</code>
+	    the new BLOB owner.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></code>:
+        
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='TrueVaultClient#updateBlobOwner'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>updateBlobOwner(vaultId, blobId, ownerId)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Update a BLOB's owner. See <a href="https://docs.truevault.com/blobs#update-a-blob-s-owner">https://docs.truevault.com/blobs#update-a-blob-s-owner</a>.</p>
+
+
+  <div class='pre p1 fill-light mt0'>updateBlobOwner(vaultId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, blobId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, ownerId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>vaultId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    the vault containing the BLOB.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>blobId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    id of the BLOB.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ownerId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    the new BLOB owner, or '' to remove owner.
 
           </div>
           
