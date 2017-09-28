@@ -13341,7 +13341,7 @@ module.exports = function(module) {
 module.exports = {
 	"name": "truevault",
 	"description": "The official TrueVault JavaScript SDK",
-	"version": "0.7.0",
+	"version": "0.8.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truevault/truevault-js-sdk"
