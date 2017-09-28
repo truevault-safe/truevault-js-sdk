@@ -16,6 +16,9 @@
   ],
   "license": "BSD-3-Clause",
   "main": "build/index.js",
+  "dependencies": {
+    "urijs": "^1.18.12"
+  },
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-loader": "^7.0.0",

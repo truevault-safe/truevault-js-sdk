@@ -1,3 +1,6 @@
+import {version} from './package.json'
+let URI = require('urijs');
+
 /**
  * A client for the [TrueVault HTTP API](https://docs.truevault.com/).
  *
@@ -52,7 +55,12 @@ class TrueVaultClient {
             }
             options.headers.Authorization = this.authHeader;
         }
-        const response = await fetch(`${this.host}/${path}`, options);
+
+        const uri = URI(`${this.host}/${path}`)
+            .addQuery("_tv_sdk", version)
+            .toString();
+
+        const response = await fetch(uri, options);
         const responseBody = await response.text();
 
         let json;
