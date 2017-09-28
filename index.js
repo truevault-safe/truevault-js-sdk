@@ -104,6 +104,7 @@ class TrueVaultClient {
             method: 'POST',
             body: formData
         });
+        tvClient.accessToken = response.user.access_token;
         tvClient.authHeader = TrueVaultClient._makeHeaderForUsername(response.user.access_token);
         return tvClient;
     }
