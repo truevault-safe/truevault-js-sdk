@@ -91,6 +91,22 @@ class TrueVaultClient {
      * @returns {Promise.<TrueVaultClient>}
      */
     static async login(accountId, username, password, mfaCode, host) {
+        const accessToken = await TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host);
+
+        return new TrueVaultClient({'accessToken': accessToken}, host);
+    }
+
+    /**
+     * Log in with a username and password and return the resulting access token.
+     * See https://docs.truevault.com/authentication#login-a-user.
+     * @param {string} accountId account id that the user belongs to.
+     * @param {string} username user's username.
+     * @param {string} password user's password.
+     * @param {string} [mfaCode] current MFA code, if user has MFA configured.
+     * @param {string} [host] host optional parameter specifying TV API host; defaults to https://api.truevault.com
+     * @returns {Promise.<string>}
+     */
+    static async generateAccessToken(accountId, username, password, mfaCode, host) {
         const formData = new FormData();
         formData.append("account_id", accountId);
         formData.append("username", username);
@@ -104,8 +120,8 @@ class TrueVaultClient {
             method: 'POST',
             body: formData
         });
-        tvClient.authHeader = TrueVaultClient._makeHeaderForUsername(response.user.access_token);
-        return tvClient;
+
+        return response.user.access_token;
     }
 
     /**
