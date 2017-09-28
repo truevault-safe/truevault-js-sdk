@@ -511,7 +511,7 @@ class TrueVaultClient {
         if (!!schemaId) {
             formData.append('schema_id', schemaId);
         }
-        if (!!ownerId) {
+        if (typeof ownerId === 'string') {
             formData.append('owner_id', ownerId);
         }
         return this.performRequest(`v1/vaults/${vaultId}/documents`, {
@@ -606,13 +606,35 @@ class TrueVaultClient {
      * @param {string} vaultId vault that contains the document.
      * @param {string} documentId document id to update.
      * @param {Object} document new document contents.
+     * @param {string|null} [ownerId] the new document owner.
      * @returns {Promise.<Object>}
      */
-    updateDocument(vaultId, documentId, document) {
+    updateDocument(vaultId, documentId, document, ownerId) {
         const formData = new FormData();
         formData.append("document", btoa(JSON.stringify(document)));
 
+        if (typeof ownerId === 'string') {
+            formData.append("owner_id", ownerId);
+        }
+
         return this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
+            method: 'PUT',
+            body: formData
+        });
+    }
+
+    /**
+     * Update a document's owner. See https://docs.truevault.com/documents#update-a-document-s-owner.
+     * @param {string} vaultId the vault containing the document.
+     * @param {string} document id of the document.
+     * @param {string} ownerId the new document owner, or '' to remove owner.
+     * @returns {Promise.<Object>}
+     */
+    updateDocumentOwner(vaultId, documentId, ownerId) {
+        const formData = new FormData();
+        formData.append('owner_id', ownerId);
+
+        return this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}/owner`, {
             method: 'PUT',
             body: formData
         });
@@ -634,11 +656,16 @@ class TrueVaultClient {
      * Create a BLOB. See https://docs.truevault.com/blobs#create-a-blob.
      * @param {string} vaultId vault that will contain the blob.
      * @param {File|Blob} file the BLOB's contents.
+     * @param {string|null} [ownerId] the BLOB's owner.
      * @returns {Promise.<Object>}
      */
-    createBlob(vaultId, file) {
+    createBlob(vaultId, file, ownerId) {
         const formData = new FormData();
         formData.append('file', file);
+
+        if (typeof ownerId === 'string') {
+            formData.append('owner_id', ownerId);
+        }
 
         return this.performRequest(`v1/vaults/${vaultId}/blobs`, {
             method: 'POST',
@@ -651,15 +678,20 @@ class TrueVaultClient {
      * @param {string} vaultId vault that will contain the blob.
      * @param {File|Blob} file the BLOB's contents.
      * @param {function} progressCallback callback for XHR's `progress` and `load` events.
+     * @param {string|null} [ownerId] the BLOB's owner.
      * @returns {Promise.<Object>}
      */
-    createBlobWithProgress(vaultId, file, progressCallback) {
+    createBlobWithProgress(vaultId, file, progressCallback, ownerId) {
         // We are using XMLHttpRequest here since fetch does not have a progress API
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
 
             const formData = new FormData();
             formData.append('file', file);
+
+            if (typeof ownerId === 'string') {
+                formData.append('owner_id', ownerId);
+            }
 
             xhr.upload.addEventListener('progress', progressCallback);
             xhr.upload.addEventListener('load', progressCallback);
@@ -720,13 +752,35 @@ class TrueVaultClient {
      * @param {string} vaultId the vault containing the BLOB.
      * @param {string} blobId id of the BLOB.
      * @param {File|Blob} file the BLOB's contents.
+     * @param {string|null} [ownerId] the new BLOB owner.
      * @returns {Promise.<Object>}
      */
-    updateBlob(vaultId, blobId, file) {
+    updateBlob(vaultId, blobId, file, ownerId) {
         const formData = new FormData();
         formData.append('file', file);
 
+        if (typeof ownerId === 'string') {
+            formData.append('owner_id', ownerId);
+        }
+
         return this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
+            method: 'PUT',
+            body: formData
+        });
+    }
+
+    /**
+     * Update a BLOB's owner. See https://docs.truevault.com/blobs#update-a-blob-s-owner.
+     * @param {string} vaultId the vault containing the BLOB.
+     * @param {string} blobId id of the BLOB.
+     * @param {string} ownerId the new BLOB owner, or '' to remove owner.
+     * @returns {Promise.<Object>}
+     */
+    updateBlobOwner(vaultId, blobId, ownerId) {
+        const formData = new FormData();
+        formData.append('owner_id', ownerId);
+
+        return this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}/owner`, {
             method: 'PUT',
             body: formData
         });
