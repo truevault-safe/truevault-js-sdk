@@ -5982,6 +5982,66 @@ var TrueVaultClient = function () {
         }()
 
         /**
+         * Send an SMS message to a user via Twilio.
+         * @param {string} twilioAccountSid Twilio Account Sid. See https://www.twilio.com/console
+         * @param {string} twilioKeySid Twilio Key Sid. See https://www.twilio.com/docs/api/rest/keys
+         * @param {string} twilioKeySecret Twilio Key Secret. See https://www.twilio.com/docs/api/rest/keys
+         * @param {string} userId the user to send to.
+         * @param {string} fromNumberSpecifier the specifier for the "From" phone number. See https://docs.truevault.com/email#value-specifiers.
+         * @param {string} toNumberSpecifier the specifier for the "To" phone number. See https://docs.truevault.com/email#value-specifiers.
+         * @param {Object} messageBody The text to send in the body of the message
+         * @returns {Promise.<String>}
+         */
+
+    }, {
+        key: 'sendSMSTwilio',
+        value: function () {
+            var _ref26 = _asyncToGenerator(regeneratorRuntime.mark(function _callee26(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody) {
+                var headers, response;
+                return regeneratorRuntime.wrap(function _callee26$(_context26) {
+                    while (1) {
+                        switch (_context26.prev = _context26.next) {
+                            case 0:
+                                headers = {
+                                    'Content-Type': 'application/json'
+                                };
+                                _context26.next = 3;
+                                return this.performRequest('v1/users/' + userId + '/message/sms', {
+                                    method: 'POST',
+                                    headers: headers,
+                                    body: JSON.stringify({
+                                        provider: 'TWILIO',
+                                        auth: {
+                                            account_sid: twilioAccountSid,
+                                            username: twilioKeySid,
+                                            password: twilioKeySecret
+                                        },
+                                        from_number: fromNumberSpecifier,
+                                        to_number: toNumberSpecifier,
+                                        message_body: messageBody
+                                    })
+                                });
+
+                            case 3:
+                                response = _context26.sent;
+                                return _context26.abrupt('return', response.provider_message_id);
+
+                            case 5:
+                            case 'end':
+                                return _context26.stop();
+                        }
+                    }
+                }, _callee26, this);
+            }));
+
+            function sendSMSTwilio(_x48, _x49, _x50, _x51, _x52, _x53, _x54) {
+                return _ref26.apply(this, arguments);
+            }
+
+            return sendSMSTwilio;
+        }()
+
+        /**
          * Create a password reset flow. See https://docs.truevault.com/PasswordResetFlow.html.
          * @param {string} name name of this flow
          * @param {string} sendGridTemplateId SendGrid template id to use when sending password reset emails
@@ -5995,16 +6055,16 @@ var TrueVaultClient = function () {
     }, {
         key: 'createPasswordResetFlow',
         value: function () {
-            var _ref26 = _asyncToGenerator(regeneratorRuntime.mark(function _callee26(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
+            var _ref27 = _asyncToGenerator(regeneratorRuntime.mark(function _callee27(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
                 var headers, response;
-                return regeneratorRuntime.wrap(function _callee26$(_context26) {
+                return regeneratorRuntime.wrap(function _callee27$(_context27) {
                     while (1) {
-                        switch (_context26.prev = _context26.next) {
+                        switch (_context27.prev = _context27.next) {
                             case 0:
                                 headers = {
                                     'Content-Type': 'application/json'
                                 };
-                                _context26.next = 3;
+                                _context27.next = 3;
                                 return this.performRequest('v1/password_reset_flows', {
                                     method: 'POST',
                                     headers: headers,
@@ -6019,19 +6079,19 @@ var TrueVaultClient = function () {
                                 });
 
                             case 3:
-                                response = _context26.sent;
-                                return _context26.abrupt('return', response.password_reset_flow);
+                                response = _context27.sent;
+                                return _context27.abrupt('return', response.password_reset_flow);
 
                             case 5:
                             case 'end':
-                                return _context26.stop();
+                                return _context27.stop();
                         }
                     }
-                }, _callee26, this);
+                }, _callee27, this);
             }));
 
-            function createPasswordResetFlow(_x48, _x49, _x50, _x51, _x52, _x53) {
-                return _ref26.apply(this, arguments);
+            function createPasswordResetFlow(_x55, _x56, _x57, _x58, _x59, _x60) {
+                return _ref27.apply(this, arguments);
             }
 
             return createPasswordResetFlow;
@@ -6045,34 +6105,34 @@ var TrueVaultClient = function () {
     }, {
         key: 'listPasswordResetFlows',
         value: function () {
-            var _ref27 = _asyncToGenerator(regeneratorRuntime.mark(function _callee27() {
+            var _ref28 = _asyncToGenerator(regeneratorRuntime.mark(function _callee28() {
                 var headers, response;
-                return regeneratorRuntime.wrap(function _callee27$(_context27) {
+                return regeneratorRuntime.wrap(function _callee28$(_context28) {
                     while (1) {
-                        switch (_context27.prev = _context27.next) {
+                        switch (_context28.prev = _context28.next) {
                             case 0:
                                 headers = {
                                     'Content-Type': 'application/json'
                                 };
-                                _context27.next = 3;
+                                _context28.next = 3;
                                 return this.performRequest('v1/password_reset_flows', {
                                     headers: headers
                                 });
 
                             case 3:
-                                response = _context27.sent;
-                                return _context27.abrupt('return', response.password_reset_flows);
+                                response = _context28.sent;
+                                return _context28.abrupt('return', response.password_reset_flows);
 
                             case 5:
                             case 'end':
-                                return _context27.stop();
+                                return _context28.stop();
                         }
                     }
-                }, _callee27, this);
+                }, _callee28, this);
             }));
 
             function listPasswordResetFlows() {
-                return _ref27.apply(this, arguments);
+                return _ref28.apply(this, arguments);
             }
 
             return listPasswordResetFlows;
@@ -6102,29 +6162,29 @@ var TrueVaultClient = function () {
     }], [{
         key: 'login',
         value: function () {
-            var _ref28 = _asyncToGenerator(regeneratorRuntime.mark(function _callee28(accountId, username, password, mfaCode, host) {
+            var _ref29 = _asyncToGenerator(regeneratorRuntime.mark(function _callee29(accountId, username, password, mfaCode, host) {
                 var accessToken;
-                return regeneratorRuntime.wrap(function _callee28$(_context28) {
+                return regeneratorRuntime.wrap(function _callee29$(_context29) {
                     while (1) {
-                        switch (_context28.prev = _context28.next) {
+                        switch (_context29.prev = _context29.next) {
                             case 0:
-                                _context28.next = 2;
+                                _context29.next = 2;
                                 return TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host);
 
                             case 2:
-                                accessToken = _context28.sent;
-                                return _context28.abrupt('return', new TrueVaultClient({ 'accessToken': accessToken }, host));
+                                accessToken = _context29.sent;
+                                return _context29.abrupt('return', new TrueVaultClient({ 'accessToken': accessToken }, host));
 
                             case 4:
                             case 'end':
-                                return _context28.stop();
+                                return _context29.stop();
                         }
                     }
-                }, _callee28, this);
+                }, _callee29, this);
             }));
 
-            function login(_x54, _x55, _x56, _x57, _x58) {
-                return _ref28.apply(this, arguments);
+            function login(_x61, _x62, _x63, _x64, _x65) {
+                return _ref29.apply(this, arguments);
             }
 
             return login;
@@ -6144,11 +6204,11 @@ var TrueVaultClient = function () {
     }, {
         key: 'generateAccessToken',
         value: function () {
-            var _ref29 = _asyncToGenerator(regeneratorRuntime.mark(function _callee29(accountId, username, password, mfaCode, host) {
+            var _ref30 = _asyncToGenerator(regeneratorRuntime.mark(function _callee30(accountId, username, password, mfaCode, host) {
                 var formData, tvClient, response;
-                return regeneratorRuntime.wrap(function _callee29$(_context29) {
+                return regeneratorRuntime.wrap(function _callee30$(_context30) {
                     while (1) {
-                        switch (_context29.prev = _context29.next) {
+                        switch (_context30.prev = _context30.next) {
                             case 0:
                                 formData = new FormData();
 
@@ -6160,26 +6220,26 @@ var TrueVaultClient = function () {
                                 }
 
                                 tvClient = new TrueVaultClient(null, host);
-                                _context29.next = 8;
+                                _context30.next = 8;
                                 return tvClient.performRequest('v1/auth/login', {
                                     method: 'POST',
                                     body: formData
                                 });
 
                             case 8:
-                                response = _context29.sent;
-                                return _context29.abrupt('return', response.user.access_token);
+                                response = _context30.sent;
+                                return _context30.abrupt('return', response.user.access_token);
 
                             case 10:
                             case 'end':
-                                return _context29.stop();
+                                return _context30.stop();
                         }
                     }
-                }, _callee29, this);
+                }, _callee30, this);
             }));
 
-            function generateAccessToken(_x59, _x60, _x61, _x62, _x63) {
-                return _ref29.apply(this, arguments);
+            function generateAccessToken(_x66, _x67, _x68, _x69, _x70) {
+                return _ref30.apply(this, arguments);
             }
 
             return generateAccessToken;
