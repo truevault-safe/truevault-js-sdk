@@ -5396,6 +5396,78 @@ var TrueVaultClient = function () {
         }
 
         /**
+         * Create the user schema. See https://docs.truevault.com/schemas#create-the-user-schema
+         * @param {string} accountId account id that the user schema belongs to.
+         * @param {string} name the name of the schema.
+         * @param {Array} fields field metadata for the schema. See https://docs.truevault.com/schemas.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'createUserSchema',
+        value: function createUserSchema(accountId, name, fields) {
+            var schemaDefinition = { name: name, fields: fields };
+            var formData = new FormData();
+            formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
+
+            return this.performRequest('v1/accounts/' + accountId + '/user_schema', {
+                method: 'POST',
+                body: formData
+            });
+        }
+
+        /**
+         * Read the user schema. See https://docs.truevault.com/schemas#read-the-user-schema
+         * @param {string} accountId account id that the user schema belongs to.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'readUserSchema',
+        value: function readUserSchema(accountId) {
+            return this.performRequest('v1/accounts/' + accountId + '/user_schema', {
+                method: 'GET',
+                body: new FormData()
+            });
+        }
+
+        /**
+         * Update the user schema. See https://docs.truevault.com/schemas#create-the-user-schema
+         * @param {string} accountId account id that the user schema belongs to.
+         * @param {string} name the name of the schema.
+         * @param {Array} fields field metadata for the schema. See https://docs.truevault.com/schemas.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'updateUserSchema',
+        value: function updateUserSchema(accountId, name, fields) {
+            var schemaDefinition = { name: name, fields: fields };
+            var formData = new FormData();
+            formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
+
+            return this.performRequest('v1/accounts/' + accountId + '/user_schema', {
+                method: 'PUT',
+                body: formData
+            });
+        }
+
+        /**
+         * Delete the user schema. See https://docs.truevault.com/schemas#create-the-user-schema
+         * @param {string} accountId account id that the user schema belongs to.
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'deleteUserSchema',
+        value: function deleteUserSchema(accountId) {
+            return this.performRequest('v1/accounts/' + accountId + '/user_schema', {
+                method: 'DELETE',
+                body: new FormData()
+            });
+        }
+
+        /**
          * Create a new document. See https://docs.truevault.com/documents#create-a-document.
          * @param {string} vaultId vault to place the document in.
          * @param {string|null} schemaId schema to associate with the document.
