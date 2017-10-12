@@ -913,6 +913,41 @@ class TrueVaultClient {
     }
 
     /**
+     * Send an SMS message to a user via Twilio.
+     * @param {string} twilioAccountSid Twilio Account Sid. See https://www.twilio.com/console
+     * @param {string} twilioKeySid Twilio Key Sid. See https://www.twilio.com/docs/api/rest/keys
+     * @param {string} twilioKeySecret Twilio Key Secret. See https://www.twilio.com/docs/api/rest/keys
+     * @param {string} userId the user to send to.
+     * @param {string} fromNumberSpecifier the specifier for the "From" phone number. See https://docs.truevault.com/email#value-specifiers.
+     * @param {string} toNumberSpecifier the specifier for the "To" phone number. See https://docs.truevault.com/email#value-specifiers.
+     * @param {Object} messageBody The text to send in the body of the message
+     * @returns {Promise.<String>}
+     */
+    async sendSMSTwilio(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody) {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        const response = await this.performRequest(`v1/users/${userId}/message/sms`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                provider: 'TWILIO',
+                auth: {
+                    account_sid: twilioAccountSid,
+                    username: twilioKeySid,
+                    password: twilioKeySecret
+                },
+                from_number: fromNumberSpecifier,
+                to_number: toNumberSpecifier,
+                message_body: messageBody
+            })
+        });
+
+        return response.provider_message_id;
+    }
+
+    /**
      * Create a password reset flow. See https://docs.truevault.com/PasswordResetFlow.html.
      * @param {string} name name of this flow
      * @param {string} sendGridTemplateId SendGrid template id to use when sending password reset emails
