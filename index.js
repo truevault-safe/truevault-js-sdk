@@ -921,9 +921,10 @@ class TrueVaultClient {
      * @param {string} fromNumberSpecifier the specifier for the "From" phone number. See https://docs.truevault.com/email#value-specifiers.
      * @param {string} toNumberSpecifier the specifier for the "To" phone number. See https://docs.truevault.com/email#value-specifiers.
      * @param {Object} messageBody The text to send in the body of the message
+     * @param {Array} mediaURLs Optional array of value specifiers producing URLs of images to include in the message. See https://docs.truevault.com/email#value-specifiers.
      * @returns {Promise.<String>}
      */
-    async sendSMSTwilio(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody) {
+    async sendSMSTwilio(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody, mediaURLs) {
         const headers = {
             'Content-Type': 'application/json'
         };
@@ -940,7 +941,8 @@ class TrueVaultClient {
                 },
                 from_number: fromNumberSpecifier,
                 to_number: toNumberSpecifier,
-                message_body: messageBody
+                message_body: messageBody,
+                media_urls: mediaURLs || []
             })
         });
 
