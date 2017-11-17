@@ -5990,13 +5990,14 @@ var TrueVaultClient = function () {
          * @param {string} fromNumberSpecifier the specifier for the "From" phone number. See https://docs.truevault.com/email#value-specifiers.
          * @param {string} toNumberSpecifier the specifier for the "To" phone number. See https://docs.truevault.com/email#value-specifiers.
          * @param {Object} messageBody The text to send in the body of the message
+         * @param {Array} mediaURLs Optional array of value specifiers producing URLs of images to include in the message. See https://docs.truevault.com/email#value-specifiers.
          * @returns {Promise.<String>}
          */
 
     }, {
         key: 'sendSMSTwilio',
         value: function () {
-            var _ref26 = _asyncToGenerator(regeneratorRuntime.mark(function _callee26(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody) {
+            var _ref26 = _asyncToGenerator(regeneratorRuntime.mark(function _callee26(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody, mediaURLs) {
                 var headers, response;
                 return regeneratorRuntime.wrap(function _callee26$(_context26) {
                     while (1) {
@@ -6018,7 +6019,8 @@ var TrueVaultClient = function () {
                                         },
                                         from_number: fromNumberSpecifier,
                                         to_number: toNumberSpecifier,
-                                        message_body: messageBody
+                                        message_body: messageBody,
+                                        media_urls: mediaURLs || []
                                     })
                                 });
 
@@ -6034,7 +6036,7 @@ var TrueVaultClient = function () {
                 }, _callee26, this);
             }));
 
-            function sendSMSTwilio(_x48, _x49, _x50, _x51, _x52, _x53, _x54) {
+            function sendSMSTwilio(_x48, _x49, _x50, _x51, _x52, _x53, _x54, _x55) {
                 return _ref26.apply(this, arguments);
             }
 
@@ -6090,7 +6092,7 @@ var TrueVaultClient = function () {
                 }, _callee27, this);
             }));
 
-            function createPasswordResetFlow(_x55, _x56, _x57, _x58, _x59, _x60) {
+            function createPasswordResetFlow(_x56, _x57, _x58, _x59, _x60, _x61) {
                 return _ref27.apply(this, arguments);
             }
 
@@ -6183,7 +6185,7 @@ var TrueVaultClient = function () {
                 }, _callee29, this);
             }));
 
-            function login(_x61, _x62, _x63, _x64, _x65) {
+            function login(_x62, _x63, _x64, _x65, _x66) {
                 return _ref29.apply(this, arguments);
             }
 
@@ -6238,7 +6240,7 @@ var TrueVaultClient = function () {
                 }, _callee30, this);
             }));
 
-            function generateAccessToken(_x66, _x67, _x68, _x69, _x70) {
+            function generateAccessToken(_x67, _x68, _x69, _x70, _x71) {
                 return _ref30.apply(this, arguments);
             }
 
@@ -13473,7 +13475,7 @@ module.exports = function(module) {
 module.exports = {
 	"name": "truevault",
 	"description": "The official TrueVault JavaScript SDK",
-	"version": "0.8.0",
+	"version": "0.9.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truevault/truevault-js-sdk"
