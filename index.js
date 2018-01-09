@@ -182,7 +182,7 @@ class TrueVaultClient {
      * @param {Array} [groupIds] add user to the given groups, if provided.
      * @returns {Promise.<Object>}
      */
-    async createUser(username, password, attributes, groupIds) {
+    async createUser(username, password, attributes, groupIds, status) {
         const formData = new FormData();
         formData.append("username", username);
         formData.append("password", password);
@@ -191,6 +191,9 @@ class TrueVaultClient {
         }
         if (groupIds) {
             formData.append("group_ids", groupIds.join(","));
+        }
+        if (status) {
+            formData.append("status", status);
         }
         const response = await this.performRequest('v1/users', {
             method: 'POST',
@@ -546,7 +549,6 @@ class TrueVaultClient {
     readUserSchema(accountId) {
         return this.performRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'GET',
-            body: new FormData()
         });
     }
 
