@@ -175,6 +175,15 @@ class TrueVaultClient {
     }
 
     /**
+     * Reads multiple users. See https://docs.truevault.com/users#read-a-user.
+     * @returns {Promise.<Array>}
+     */
+    async readUsers(userIds) {
+        const response = await this.performRequest(`v2/users/${userIds.join(',')}?full=true`);
+        return response.users;
+    }
+
+    /**
      * Create a new user. See https://docs.truevault.com/users#create-a-user.
      * @param {string} username new user's username.
      * @param {string} password new user's password.
