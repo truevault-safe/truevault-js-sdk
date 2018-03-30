@@ -231,7 +231,7 @@ class TrueVaultClient {
     /**
      * Update a user's status. See https://docs.truevault.com/users#update-a-user.
      * @param {string} userId the user's userId
-     * @param {Object} status
+     * @param {string} status
      * @returns {Promise.<Object>}
      */
     async updateUserStatus(userId, status) {
@@ -358,7 +358,7 @@ class TrueVaultClient {
     /**
      * Create a new group. See https://docs.truevault.com/groups#create-a-group.
      * @param {string} name group name.
-     * @param {Object} policy group policy. See https://docs.truevault.com/groups.
+     * @param {Array} policy group policy. See https://docs.truevault.com/groups.
      * @param {Array} [userIds] user ids to add to the group.
      * @returns {Promise.<Object>}
      */
@@ -380,7 +380,7 @@ class TrueVaultClient {
      * Update an existing group's name and policy. See https://docs.truevault.com/groups#update-a-group.
      * @param {string} groupId group id to update.
      * @param {string} name group name.
-     * @param {Object} policy group policy. See https://docs.truevault.com/groups.
+     * @param {Array} policy group policy. See https://docs.truevault.com/groups.
      * @returns {Promise.<Object>}
      */
     async updateGroup(groupId, name, policy) {
