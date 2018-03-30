@@ -17,6 +17,8 @@
   "license": "BSD-3-Clause",
   "main": "build/index.js",
   "dependencies": {
+    "isomorphic-fetch": "^2.2.1",
+    "isomorphic-form-data": "^1.0.0",
     "urijs": "^1.18.12"
   },
   "devDependencies": {

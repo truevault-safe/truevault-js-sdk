@@ -1,5 +1,7 @@
 import {version} from './package.json'
 let URI = require('urijs');
+require('isomorphic-fetch');
+require('isomorphic-form-data');
 
 /**
  * A client for the [TrueVault HTTP API](https://docs.truevault.com/).
@@ -820,7 +822,7 @@ class TrueVaultClient {
         const response = await fetch(`${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, {
             headers: headers
         });
-        return response.blob();
+        return response.blob ? response.blob() : response.body;
     }
 
     /**
