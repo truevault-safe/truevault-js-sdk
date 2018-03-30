@@ -88,7 +88,9 @@ Make changes to `index.js` and then bundle them into `build/index.js` with webpa
 
 `yarn webpack`
 
-The integration tests are built with [Jest](https://facebook.github.io/jest/docs/en/getting-started.html). To run them, do `yarn jest`.
+The integration tests are built with [Jest](https://facebook.github.io/jest/docs/en/getting-started.html). To run them,
+first copy `test.env.template` to `test.env` and populate `test.env` with values from your account. To run tests, do
+`yarn jest`.
 
 ## Documentation
 

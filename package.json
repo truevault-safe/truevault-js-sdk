@@ -28,8 +28,12 @@
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.5.2",
     "documentation": "^4.0.0-rc.1",
+    "dotenv": "^5.0.1",
     "jest": "^22.4.3",
+    "jest-json-schema": "^2.0.0",
+    "otplib": "^8.0.1",
     "regenerator-runtime": "^0.11.1",
+    "uuid": "^3.2.1",
     "webpack": "^2.6.1"
   }
 }
