@@ -511,6 +511,9 @@ test('vaults and docs', async () => {
     const indexedDoc = await client.createDocument(vaultId, newSchema.id, {foo: "bar"});
     expect(indexedDoc).toMatchSchema(documentSchema);
 
+    const docsInSchema = await client.listDocumentsInSchema(vaultId, newSchema.id, true);
+    expect(docsInSchema).toMatchSchema(docListSchema);
+
     const searchResultsNotFull = await client.searchDocuments(vaultId, {
         schema_id: newSchema.id,
         filter: {

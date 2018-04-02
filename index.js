@@ -850,6 +850,37 @@ class TrueVaultClient {
         }
         return response.data;
     }
+    /**
+     * List documents in a schema. See https://docs.truevault.com/documents#list-all-documents-with-schema
+     * @param {string} vaultId vault to look in.
+     * @param {string} schemaId
+     * @param {boolean} [full] include document contents in listing.
+     * @param {number} [page] which page to get, if pagination is needed.
+     * @param {number} [perPage] number of documents per page.
+     * @returns {Promise.<Object>}
+     */
+    async listDocumentsInSchema(vaultId, schemaId, full, page, perPage) {
+        let url = `v1/vaults/${vaultId}/schemas/${schemaId}/documents?`;
+        if (!!full) {
+            url += `&full=${full}`;
+        }
+        if (!!page) {
+            url += `&page=${page}`;
+        }
+        if (!!perPage) {
+            url += `&per_page=${perPage}`;
+        }
+        const response = await this.performRequest(url);
+        if (!!full) {
+            response.data.items = response.data.items.map(item => {
+                if (item.document) {
+                    item.document = JSON.parse(atob(item.document));
+                }
+                return item;
+            });
+        }
+        return response.data;
+    }
 
     /**
      * Get the contents of one or more documents. See https://docs.truevault.com/documents#read-a-document.
