@@ -53,12 +53,15 @@ test('login fails with invalid credentials', async () => {
     }
 });
 
-test('logout clears authHeader', async () => {
+test('login', async () => {
     const loginUserUsername = uniqueString();
     const loginUserPassword = 'testpassword';
     await client.createUser(loginUserUsername, loginUserPassword);
 
     const loginClient = await TrueVault.login(TEST_ACCOUNT_UUID, loginUserUsername, loginUserPassword, undefined, TEST_TRUEVAULT_HOST);
+
+    expect(loginClient.accessToken).toMatch(/[a-z0-9.-]+/);
+
     expect(await loginClient.logout()).toMatchSchema(RESPONSE_SCHEMA);
     expect(loginClient.authHeader).toBeNull();
 });

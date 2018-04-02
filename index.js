@@ -21,30 +21,49 @@ class TrueVaultClient {
      * - { httpBasic: 'http basic base64 string' }
      * - null, to indicate no authentication is to be provided to the server
      *
-     * @param {object|null} authn Authentication info, or null if no authentication info is to be used.
+     * @param {object} authn Authentication info, or null if no authentication info is to be used.
      * @param {string} host optional parameter specifying TV API host; defaults to https://api.truevault.com
      */
     constructor(authn, host) {
-        this.authHeader = null;
-        if (authn === null) {
+        this._authHeader = null;
+        if (!authn) {
             // no auth
-            this.authHeader = null;
-        } else if (typeof authn === 'string') {
-            // old style: api key or access token
-            this.authHeader = TrueVaultClient._makeHeaderForUsername(authn);
+            this._authHeader = null;
         } else if (typeof authn === 'object') {
             if (authn.hasOwnProperty('apiKey')) {
-                this.authHeader = TrueVaultClient._makeHeaderForUsername(authn['apiKey'])
+                this._authHeader = TrueVaultClient._makeHeaderForUsername(authn['apiKey'])
             } else if (authn.hasOwnProperty('accessToken')) {
-                this.authHeader = TrueVaultClient._makeHeaderForUsername(authn['accessToken'])
+                this._accessToken = authn['accessToken'];
+                this._authHeader = TrueVaultClient._makeHeaderForUsername(this.accessToken)
             } else if (authn.hasOwnProperty('httpBasic')) {
-                this.authHeader = `Basic ${authn['httpBasic']}`;
+                this._authHeader = `Basic ${authn['httpBasic']}`;
             }
         } else {
             throw new Error('Invalid authentication method provided');
         }
 
         this.host = host || 'https://api.truevault.com';
+    }
+
+    /**
+     * Returns the TrueVault access token that was supplied in the constructor/returned from the login call. Throws
+     * if the client was created without an access token (e. g. created with an API key).
+     * @returns {string}
+     */
+    get accessToken() {
+        if (!this._accessToken) {
+            throw new Error('No access token set. This client may have been configured with an API key or a custom auth header');
+        }
+        return this._accessToken;
+    }
+
+    /**
+     * Returns the Authentication: header used for making requests (e. g. "Basic ABC123"). Useful if you need to make
+     * raw requests for some reason.
+     * @returns {*}
+     */
+    get authHeader() {
+        return this._authHeader;
     }
 
     async performRequest(path, options) {
@@ -83,7 +102,8 @@ class TrueVaultClient {
 
     /**
      * Useful when you want to create a client starting from a user's username and password as opposed to an API key
-     * or access token.
+     * or access token. The resulting TrueVaultClient has an accessToken property you can use to retrieve the raw
+     * TrueVault access token if needed (e. g. to save in localStorage).
      * See https://docs.truevault.com/authentication#login-a-user.
      * @param {string} accountId account id that the user belongs to.
      * @param {string} username user's username.
@@ -133,7 +153,7 @@ class TrueVaultClient {
      */
     async logout() {
         const response = await this.performRequest(`v1/auth/logout`, {method: 'POST'});
-        this.authHeader = null;
+        this._authHeader = null;
         return response;
     }
 
