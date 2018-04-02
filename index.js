@@ -586,6 +586,23 @@ class TrueVaultClient {
     }
 
     /**
+     * Lists all vaults. See https://docs.truevault.com/vaults#list-all-vaults.
+     * @param [page=1]
+     * @param [per_page=100]
+     * @returns {Promise<*>}
+     */
+    async listVaults(page, per_page) {
+        if (typeof page !== "number") {
+            page = 1;
+        }
+        if (typeof per_page !== "number") {
+            per_page = 100
+        }
+        const response = await this.performRequest(`v1/vaults?page=${page}&per_page=${per_page}`);
+        return response.vaults;
+    }
+
+    /**
      * Create a new vault. See https://docs.truevault.com/vaults#create-a-vault.
      * @param {string} name the name of the new vault.
      * @returns {Promise.<Object>}
@@ -598,6 +615,48 @@ class TrueVaultClient {
             method: 'POST',
             body: formData
         });
+        return response.vault;
+    }
+
+    /**
+     * Read a vault. See https://docs.truevault.com/vaults#read-a-vault
+     * @param vaultId
+     * @returns {Promise<Object>}
+     */
+    async readVault(vaultId) {
+        const response = await this.performRequest(`v1/vaults/${vaultId}`);
+
+        return response.vault;
+    }
+
+    /**
+     * Update a vault. See https://docs.truevault.com/vaults#update-a-vault
+     * @param vaultId
+     * @param name
+     * @returns {Promise<Object>}
+     */
+    async updateVault(vaultId, name) {
+        const formData = new FormData();
+        formData.append('name', name);
+
+        const response = await this.performRequest(`v1/vaults/${vaultId}`, {
+            method: 'PUT',
+            body: formData
+        });
+
+        return response.vault;
+    }
+
+    /**
+     * Delete a vault. See https://docs.truevault.com/vaults#delete-a-vault
+     * @param vaultId
+     * @returns {Promise<Object>}
+     */
+    async deleteVault(vaultId) {
+        const response = await this.performRequest(`v1/vaults/${vaultId}`, {
+            method: 'DELETE'
+        });
+
         return response.vault;
     }
 

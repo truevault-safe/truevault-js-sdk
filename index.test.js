@@ -386,8 +386,21 @@ test('blobs', async () => {
 });
 
 test('vaults and docs', async () => {
-    const vaultName = uniqueString();
-    const newVault = await client.createVault(vaultName);
+    const vaults = await client.listVaults();
+    const vaultSchema = {
+        type: 'object',
+        properties: {
+            id: {type: 'string', format: 'uuid'},
+            name: {type: 'string'}
+        },
+        required: ['id', 'name']
+    };
+    expect(vaults).toMatchSchema({
+        type: 'array',
+        items: vaultSchema
+    });
+
+    const newVault = await client.createVault(uniqueString());
     expect(newVault).toMatchSchema({
         type: 'object',
         properties: {
@@ -396,6 +409,14 @@ test('vaults and docs', async () => {
         }
     });
     const vaultId = newVault.id;
+
+    const vaultFromTV = await client.readVault(vaultId);
+    expect(vaultFromTV).toMatchSchema(vaultSchema);
+
+    const newVaultName = uniqueString();
+    const updatedVault = await client.updateVault(vaultId, newVaultName);
+    expect(updatedVault).toMatchSchema(vaultSchema);
+    expect(updatedVault.name).toBe(newVaultName);
 
     const docAttributes = {foo: "bar"};
     const newDoc = await client.createDocument(vaultId, undefined, docAttributes);
@@ -549,6 +570,11 @@ test('vaults and docs', async () => {
         },
         required: ['id']
     });
+
+    const vaultToDelete = await client.createVault(uniqueString());
+
+    const deleteVaultResponse = await client.deleteVault(vaultToDelete.id);
+    expect(deleteVaultResponse).toMatchSchema(vaultSchema);
 });
 
 test('password reset flow', async () => {
