@@ -198,6 +198,9 @@ test('users', async () => {
     };
     expect(newUser).toMatchSchema(userSchemaWithUsername);
 
+    const newUserWithStatus = await client.createUser(uniqueString(), uniqueString(), {}, [], 'PENDING');
+    expect(newUserWithStatus.status).toBe('PENDING');
+
     const users = await client.listUsers();
     expect(users).toMatchSchema({
         type: 'array',

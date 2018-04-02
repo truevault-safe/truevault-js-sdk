@@ -235,6 +235,7 @@ class TrueVaultClient {
      * @param {string} password new user's password.
      * @param {Object} [attributes] new user's attributes, if desired.
      * @param {Array} [groupIds] add user to the given groups, if provided.
+     * @param {string} status the newly created user's status
      * @returns {Promise.<Object>}
      */
     async createUser(username, password, attributes, groupIds, status) {
