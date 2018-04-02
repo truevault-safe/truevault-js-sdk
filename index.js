@@ -950,14 +950,19 @@ class TrueVaultClient {
      * @param {string} documentId document id to update.
      * @param {Object} document new document contents.
      * @param {string|null} [ownerId] the new document owner.
+     * @param {string|null} [schemaId] the new document schema.
      * @returns {Promise.<Object>}
      */
-    async updateDocument(vaultId, documentId, document, ownerId) {
+    async updateDocument(vaultId, documentId, document, ownerId, schemaId) {
         const formData = new FormData();
         formData.append("document", btoa(JSON.stringify(document)));
 
         if (typeof ownerId === 'string') {
             formData.append("owner_id", ownerId);
+        }
+
+        if (typeof schemaId === 'string') {
+            formData.append("schema_id", schemaId);
         }
 
         const response = await this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {

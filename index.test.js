@@ -494,6 +494,9 @@ test('vaults and docs', async () => {
     };
     expect(newSchema).toMatchSchema(schemaSchema);
 
+    const addedDocToSchemaResponse = await client.updateDocument(vaultId, newDocId, {}, null, newSchema.id);
+    expect(addedDocToSchemaResponse).toMatchSchema(documentSchema);
+
     const schemaFromTrueVault = await client.readSchema(vaultId, newSchema.id);
     expect(schemaFromTrueVault.name).toBe(newSchemaName);
     expect(schemaFromTrueVault).toMatchSchema(schemaSchema);
