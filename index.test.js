@@ -15,6 +15,19 @@ expect.extend(matchersWithOptions({
     schemas: []
 }));
 
+const USER_SCHEMA = {
+    type: 'object',
+    properties: {
+        account_id: {type: 'string', format: 'uuid'},
+        id: {type: 'string', format: 'uuid'},
+        status: {type: 'string'},
+        username: {type: 'string'},
+        mfa_enrolled: {type: 'boolean'},
+        attributes: {type: ['null', 'object']}
+    },
+    required: ['account_id', 'id', 'status', 'username', 'mfa_enrolled']
+};
+
 const TEST_TRUEVAULT_HOST = process.env.TEST_TRUEVAULT_HOST;
 const TEST_ACCOUNT_UUID = process.env.TEST_ACCOUNT_UUID;
 const TEST_USER_API_KEY = process.env.TEST_USER_API_KEY;
@@ -42,16 +55,13 @@ test('login', async () => {
 
     expect(loginClient.accessToken).toMatch(/[a-z0-9.-]+/);
 
-    expect(await loginClient.logout()).toMatchSchema({
-        type: 'object',
-        properties: {
-            account_id: {type: 'string', format: 'uuid'},
-            id: {type: 'string', format: 'uuid'},
-            username: {type: 'string'},
-            mfa_enrolled: {type: 'boolean'}
-        },
-        required: ['account_id', 'id', 'username', 'mfa_enrolled']
-    });
+    const currentUser = await loginClient.readCurrentUser(false);
+    expect(currentUser.attributes).toBe(undefined);
+
+    const currentUserFull = await loginClient.readCurrentUser();
+    expect(currentUserFull.attributes).toEqual({});
+
+    expect(await loginClient.logout()).toMatchSchema(USER_SCHEMA);
     expect(loginClient.authHeader).toBeNull();
 });
 
@@ -75,18 +85,7 @@ test('error handling', async () => {
 
 test('readCurrentUser', async () => {
     const user = await client.readCurrentUser();
-    expect(user).toMatchSchema({
-        type: 'object',
-        properties: {
-            account_id: {type: 'string', format: 'uuid'},
-            id: {type: 'string', format: 'uuid'},
-            status: {type: 'string'},
-            username: {type: 'string'},
-            mfa_enrolled: {type: 'boolean'},
-            attributes: {type: 'object'}
-        },
-        required: ['account_id', 'id', 'status', 'username', 'mfa_enrolled', 'attributes']
-    });
+    expect(user).toMatchSchema(USER_SCHEMA);
 });
 
 test('groups', async () => {
@@ -292,6 +291,12 @@ test('users', async () => {
 
     const newUserDeleted = await client.deleteUser(newUser.id);
     expect(newUserDeleted).toMatchSchema(userSchemaWithUsername);
+
+    const updateCurrentUserResult = await client.updateCurrentUser(null);
+    expect(updateCurrentUserResult).toMatchSchema(USER_SCHEMA);
+
+    const currentUserAfterUpdate = await client.readCurrentUser();
+    expect(currentUserAfterUpdate.attributes).toBe(null);
 });
 
 test('user mfa', async () => {

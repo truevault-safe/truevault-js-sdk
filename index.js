@@ -184,14 +184,38 @@ class TrueVaultClient {
 
     /**
      * Get data about the authenticated user. See https://docs.truevault.com/authentication#verify-a-user.
+     * @param [full=true] Whether to include user attributes and groups
      * @returns {Promise.<Object>}
      */
-    async readCurrentUser() {
-        const response = await this.performRequest('v1/auth/me?full=true');
+    async readCurrentUser(full) {
+        if (full !== false) {
+            full = true;
+        }
+
+        const response = await this.performRequest(`v1/auth/me?full=${full}`);
         const user = response.user;
-        if (user.attributes === null) {
-            user.attributes = {};
-        } else {
+        if (user.attributes) {
+            user.attributes = JSON.parse(atob(user.attributes));
+        }
+        return user;
+    }
+
+    /**
+     * Updates the currently authenticated user's attributes. See https://docs.truevault.com/authentication#verify-a-user.
+     * @param attributes
+     * @returns {Promise<Object>}
+     */
+    async updateCurrentUser(attributes) {
+        const formData = new FormData();
+        formData.append("attributes", btoa(JSON.stringify(attributes)));
+
+        const response = await this.performRequest('v1/auth/me?full=true', {
+            method: 'PUT',
+            body: formData
+        });
+
+        const user = response.user;
+        if (user.attributes) {
             user.attributes = JSON.parse(atob(user.attributes));
         }
         return user;
