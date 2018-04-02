@@ -535,14 +535,26 @@ class TrueVaultClient {
      * @param {Object} searchOption search query. See https://docs.truevault.com/documentsearch#defining-search-options.
      * @returns {Promise.<Object>}
      */
-    searchUsers(searchOption) {
+    async searchUsers(searchOption) {
         const formData = new FormData();
         formData.append("search_option", btoa(JSON.stringify(searchOption)));
 
-        return this.performRequest(`v1/users/search`, {
+        const response = await this.performRequest(`v1/users/search`, {
             method: 'POST',
             body: formData
         });
+
+        const documents = response.data.documents.map(doc => {
+            if (doc.attributes) {
+                doc.attributes = JSON.parse(atob(doc.attributes));
+            }
+            return doc;
+        });
+
+        return {
+            info: response.data.info,
+            documents
+        };
     }
 
     /**
@@ -732,14 +744,26 @@ class TrueVaultClient {
      * @param {Object} searchOption search query. See https://docs.truevault.com/documentsearch#defining-search-options.
      * @returns {Promise.<Object>}
      */
-    searchDocuments(vaultId, searchOption) {
+    async searchDocuments(vaultId, searchOption) {
         const formData = new FormData();
         formData.append("search_option", btoa(JSON.stringify(searchOption)));
 
-        return this.performRequest(`v1/vaults/${vaultId}/search`, {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/search`, {
             method: 'POST',
             body: formData
         });
+
+        const documents = response.data.documents.map(doc => {
+            if (doc.document) {
+                doc.document = JSON.parse(atob(doc.document));
+            }
+            return doc;
+        });
+
+        return {
+            info: response.data.info,
+            documents
+        };
     }
 
     /**

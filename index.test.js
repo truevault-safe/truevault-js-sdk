@@ -61,7 +61,7 @@ test('error handling', async () => {
     try {
         await TrueVault.login(TEST_ACCOUNT_UUID, 'invalid', 'invalid', undefined, TEST_TRUEVAULT_HOST);
         fail('Should have thrown');
-    } catch(e) {
+    } catch (e) {
         expect(e.error).toMatchSchema({
             type: 'object',
             properties: {
@@ -217,7 +217,7 @@ test('users', async () => {
     const userUpdatedAttributes = await client.updateUserAttributes(newUser.id, {foo: uniqueAttributeValue});
     expect(userUpdatedAttributes).toMatchSchema(userSchemaWithUsername);
 
-    const searchResult = await client.searchUsers({
+    const searchResultNotFull = await client.searchUsers({
         "filter": {
             "foo": {
                 "type": "eq",
@@ -225,35 +225,68 @@ test('users', async () => {
             }
         }
     });
-    expect(searchResult).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
+    expect(searchResultNotFull).toMatchSchema({
+        type: 'object',
         properties: {
-            data: {
+            documents: {
+                type: 'array',
+                items: {
+                    type: 'object',
+                    properties: {
+                        id: {type: 'string', format: 'uuid'}
+                    },
+                    required: ['id']
+                }
+            },
+            info: {
                 type: 'object',
                 properties: {
-                    documents: {
-                        type: 'array',
-                        items: {
-                            type: 'object',
-                            properties: {
-                                id: {type: 'string', format: 'uuid'}
-                            },
-                            required: ['id']
-                        }
-                    },
-                    info: {
-                        type: 'object',
-                        properties: {
-                            current_page: {type: 'integer'},
-                            num_pages: {type: 'integer'},
-                            total_result_count: {type: 'integer'}
-                        },
-                        required: ['current_page', 'num_pages', 'total_result_count']
-                    }
+                    current_page: {type: 'integer'},
+                    num_pages: {type: 'integer'},
+                    total_result_count: {type: 'integer'},
+                    per_page: {type: 'integer'}
                 },
-                required: ['documents', 'info']
+                required: ['current_page', 'num_pages', 'total_result_count', 'per_page']
+            }
+        },
+        required: ['documents', 'info']
+    });
+
+    const searchResultFull = await client.searchUsers({
+        "full_document": true,
+        "filter": {
+            "foo": {
+                "type": "eq",
+                "value": uniqueAttributeValue
             }
         }
+    });
+    expect(searchResultFull).toMatchSchema({
+        type: 'object',
+        properties: {
+            documents: {
+                type: 'array',
+                items: {
+                    type: 'object',
+                    properties: {
+                        id: {type: 'string', format: 'uuid'},
+                        attributes: {type: ['null', 'object']},
+                    },
+                    required: ['id', 'attributes']
+                }
+            },
+            info: {
+                type: 'object',
+                properties: {
+                    current_page: {type: 'integer'},
+                    num_pages: {type: 'integer'},
+                    total_result_count: {type: 'integer'},
+                    per_page: {type: 'integer'}
+                },
+                required: ['current_page', 'num_pages', 'total_result_count', 'per_page']
+            }
+        },
+        required: ['documents', 'info']
     });
 
     const newUserAccessToken = await client.createUserAccessToken(newUser.id);
@@ -499,27 +532,61 @@ test('vaults and docs', async () => {
         }
     });
     expect(searchResultsNotFull).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
+        type: 'object',
         properties: {
-            data: {
+            documents: {type: 'array'},
+            info: {
                 type: 'object',
                 properties: {
-                    documents: {type: 'array'},
-                    info: {
-                        type: 'object',
-                        properties: {
-                            current_page: {type: 'integer'},
-                            num_pages: {type: 'integer'},
-                            per_page: {type: 'integer'},
-                            total_result_count: {type: 'integer'}
-                        },
-                        required: ['current_page', 'num_pages', 'per_page', 'total_result_count']
-                    }
+                    current_page: {type: 'integer'},
+                    num_pages: {type: 'integer'},
+                    per_page: {type: 'integer'},
+                    total_result_count: {type: 'integer'}
                 },
-                required: ['documents', 'info']
+                required: ['current_page', 'num_pages', 'per_page', 'total_result_count']
             }
         },
-        required: ['data']
+        required: ['documents', 'info']
+    });
+
+    const searchResultsFull = await client.searchDocuments(vaultId, {
+        schema_id: newSchema.id,
+        full_document: true,
+        filter: {
+            foo: {
+                type: "eq",
+                value: "bar"
+            }
+        }
+    });
+
+    expect(searchResultsFull).toMatchSchema({
+        type: 'object',
+        properties: {
+            documents: {
+                type: 'array',
+                items: {
+                    type: 'object',
+                    properties: {
+                        document_id: {type: 'string', format: 'uuid'},
+                        owner_id: {type: ['string', 'null'], format: 'uuid'},
+                        document: {type: 'object'}
+                    },
+                    required: ['document_id', 'owner_id', 'document']
+                }
+            },
+            info: {
+                type: 'object',
+                properties: {
+                    current_page: {type: 'integer'},
+                    num_pages: {type: 'integer'},
+                    per_page: {type: 'integer'},
+                    total_result_count: {type: 'integer'}
+                },
+                required: ['current_page', 'num_pages', 'per_page', 'total_result_count']
+            }
+        },
+        required: ['documents', 'info']
     });
 
     const deleteDocumentResponse = await client.deleteDocument(vaultId, newDocId);
