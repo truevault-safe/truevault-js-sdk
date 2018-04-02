@@ -9,21 +9,10 @@ import {Readable} from 'stream';
 import fs from 'fs';
 import {matchersWithOptions} from 'jest-json-schema';
 
-const RESPONSE_SCHEMA_ID = 'http://truevault.com/schemas/response';
-const RESPONSE_SCHEMA = {
-    '$id': RESPONSE_SCHEMA_ID,
-    type: 'object',
-    properties: {
-        result: {type: 'string', enum: ['success']},
-        transaction_id: {type: 'string', format: 'uuid'}
-    },
-    required: ['result', 'transaction_id']
-};
-
 expect.extend(matchersWithOptions({
     allErrors: true,
     verbose: true,
-    schemas: [RESPONSE_SCHEMA]
+    schemas: []
 }));
 
 const TEST_TRUEVAULT_HOST = process.env.TEST_TRUEVAULT_HOST;
@@ -53,7 +42,16 @@ test('login', async () => {
 
     expect(loginClient.accessToken).toMatch(/[a-z0-9.-]+/);
 
-    expect(await loginClient.logout()).toMatchSchema(RESPONSE_SCHEMA);
+    expect(await loginClient.logout()).toMatchSchema({
+        type: 'object',
+        properties: {
+            account_id: {type: 'string', format: 'uuid'},
+            id: {type: 'string', format: 'uuid'},
+            username: {type: 'string'},
+            mfa_enrolled: {type: 'boolean'}
+        },
+        required: ['account_id', 'id', 'username', 'mfa_enrolled']
+    });
     expect(loginClient.authHeader).toBeNull();
 });
 
@@ -129,7 +127,7 @@ test('groups', async () => {
     const newUser = await client.createUser(uniqueString(), uniqueString());
 
     const addUsersResult = await client.addUsersToGroup(newGroup.id, [newUser.id]);
-    expect(addUsersResult).toMatchSchema(RESPONSE_SCHEMA);
+    expect(addUsersResult).toBe(undefined);
 
     const removeUsersResult = await client.removeUsersFromGroup(newGroup.id, [newUser.id]);
     expect(removeUsersResult).toMatchSchema(groupSchema);
@@ -138,12 +136,7 @@ test('groups', async () => {
     expect(addUsersReturnIdsResult).toMatchSchema(groupSchema);
 
     const deleteResult = await client.deleteGroup(newGroup.id);
-    expect(deleteResult).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
-        properties: {
-            group: groupSchema
-        }
-    })
+    expect(deleteResult).toMatchSchema(groupSchema);
 });
 
 test('users', async () => {
@@ -165,19 +158,9 @@ test('users', async () => {
             vault_id: {type: 'string', format: 'uuid'}
         }
     };
-    expect(updateSchemaResponse).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
-        properties: {
-            schema: schemaSchema
-        }
-    });
+    expect(updateSchemaResponse).toMatchSchema(schemaSchema);
     const readUserSchemaResponse = await client.readUserSchema(TEST_ACCOUNT_UUID);
-    expect(readUserSchemaResponse).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
-        properties: {
-            schema: schemaSchema
-        }
-    });
+    expect(readUserSchemaResponse).toMatchSchema(schemaSchema);
 
     // In practice, deleting UserSchema always fails because there's at least one user
     try {
@@ -316,8 +299,18 @@ test('user mfa', async () => {
     const newUserPassword = 'password';
     const newUser = await client.createUser(newUsername, newUserPassword);
 
-    const mfaEnrollmentResult = await client.startUserMfaEnrollment(newUser.id, 'js-integration-tests');
-    const secret = mfaEnrollmentResult.mfa.secret;
+    const mfaEnrollmentInfo = await client.startUserMfaEnrollment(newUser.id, 'js-integration-tests');
+    expect(mfaEnrollmentInfo).toMatchSchema({
+        type: 'object',
+        properties: {
+            qr_code_svg: {type: 'string'},
+            secret: {type: 'string'},
+            uri: {type: 'string'}
+        },
+        required: ['qr_code_svg', 'secret', 'uri']
+    });
+
+    const secret = mfaEnrollmentInfo.secret;
 
     const token1 = otplib.authenticator.generate(secret);
 
@@ -326,36 +319,30 @@ test('user mfa', async () => {
     const token2 = otplib.authenticator.generate(secret);
 
     const mfaFinalizationResult = await client.finalizeMfaEnrollment(newUser.id, token1, token2);
-    expect(mfaFinalizationResult.result).toBe('success');
+    expect(mfaFinalizationResult).toBe(undefined);
 
     await sleep(30000);
     const token3 = otplib.authenticator.generate(secret);
 
     const mfaUnrenrollResult = await client.unenrollMfa(newUser.id, token3, newUserPassword);
-    expect(mfaUnrenrollResult).toMatchSchema(RESPONSE_SCHEMA);
+    expect(mfaUnrenrollResult).toBe(undefined);
 });
 
 test('blobs', async () => {
     const vaultName = uniqueString();
     const newVault = await client.createVault(vaultName);
-    const newVaultId = newVault.vault.id;
+    const newVaultId = newVault.id;
 
     const newBlob = await client.createBlob(newVaultId, fs.createReadStream(__filename));
 
     expect(newBlob).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
+        type: 'object',
         properties: {
-            blob: {
-                type: 'object',
-                properties: {
-                    id: {type: 'string', format: 'uuid'},
-                    filename: {type: 'string'},
-                    size: {type: 'string'}
-                },
-                required: ['id', 'filename', 'size']
-            }
+            id: {type: 'string', format: 'uuid'},
+            filename: {type: 'string'},
+            size: {type: 'string'}
         },
-        required: ['blob']
+        required: ['id', 'filename', 'size']
     });
 
     const blobs = await client.listBlobs(newVaultId);
@@ -380,73 +367,49 @@ test('blobs', async () => {
         required: ['total', 'page', 'per_page', 'items']
     });
 
-    await client.getBlob(newVaultId, newBlob.blob.id);
+    await client.getBlob(newVaultId, newBlob.id);
 
-    const updateBlobResponse = await client.updateBlob(newVaultId, newBlob.blob.id, fs.createReadStream(__filename));
-    expect(updateBlobResponse).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
-        properties: {
-            blob: blobSchema
-        },
-        required: ['blob']
-    });
+    const updateBlobResponse = await client.updateBlob(newVaultId, newBlob.id, fs.createReadStream(__filename));
+    expect(updateBlobResponse).toMatchSchema(blobSchema);
 
     const newUser = await client.createUser(uniqueString(), uniqueString());
-    const updateOwnerResponse = await client.updateBlobOwner(newVaultId, newBlob.blob.id, newUser.id);
-    expect(updateOwnerResponse).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
-        properties: {
-            blob: blobSchema
-        },
-        required: ['blob']
-    });
+    const updateOwnerResponse = await client.updateBlobOwner(newVaultId, newBlob.id, newUser.id);
+    expect(updateOwnerResponse).toMatchSchema(blobSchema);
 
-    const deleteResponse = await client.deleteBlob(newVaultId, newBlob.blob.id);
-    expect(deleteResponse).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
-        properties: {
-            blob: blobSchema
-        },
-        required: ['blob']
-    });
+    const deleteResponse = await client.deleteBlob(newVaultId, newBlob.id);
+    expect(deleteResponse).toMatchSchema(blobSchema);
 });
 
 test('vaults and docs', async () => {
     const vaultName = uniqueString();
     const newVault = await client.createVault(vaultName);
     expect(newVault).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
+        type: 'object',
         properties: {
-            vault: {
-                type: 'object',
-                properties: {
-                    id: {type: 'string', format: 'uuid'},
-                    name: {type: 'string'}
-                }
-            }
+            id: {type: 'string', format: 'uuid'},
+            name: {type: 'string'}
         }
     });
-    const vaultId = newVault.vault.id;
+    const vaultId = newVault.id;
 
     const docAttributes = {foo: "bar"};
     const newDoc = await client.createDocument(vaultId, undefined, docAttributes);
-    expect(newDoc).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
+    const documentSchema = {
+        type: 'object',
         properties: {
-            document: {
-                type: 'object',
-                properties: {
-                    id: {type: 'string', format: 'uuid'}
-                }
-            }
-        }
-    });
-    const newDocId = newDoc.document.id;
+            id: {type: 'string', format: 'uuid'},
+            vault_id: {type: 'string', format: 'uuid'},
+            owner_id: {type: ['string', 'null'], format: 'uuid'}
+        },
+        required: ['id', 'vault_id', 'owner_id']
+    };
+    expect(newDoc).toMatchSchema(documentSchema);
+    const newDocId = newDoc.id;
 
     const newUser = await client.createUser(uniqueString(), uniqueString());
 
     const updateOwnerResponse = await client.updateDocumentOwner(vaultId, newDocId, newUser.id);
-    expect(updateOwnerResponse).toMatchSchema(RESPONSE_SCHEMA);
+    expect(updateOwnerResponse).toMatchSchema(documentSchema);
 
     const getDocsByIdResponse = await client.getDocuments(vaultId, [newDocId]);
     expect(getDocsByIdResponse).toMatchSchema({
@@ -485,7 +448,7 @@ test('vaults and docs', async () => {
     expect(fullDocs).toMatchSchema(docListSchema);
 
     const updateDocumentResponse = await client.updateDocument(vaultId, newDocId, {newFoo: "newBar"});
-    expect(updateDocumentResponse).toMatchSchema(RESPONSE_SCHEMA);
+    expect(updateDocumentResponse).toMatchSchema(documentSchema);
 
     const newSchema = await client.createSchema(vaultId, uniqueString(), [{
         name: 'foo',
@@ -493,37 +456,18 @@ test('vaults and docs', async () => {
         index: true
     }]);
     expect(newSchema).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
+        type: 'object',
         properties: {
-            schema: {
-                type: 'object',
-                properties: {
-                    id: {type: 'string', format: 'uuid'},
-                    vault_id: {type: 'string', format: 'uuid'},
-                    name: {type: 'string'},
-                    fields: {type: 'array'}
-                },
-                required: ['id', 'vault_id', 'name', 'fields']
-            }
+            id: {type: 'string', format: 'uuid'},
+            vault_id: {type: 'string', format: 'uuid'},
+            name: {type: 'string'},
+            fields: {type: 'array'}
         },
-        required: ['schema']
+        required: ['id', 'vault_id', 'name', 'fields']
     });
 
-    const indexedDoc = await client.createDocument(vaultId, newSchema.schema.id, {foo: "bar"});
-    expect(indexedDoc).toMatchSchema({
-        allOf: [{"$ref": RESPONSE_SCHEMA_ID}],
-        properties: {
-            document: {
-                type: 'object',
-                properties: {
-                    id: {type: 'string', format: 'uuid'},
-                    vault_id: {type: 'string', format: 'uuid'}
-                },
-                required: ['id', 'vault_id']
-            }
-        },
-        required: ['document']
-    });
+    const indexedDoc = await client.createDocument(vaultId, newSchema.id, {foo: "bar"});
+    expect(indexedDoc).toMatchSchema(documentSchema);
 
     const searchResultsNotFull = await client.searchDocuments(vaultId, {
         schema_id: newSchema.id,
@@ -593,7 +537,13 @@ test('vaults and docs', async () => {
     });
 
     const deleteDocumentResponse = await client.deleteDocument(vaultId, newDocId);
-    expect(deleteDocumentResponse).toMatchSchema(RESPONSE_SCHEMA);
+    expect(deleteDocumentResponse).toMatchSchema({
+        type: 'object',
+        properties: {
+            id: {type: 'string', format: 'uuid'}
+        },
+        required: ['id']
+    });
 });
 
 test('password reset flow', async () => {
@@ -626,7 +576,7 @@ test('password reset flow', async () => {
     });
 
     const sendResult = await client.sendPasswordResetEmail(passwordResetFlow.id, uniqueString());
-    expect(sendResult).toMatchSchema(RESPONSE_SCHEMA);
+    expect(sendResult).toBe(undefined);
 });
 
 test('sendgrid', async () => {

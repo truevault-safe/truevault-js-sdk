@@ -1,4 +1,5 @@
 import {version} from './package.json'
+
 let URI = require('urijs');
 require('isomorphic-fetch');
 require('isomorphic-form-data');
@@ -178,7 +179,7 @@ class TrueVaultClient {
     async logout() {
         const response = await this.performRequest(`v1/auth/logout`, {method: 'POST'});
         this._authHeader = null;
-        return response;
+        return response.logout;
     }
 
     /**
@@ -235,7 +236,7 @@ class TrueVaultClient {
      * @param {string} password new user's password.
      * @param {Object} [attributes] new user's attributes, if desired.
      * @param {Array} [groupIds] add user to the given groups, if provided.
-     * @param {string} status the newly created user's status
+     * @param {string} [status] the newly created user's status
      * @returns {Promise.<Object>}
      */
     async createUser(username, password, attributes, groupIds, status) {
@@ -362,14 +363,15 @@ class TrueVaultClient {
      * Start MFA enrollment for a user. See https://docs.truevault.com/users#start-mfa-enrollment-for-a-user.
      * @param {string} userId user id.
      * @param {string} issuer MFA issuer.
-     * @returns {Promise.<string>}
+     * @returns {Promise.<Object>}
      */
-    startUserMfaEnrollment(userId, issuer) {
-        return this.performRequest(`v1/users/${userId}/mfa/start_enrollment`, {
+    async startUserMfaEnrollment(userId, issuer) {
+        const result = await this.performRequest(`v1/users/${userId}/mfa/start_enrollment`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({issuer})
         });
+        return result.mfa;
     }
 
     /**
@@ -377,10 +379,10 @@ class TrueVaultClient {
      * @param {string} userId user id.
      * @param {string} mfaCode1 first MFA code.
      * @param {string} mfaCode2 second MFA code.
-     * @returns {Promise.<string>}
+     * @returns {Promise.<undefined>}
      */
-    finalizeMfaEnrollment(userId, mfaCode1, mfaCode2) {
-        return this.performRequest(`v1/users/${userId}/mfa/finalize_enrollment`, {
+    async finalizeMfaEnrollment(userId, mfaCode1, mfaCode2) {
+        await this.performRequest(`v1/users/${userId}/mfa/finalize_enrollment`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({mfa_code_1: mfaCode1, mfa_code_2: mfaCode2})
@@ -392,10 +394,10 @@ class TrueVaultClient {
      * @param {string} userId user id.
      * @param {string} mfaCode MFA code for user.
      * @param {string} password user's password.
-     * @returns {Promise.<string>}
+     * @returns {Promise.<undefined>}
      */
-    unenrollMfa(userId, mfaCode, password) {
-        return this.performRequest(`v1/users/${userId}/mfa/unenroll`, {
+    async unenrollMfa(userId, mfaCode, password) {
+        await this.performRequest(`v1/users/${userId}/mfa/unenroll`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({mfa_code: mfaCode, password: password})
@@ -453,9 +455,10 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async deleteGroup(groupId) {
-        return this.performRequest(`v1/groups/${groupId}`, {
+        const response = await this.performRequest(`v1/groups/${groupId}`, {
             method: 'DELETE'
         });
+        return response.group;
     }
 
     /**
@@ -481,14 +484,14 @@ class TrueVaultClient {
      * Add users to a group. See https://docs.truevault.com/groups#add-users-to-a-group.
      * @param {string} groupId group to add to.
      * @param {Array} userIds user ids to add to the group.
-     * @returns {Promise.<Object>}
+     * @returns {Promise.<undefined>}
      */
-    addUsersToGroup(groupId, userIds) {
+    async addUsersToGroup(groupId, userIds) {
         const headers = {
             'Content-Type': 'application/json'
         };
 
-        return this.performRequest(`v1/groups/${groupId}/membership`, {
+        await this.performRequest(`v1/groups/${groupId}/membership`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({user_ids: userIds})
@@ -563,14 +566,15 @@ class TrueVaultClient {
      * @param {string} name the name of the new vault.
      * @returns {Promise.<Object>}
      */
-    createVault(name) {
+    async createVault(name) {
         const formData = new FormData();
         formData.append("name", name);
 
-        return this.performRequest('v1/vaults', {
+        const response = await this.performRequest('v1/vaults', {
             method: 'POST',
             body: formData
         });
+        return response.vault;
     }
 
     /**
@@ -580,15 +584,16 @@ class TrueVaultClient {
      * @param {Array} fields field metadata for the schema. See https://docs.truevault.com/schemas.
      * @returns {Promise.<Object>}
      */
-    createSchema(vaultId, name, fields) {
+    async createSchema(vaultId, name, fields) {
         const schemaDefinition = {name, fields};
         const formData = new FormData();
         formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
 
-        return this.performRequest(`v1/vaults/${vaultId}/schemas`, {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/schemas`, {
             method: 'POST',
             body: formData
         });
+        return response.schema;
     }
 
     /**
@@ -598,15 +603,16 @@ class TrueVaultClient {
      * @param {Array} fields field metadata for the schema. See https://docs.truevault.com/schemas.
      * @returns {Promise.<Object>}
      */
-    createUserSchema(accountId, name, fields) {
+    async createUserSchema(accountId, name, fields) {
         const schemaDefinition = {name, fields};
         const formData = new FormData();
         formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
 
-        return this.performRequest(`v1/accounts/${accountId}/user_schema`, {
+        const response = await this.performRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'POST',
             body: formData
         });
+        return response.user_schema;
     }
 
     /**
@@ -614,40 +620,43 @@ class TrueVaultClient {
      * @param {string} accountId account id that the user schema belongs to.
      * @returns {Promise.<Object>}
      */
-    readUserSchema(accountId) {
-        return this.performRequest(`v1/accounts/${accountId}/user_schema`, {
+    async readUserSchema(accountId) {
+        const response = await this.performRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'GET',
         });
+        return response.user_schema;
     }
 
     /**
-     * Update the user schema. See https://docs.truevault.com/schemas#create-the-user-schema
+     * Update the user schema. See https://docs.truevault.com/schemas#update-the-user-schema
      * @param {string} accountId account id that the user schema belongs to.
      * @param {string} name the name of the schema.
      * @param {Array} fields field metadata for the schema. See https://docs.truevault.com/schemas.
      * @returns {Promise.<Object>}
      */
-    updateUserSchema(accountId, name, fields) {
+    async updateUserSchema(accountId, name, fields) {
         const schemaDefinition = {name, fields};
         const formData = new FormData();
         formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
 
-        return this.performRequest(`v1/accounts/${accountId}/user_schema`, {
+        const response = await this.performRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'PUT',
             body: formData
         });
+        return response.user_schema;
     }
 
     /**
-     * Delete the user schema. See https://docs.truevault.com/schemas#create-the-user-schema
+     * Delete the user schema. See https://docs.truevault.com/schemas#delete-the-user-schema
      * @param {string} accountId account id that the user schema belongs to.
      * @returns {Promise.<Object>}
      */
-    deleteUserSchema(accountId) {
-        return this.performRequest(`v1/accounts/${accountId}/user_schema`, {
+    async deleteUserSchema(accountId) {
+        const response = await this.performRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'DELETE',
             body: new FormData()
         });
+        return response.user_schema;
     }
 
     /**
@@ -658,7 +667,7 @@ class TrueVaultClient {
      * @param {string|null} [ownerId] the document's owner.
      * @returns {Promise.<Object>}
      */
-    createDocument(vaultId, schemaId, document, ownerId) {
+    async createDocument(vaultId, schemaId, document, ownerId) {
         const formData = new FormData();
         formData.append('document', btoa(JSON.stringify(document)));
 
@@ -668,10 +677,11 @@ class TrueVaultClient {
         if (typeof ownerId === 'string') {
             formData.append('owner_id', ownerId);
         }
-        return this.performRequest(`v1/vaults/${vaultId}/documents`, {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/documents`, {
             method: 'POST',
             body: formData
         });
+        return response.document;
     }
 
     /**
@@ -775,7 +785,7 @@ class TrueVaultClient {
      * @param {string|null} [ownerId] the new document owner.
      * @returns {Promise.<Object>}
      */
-    updateDocument(vaultId, documentId, document, ownerId) {
+    async updateDocument(vaultId, documentId, document, ownerId) {
         const formData = new FormData();
         formData.append("document", btoa(JSON.stringify(document)));
 
@@ -783,27 +793,29 @@ class TrueVaultClient {
             formData.append("owner_id", ownerId);
         }
 
-        return this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
             method: 'PUT',
             body: formData
         });
+        return response.document;
     }
 
     /**
      * Update a document's owner. See https://docs.truevault.com/documents#update-a-document-s-owner.
      * @param {string} vaultId the vault containing the document.
-     * @param {string} document id of the document.
+     * @param {string} documentId id of the document.
      * @param {string} ownerId the new document owner, or '' to remove owner.
      * @returns {Promise.<Object>}
      */
-    updateDocumentOwner(vaultId, documentId, ownerId) {
+    async updateDocumentOwner(vaultId, documentId, ownerId) {
         const formData = new FormData();
         formData.append('owner_id', ownerId);
 
-        return this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}/owner`, {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}/owner`, {
             method: 'PUT',
             body: formData
         });
+        return response.document;
     }
 
     /**
@@ -812,10 +824,14 @@ class TrueVaultClient {
      * @param {string} documentId document id to delete.
      * @returns {Promise.<Object>}
      */
-    deleteDocument(vaultId, documentId) {
-        return this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
+    async deleteDocument(vaultId, documentId) {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
             method: 'DELETE'
         });
+        return {
+            id: response.document_id,
+            owner_id: response.owner_id
+        };
     }
 
     /**
@@ -825,7 +841,7 @@ class TrueVaultClient {
      * @param {string|null} [ownerId] the BLOB's owner.
      * @returns {Promise.<Object>}
      */
-    createBlob(vaultId, file, ownerId) {
+    async createBlob(vaultId, file, ownerId) {
         const formData = new FormData();
         formData.append('file', file);
 
@@ -833,10 +849,11 @@ class TrueVaultClient {
             formData.append('owner_id', ownerId);
         }
 
-        return this.performRequest(`v1/vaults/${vaultId}/blobs`, {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/blobs`, {
             method: 'POST',
             body: formData
         });
+        return response.blob;
     }
 
     /**
@@ -921,7 +938,7 @@ class TrueVaultClient {
      * @param {string|null} [ownerId] the new BLOB owner.
      * @returns {Promise.<Object>}
      */
-    updateBlob(vaultId, blobId, file, ownerId) {
+    async updateBlob(vaultId, blobId, file, ownerId) {
         const formData = new FormData();
         formData.append('file', file);
 
@@ -929,10 +946,11 @@ class TrueVaultClient {
             formData.append('owner_id', ownerId);
         }
 
-        return this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
+        const resopnse = await this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
             method: 'PUT',
             body: formData
         });
+        return resopnse.blob;
     }
 
     /**
@@ -942,14 +960,15 @@ class TrueVaultClient {
      * @param {string} ownerId the new BLOB owner, or '' to remove owner.
      * @returns {Promise.<Object>}
      */
-    updateBlobOwner(vaultId, blobId, ownerId) {
+    async updateBlobOwner(vaultId, blobId, ownerId) {
         const formData = new FormData();
         formData.append('owner_id', ownerId);
 
-        return this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}/owner`, {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}/owner`, {
             method: 'PUT',
             body: formData
         });
+        return response.blob;
     }
 
     /**
@@ -958,10 +977,11 @@ class TrueVaultClient {
      * @param {string} blobId the BLOB to delete.
      * @returns {Promise.<Object>}
      */
-    deleteBlob(vaultId, blobId) {
-        return this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
+    async deleteBlob(vaultId, blobId) {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
             method: 'DELETE'
         });
+        return response.blob;
     }
 
     /**
@@ -1078,16 +1098,16 @@ class TrueVaultClient {
      * Send a password reset email to a user. See https://docs.truevault.com/PasswordResetFlow.html.
      * @param {string} flowId the flow to use to send a password reset email
      * @param {string} username
-     * @returns {Promise.<Object>}
+     * @returns {Promise.<undefined>}
      */
-    sendPasswordResetEmail(flowId, username) {
+    async sendPasswordResetEmail(flowId, username) {
         const headers = {
             'Content-Type': 'application/json'
         };
-        return this.performRequest(`v1/password_reset_flows/${flowId}/email`, {
-            method:  'POST',
+        await this.performRequest(`v1/password_reset_flows/${flowId}/email`, {
+            method: 'POST',
             headers: headers,
-            body:    JSON.stringify({
+            body: JSON.stringify({
                 username
             })
         });
