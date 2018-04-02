@@ -44,15 +44,6 @@ function sleep(ms) {
 
 const client = new TrueVault({apiKey: TEST_USER_API_KEY}, TEST_TRUEVAULT_HOST);
 
-test('login fails with invalid credentials', async () => {
-    try {
-        await TrueVault.login(TEST_ACCOUNT_UUID, 'invalid', 'invalid', undefined, TEST_TRUEVAULT_HOST);
-        fail('Should have thrown');
-    } catch (e) {
-
-    }
-});
-
 test('login', async () => {
     const loginUserUsername = uniqueString();
     const loginUserPassword = 'testpassword';
@@ -66,6 +57,23 @@ test('login', async () => {
     expect(loginClient.authHeader).toBeNull();
 });
 
+test('error handling', async () => {
+    try {
+        await TrueVault.login(TEST_ACCOUNT_UUID, 'invalid', 'invalid', undefined, TEST_TRUEVAULT_HOST);
+        fail('Should have thrown');
+    } catch(e) {
+        expect(e.error).toMatchSchema({
+            type: 'object',
+            properties: {
+                code: {type: 'string'},
+                message: {type: 'string'},
+                type: {type: 'string'}
+            },
+            required: ['code', 'message', 'type']
+        });
+        expect(e.transaction_id).toMatchSchema({type: 'string', format: 'uuid'});
+    }
+});
 
 test('readCurrentUser', async () => {
     const user = await client.readCurrentUser();

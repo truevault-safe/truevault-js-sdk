@@ -6,24 +6,47 @@ require('isomorphic-form-data');
 /**
  * A client for the [TrueVault HTTP API](https://docs.truevault.com/).
  *
+ * **Overview**
+ *
+ * The TrueVault JS SDK makes it easy to communicate with the TrueVault API from JavaScript web apps, nodejs servers,
+ * and lambda methods.
+ *
+ * ***JS Web example***
+ * ```js
+ * async function onLoginClicked() {
+ *   var trueVaultClient = await TrueVault.login(TRUEVAULT_ACCOUNT_ID, username, password)
+ *   localStorage.trueVaultAccessToken = trueVaultClient.accessToken;
+ *   var userInfo = trueVaultClient.readCurrentUser();
+ *   ...
+ * }
+ * ```
+ *
+ * **Error Handling**
+ *
+ * If any request fails, the method will throw an error. The thrown `Error` instance will have the following properties:
+ *
+ * - `message`: the message returned by the TrueVault API
+ * - `transaction_id`: a unique ID that can be used in support requests to help@truevault.com to help us resolve the error
+ * - `error`: the machine-readable error object returned by TrueVault.
+ *
+ * For more information on TrueVault API responses, see https://docs.truevault.com/overview#api-responses.
+ *
+ * **Authentication**
+ *
  * If you already have an API key or access token, use the constructor. If you have a username and password, see
- * `login()`.
+ * `login()`. See https://docs.truevault.com/overview#authentication for more on authentication concepts in TrueVault.
+ *
+ * To authenticate, provide one of the following styles of objects based on how you wish to authenticate:
+ *
+ * - `{ apiKey: 'your API key' }`
+ * - `{ accessToken: 'your access token' }`
+ * - `{ httpBasic: 'http basic base64 string' }`
+ * - `null`, to indicate no authentication is to be provided to the server
+ *
+ * @param {object} authn Authentication info, or null if no authentication info is to be used.
+ * @param {string} host optional parameter specifying TV API host; defaults to https://api.truevault.com
  */
 class TrueVaultClient {
-
-    /**
-     * See https://docs.truevault.com/overview#authentication for more on authentication concepts in TrueVault.
-     *
-     * To authenticate, provide one of the following styles of objects based on how you wish to authenticate:
-     *
-     * - { apiKey: 'your API key' }
-     * - { accessToken: 'your access token' }
-     * - { httpBasic: 'http basic base64 string' }
-     * - null, to indicate no authentication is to be provided to the server
-     *
-     * @param {object} authn Authentication info, or null if no authentication info is to be used.
-     * @param {string} host optional parameter specifying TV API host; defaults to https://api.truevault.com
-     */
     constructor(authn, host) {
         this._authHeader = null;
         if (!authn) {
@@ -94,6 +117,7 @@ class TrueVaultClient {
         if (json.result === 'error') {
             const error = new Error(json.error.message);
             error.error = json.error;
+            error.transaction_id = json.transaction_id;
             throw error;
         } else {
             return json;
