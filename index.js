@@ -680,6 +680,59 @@ class TrueVaultClient {
     }
 
     /**
+     * Create a new schema. See https://docs.truevault.com/schemas#update-a-schema
+     * @param {string} vaultId the vault that should contain the schema.
+     * @param {string} schemaId the schemathat should contain the schema.
+     * @param {string} name the name of the schema.
+     * @param {Array} fields field metadata for the schema. See https://docs.truevault.com/schemas.
+     * @returns {Promise.<Object>}
+     */
+    async updateSchema(vaultId, schemaId, name, fields) {
+        const schemaDefinition = {name, fields};
+        const formData = new FormData();
+        formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
+
+        const response = await this.performRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`, {
+            method: 'PUT',
+            body: formData
+        });
+        return response.schema;
+    }
+
+    /**
+     * Read a schema. See https://docs.truevault.com/schemas#read-a-schema
+     * @param vaultId
+     * @param schemaId
+     * @returns {Promise<Object>}
+     */
+    async readSchema(vaultId, schemaId) {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`);
+        return response.schema;
+    }
+
+    /**
+     * List all schemas in a vault. See https://docs.truevault.com/schemas#list-all-schemas
+     * @param vaultId
+     * @returns {Promise<Object>}
+     */
+    async listSchemas(vaultId) {
+        const response = await this.performRequest(`v1/vaults/${vaultId}/schemas`);
+        return response.schemas;
+    }
+
+    /**
+     * Delete a schema. See https://docs.truevault.com/schemas#delete-a-schema
+     * @param vaultId
+     * @param schemaId
+     * @returns {Promise<undefined>}
+     */
+    async deleteSchema(vaultId, schemaId) {
+        await this.performRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
      * Create the user schema. See https://docs.truevault.com/schemas#create-the-user-schema
      * @param {string} accountId account id that the user schema belongs to.
      * @param {string} name the name of the schema.

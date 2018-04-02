@@ -476,12 +476,13 @@ test('vaults and docs', async () => {
     const updateDocumentResponse = await client.updateDocument(vaultId, newDocId, {newFoo: "newBar"});
     expect(updateDocumentResponse).toMatchSchema(documentSchema);
 
-    const newSchema = await client.createSchema(vaultId, uniqueString(), [{
+    const newSchemaName = uniqueString();
+    const newSchema = await client.createSchema(vaultId, newSchemaName, [{
         name: 'foo',
         type: 'string',
         index: true
     }]);
-    expect(newSchema).toMatchSchema({
+    const schemaSchema = {
         type: 'object',
         properties: {
             id: {type: 'string', format: 'uuid'},
@@ -490,7 +491,22 @@ test('vaults and docs', async () => {
             fields: {type: 'array'}
         },
         required: ['id', 'vault_id', 'name', 'fields']
+    };
+    expect(newSchema).toMatchSchema(schemaSchema);
+
+    const schemaFromTrueVault = await client.readSchema(vaultId, newSchema.id);
+    expect(schemaFromTrueVault.name).toBe(newSchemaName);
+    expect(schemaFromTrueVault).toMatchSchema(schemaSchema);
+
+    const schemas = await client.listSchemas(vaultId);
+    expect(schemas).toMatchSchema({
+        type: 'array',
+        items: schemaSchema
     });
+
+    const schemaToDelete = await client.createSchema(vaultId, uniqueString(), []);
+    const deleteSchemaResponse = await client.deleteSchema(vaultId, schemaToDelete.id);
+    expect(deleteSchemaResponse).toBe(undefined);
 
     const indexedDoc = await client.createDocument(vaultId, newSchema.id, {foo: "bar"});
     expect(indexedDoc).toMatchSchema(documentSchema);
@@ -561,6 +577,13 @@ test('vaults and docs', async () => {
         },
         required: ['documents', 'info']
     });
+
+    const newFields = [];
+    const newName = uniqueString();
+    const updateSchemaResponse = await client.updateSchema(vaultId, newSchema.id, newName, newFields);
+    expect(updateSchemaResponse).toMatchSchema(schemaSchema);
+    expect(updateSchemaResponse.name).toEqual(newName);
+    expect(updateSchemaResponse.fields).toEqual(newFields);
 
     const deleteDocumentResponse = await client.deleteDocument(vaultId, newDocId);
     expect(deleteDocumentResponse).toMatchSchema({
