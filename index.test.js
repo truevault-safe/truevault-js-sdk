@@ -128,11 +128,14 @@ test('groups', async () => {
     const addUsersResult = await client.addUsersToGroup(newGroup.id, [newUser.id]);
     expect(addUsersResult).toBe(undefined);
 
-    const removeUsersResult = await client.removeUsersFromGroup(newGroup.id, [newUser.id]);
-    expect(removeUsersResult).toMatchSchema(groupSchema);
+    const removeUsersResult = await client.removeUsersFromGroup(newGroup.id, [newUser.id])
+    expect(removeUsersResult).toBe(undefined);
 
     const addUsersReturnIdsResult = await client.addUsersToGroupReturnUserIds(newGroup.id, [newUser.id]);
     expect(addUsersReturnIdsResult).toMatchSchema(groupSchema);
+
+    const removeUsersReturnIdsResult = await client.removeUsersFromGroupReturnUserIds(newGroup.id, [newUser.id]);
+    expect(removeUsersReturnIdsResult).toMatchSchema(groupSchema);
 
     const deleteResult = await client.deleteGroup(newGroup.id);
     expect(deleteResult).toMatchSchema(groupSchema);

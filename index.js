@@ -521,6 +521,22 @@ class TrueVaultClient {
             body: JSON.stringify({user_ids: userIds})
         });
     }
+    /**
+     * Remove users from a group. See https://docs.truevault.com/groups#remove-users-from-a-group
+     * @param {string} groupId group to add to.
+     * @param {Array} userIds user ids to add to the group.
+     * @returns {Promise.<undefined>}
+     */
+    async removeUsersFromGroup(groupId, userIds) {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        await this.performRequest(`v1/groups/${groupId}/membership/${userIds.join(',')}`, {
+            method: 'DELETE',
+            headers: headers
+        });
+    }
 
     /**
      * Add users to a group returning user ids. See https://docs.truevault.com/groups#update-a-group.
@@ -546,7 +562,7 @@ class TrueVaultClient {
      * @param {Array} userIds user ids to remove from the group.
      * @returns {Promise.<Object>}
      */
-    async removeUsersFromGroup(groupId, userIds) {
+    async removeUsersFromGroupReturnUserIds(groupId, userIds) {
         const formData = new FormData();
         formData.append('operation', 'REMOVE');
         formData.append('user_ids', userIds.join(','));
