@@ -499,7 +499,7 @@ class TrueVaultClient {
      * @param {string} groupId group id to get.
      * @returns {Promise.<Object>}
      */
-    async getFullGroup(groupId) {
+    async readFullGroup(groupId) {
         const response = await this.performRequest(`v1/groups/${groupId}?full=true`);
         return response.group;
     }

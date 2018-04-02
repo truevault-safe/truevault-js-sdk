@@ -110,7 +110,7 @@ test('groups', async () => {
     };
 
     expect(newGroup).toMatchSchema(groupSchema);
-    const fullGroup = await client.getFullGroup(newGroup.id);
+    const fullGroup = await client.readFullGroup(newGroup.id);
 
     expect(fullGroup).toMatchSchema(groupSchema);
     const updatedGroup = await client.updateGroup(newGroup.id, uniqueString(), []);
