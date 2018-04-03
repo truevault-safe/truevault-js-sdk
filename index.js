@@ -90,7 +90,7 @@ class TrueVaultClient {
         return this._authHeader;
     }
 
-    async performRequest(path, options) {
+    async performLegacyRequest(path, options) {
         if (!!this.authHeader) {
             if (!options) {
                 options = {};
@@ -123,6 +123,18 @@ class TrueVaultClient {
         } else {
             return json;
         }
+    }
+
+    async performJSONRequest(path, options) {
+        if (!options) {
+            options = {};
+        }
+
+        if (!options.headers) {
+            options.headers = {};
+        }
+        options.headers['Content-Type'] = 'application/json';
+        return this.performLegacyRequest(path, options);
     }
 
     /**
@@ -163,7 +175,7 @@ class TrueVaultClient {
         }
 
         const tvClient = new TrueVaultClient(null, host);
-        const response = await tvClient.performRequest(`v1/auth/login`, {
+        const response = await tvClient.performLegacyRequest(`v1/auth/login`, {
             method: 'POST',
             body: formData
         });
@@ -177,7 +189,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async logout() {
-        const response = await this.performRequest(`v1/auth/logout`, {method: 'POST'});
+        const response = await this.performLegacyRequest(`v1/auth/logout`, {method: 'POST'});
         this._authHeader = null;
         return response.logout;
     }
@@ -192,7 +204,7 @@ class TrueVaultClient {
             full = true;
         }
 
-        const response = await this.performRequest(`v1/auth/me?full=${full}`);
+        const response = await this.performLegacyRequest(`v1/auth/me?full=${full}`);
         const user = response.user;
         if (user.attributes) {
             user.attributes = JSON.parse(atob(user.attributes));
@@ -209,7 +221,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("attributes", btoa(JSON.stringify(attributes)));
 
-        const response = await this.performRequest('v1/auth/me?full=true', {
+        const response = await this.performLegacyRequest('v1/auth/me?full=true', {
             method: 'PUT',
             body: formData
         });
@@ -246,7 +258,7 @@ class TrueVaultClient {
             path = `${path}&status=${status}`;
         }
 
-        const response = await this.performRequest(path);
+        const response = await this.performLegacyRequest(path);
         return response.users.map(user => {
             if (user.attributes) {
                 user.attributes = JSON.parse(atob(user.attributes));
@@ -260,7 +272,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async readUser(userId) {
-        const response = await this.performRequest(`v1/users/${userId}?full=true`);
+        const response = await this.performLegacyRequest(`v1/users/${userId}?full=true`);
         response.user.attributes = JSON.parse(atob(response.user.attributes));
         return response.user;
     }
@@ -270,7 +282,7 @@ class TrueVaultClient {
      * @returns {Promise.<Array>}
      */
     async readUsers(userIds) {
-        const response = await this.performRequest(`v2/users/${userIds.join(',')}?full=true`);
+        const response = await this.performLegacyRequest(`v2/users/${userIds.join(',')}?full=true`);
         return response.users;
     }
 
@@ -296,7 +308,7 @@ class TrueVaultClient {
         if (status) {
             formData.append("status", status);
         }
-        const response = await this.performRequest('v1/users', {
+        const response = await this.performLegacyRequest('v1/users', {
             method: 'POST',
             body: formData
         });
@@ -313,7 +325,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("attributes", btoa(JSON.stringify(attributes)));
 
-        const response = await this.performRequest(`v1/users/${userId}`, {
+        const response = await this.performLegacyRequest(`v1/users/${userId}`, {
             method: 'PUT',
             body: formData
         });
@@ -330,7 +342,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("status", status);
 
-        const response = await this.performRequest(`v1/users/${userId}`, {
+        const response = await this.performLegacyRequest(`v1/users/${userId}`, {
             method: 'PUT',
             body: formData
         });
@@ -347,7 +359,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("username", newUsername);
 
-        const response = await this.performRequest(`v1/users/${userId}`, {
+        const response = await this.performLegacyRequest(`v1/users/${userId}`, {
             method: 'PUT',
             body: formData
         });
@@ -364,7 +376,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("password", newPassword);
 
-        const response = await this.performRequest(`v1/users/${userId}`, {
+        const response = await this.performLegacyRequest(`v1/users/${userId}`, {
             method: 'PUT',
             body: formData
         });
@@ -377,7 +389,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async deleteUser(userId) {
-        const response = await this.performRequest(`v1/users/${userId}`, {
+        const response = await this.performLegacyRequest(`v1/users/${userId}`, {
             method: 'DELETE',
         });
         return response.user;
@@ -389,7 +401,7 @@ class TrueVaultClient {
      * @returns {Promise.<string>}
      */
     async createUserApiKey(userId) {
-        const response = await this.performRequest(`v1/users/${userId}/api_key`, {method: 'POST'});
+        const response = await this.performLegacyRequest(`v1/users/${userId}/api_key`, {method: 'POST'});
         return response.api_key;
     }
 
@@ -399,7 +411,7 @@ class TrueVaultClient {
      * @returns {Promise.<string>}
      */
     async createUserAccessToken(userId) {
-        const response = await this.performRequest(`v1/users/${userId}/access_token`, {method: 'POST'});
+        const response = await this.performLegacyRequest(`v1/users/${userId}/access_token`, {method: 'POST'});
         return response.user.access_token;
     }
 
@@ -410,9 +422,8 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async startUserMfaEnrollment(userId, issuer) {
-        const result = await this.performRequest(`v1/users/${userId}/mfa/start_enrollment`, {
+        const result = await this.performJSONRequest(`v1/users/${userId}/mfa/start_enrollment`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({issuer})
         });
         return result.mfa;
@@ -426,9 +437,8 @@ class TrueVaultClient {
      * @returns {Promise.<undefined>}
      */
     async finalizeMfaEnrollment(userId, mfaCode1, mfaCode2) {
-        await this.performRequest(`v1/users/${userId}/mfa/finalize_enrollment`, {
+        await this.performJSONRequest(`v1/users/${userId}/mfa/finalize_enrollment`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({mfa_code_1: mfaCode1, mfa_code_2: mfaCode2})
         });
     }
@@ -441,9 +451,8 @@ class TrueVaultClient {
      * @returns {Promise.<undefined>}
      */
     async unenrollMfa(userId, mfaCode, password) {
-        await this.performRequest(`v1/users/${userId}/mfa/unenroll`, {
+        await this.performJSONRequest(`v1/users/${userId}/mfa/unenroll`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({mfa_code: mfaCode, password: password})
         });
     }
@@ -462,7 +471,7 @@ class TrueVaultClient {
         if (!!userIds) {
             formData.append("user_ids", userIds.join(','));
         }
-        const response = await this.performRequest('v1/groups', {
+        const response = await this.performLegacyRequest('v1/groups', {
             method: 'POST',
             body: formData
         });
@@ -486,7 +495,7 @@ class TrueVaultClient {
             formData.append("policy", btoa(JSON.stringify(policy)));
         }
 
-        const response = await this.performRequest(`v1/groups/${groupId}`, {
+        const response = await this.performLegacyRequest(`v1/groups/${groupId}`, {
             method: 'PUT',
             body: formData
         });
@@ -499,7 +508,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async deleteGroup(groupId) {
-        const response = await this.performRequest(`v1/groups/${groupId}`, {
+        const response = await this.performLegacyRequest(`v1/groups/${groupId}`, {
             method: 'DELETE'
         });
         return response.group;
@@ -510,7 +519,7 @@ class TrueVaultClient {
      * @returns {Promise.<Array>}
      */
     async listGroups() {
-        const response = await this.performRequest(`v1/groups`);
+        const response = await this.performLegacyRequest(`v1/groups`);
         return response.groups;
     }
 
@@ -520,7 +529,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async readFullGroup(groupId) {
-        const response = await this.performRequest(`v1/groups/${groupId}?full=true`);
+        const response = await this.performLegacyRequest(`v1/groups/${groupId}?full=true`);
         return response.group;
     }
 
@@ -531,13 +540,8 @@ class TrueVaultClient {
      * @returns {Promise.<undefined>}
      */
     async addUsersToGroup(groupId, userIds) {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-
-        await this.performRequest(`v1/groups/${groupId}/membership`, {
+        await this.performJSONRequest(`v1/groups/${groupId}/membership`, {
             method: 'POST',
-            headers: headers,
             body: JSON.stringify({user_ids: userIds})
         });
     }
@@ -548,13 +552,8 @@ class TrueVaultClient {
      * @returns {Promise.<undefined>}
      */
     async removeUsersFromGroup(groupId, userIds) {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-
-        await this.performRequest(`v1/groups/${groupId}/membership/${userIds.join(',')}`, {
-            method: 'DELETE',
-            headers: headers
+        await this.performJSONRequest(`v1/groups/${groupId}/membership/${userIds.join(',')}`, {
+            method: 'DELETE'
         });
     }
 
@@ -569,7 +568,7 @@ class TrueVaultClient {
         formData.append('operation', 'APPEND');
         formData.append('user_ids', userIds.join(','));
 
-        const response = await this.performRequest(`v1/groups/${groupId}`, {
+        const response = await this.performLegacyRequest(`v1/groups/${groupId}`, {
             method: 'PUT',
             body: formData
         });
@@ -587,7 +586,7 @@ class TrueVaultClient {
         formData.append('operation', 'REMOVE');
         formData.append('user_ids', userIds.join(','));
 
-        const response = await this.performRequest(`v1/groups/${groupId}`, {
+        const response = await this.performLegacyRequest(`v1/groups/${groupId}`, {
             method: 'PUT',
             body: formData
         });
@@ -603,7 +602,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("search_option", btoa(JSON.stringify(searchOption)));
 
-        const response = await this.performRequest(`v1/users/search`, {
+        const response = await this.performLegacyRequest(`v1/users/search`, {
             method: 'POST',
             body: formData
         });
@@ -634,7 +633,7 @@ class TrueVaultClient {
         if (typeof per_page !== "number") {
             per_page = 100
         }
-        const response = await this.performRequest(`v1/vaults?page=${page}&per_page=${per_page}`);
+        const response = await this.performLegacyRequest(`v1/vaults?page=${page}&per_page=${per_page}`);
         return response.vaults;
     }
 
@@ -647,7 +646,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("name", name);
 
-        const response = await this.performRequest('v1/vaults', {
+        const response = await this.performLegacyRequest('v1/vaults', {
             method: 'POST',
             body: formData
         });
@@ -660,7 +659,7 @@ class TrueVaultClient {
      * @returns {Promise<Object>}
      */
     async readVault(vaultId) {
-        const response = await this.performRequest(`v1/vaults/${vaultId}`);
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}`);
 
         return response.vault;
     }
@@ -675,7 +674,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append('name', name);
 
-        const response = await this.performRequest(`v1/vaults/${vaultId}`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}`, {
             method: 'PUT',
             body: formData
         });
@@ -689,7 +688,7 @@ class TrueVaultClient {
      * @returns {Promise<Object>}
      */
     async deleteVault(vaultId) {
-        const response = await this.performRequest(`v1/vaults/${vaultId}`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}`, {
             method: 'DELETE'
         });
 
@@ -708,7 +707,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
 
-        const response = await this.performRequest(`v1/vaults/${vaultId}/schemas`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/schemas`, {
             method: 'POST',
             body: formData
         });
@@ -728,7 +727,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
 
-        const response = await this.performRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`, {
             method: 'PUT',
             body: formData
         });
@@ -742,7 +741,7 @@ class TrueVaultClient {
      * @returns {Promise<Object>}
      */
     async readSchema(vaultId, schemaId) {
-        const response = await this.performRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`);
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`);
         return response.schema;
     }
 
@@ -752,7 +751,7 @@ class TrueVaultClient {
      * @returns {Promise<Object>}
      */
     async listSchemas(vaultId) {
-        const response = await this.performRequest(`v1/vaults/${vaultId}/schemas`);
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/schemas`);
         return response.schemas;
     }
 
@@ -763,7 +762,7 @@ class TrueVaultClient {
      * @returns {Promise<undefined>}
      */
     async deleteSchema(vaultId, schemaId) {
-        await this.performRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`, {
+        await this.performLegacyRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`, {
             method: 'DELETE'
         });
     }
@@ -780,7 +779,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
 
-        const response = await this.performRequest(`v1/accounts/${accountId}/user_schema`, {
+        const response = await this.performLegacyRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'POST',
             body: formData
         });
@@ -793,7 +792,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async readUserSchema(accountId) {
-        const response = await this.performRequest(`v1/accounts/${accountId}/user_schema`, {
+        const response = await this.performLegacyRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'GET',
         });
         return response.user_schema;
@@ -811,7 +810,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
 
-        const response = await this.performRequest(`v1/accounts/${accountId}/user_schema`, {
+        const response = await this.performLegacyRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'PUT',
             body: formData
         });
@@ -824,7 +823,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async deleteUserSchema(accountId) {
-        const response = await this.performRequest(`v1/accounts/${accountId}/user_schema`, {
+        const response = await this.performLegacyRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'DELETE',
             body: new FormData()
         });
@@ -849,7 +848,7 @@ class TrueVaultClient {
         if (typeof ownerId === 'string') {
             formData.append('owner_id', ownerId);
         }
-        const response = await this.performRequest(`v1/vaults/${vaultId}/documents`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/documents`, {
             method: 'POST',
             body: formData
         });
@@ -875,7 +874,7 @@ class TrueVaultClient {
         if (!!perPage) {
             url += `&per_page=${perPage}`;
         }
-        const response = await this.performRequest(url);
+        const response = await this.performLegacyRequest(url);
         if (!!full) {
             response.data.items = response.data.items.map(item => {
                 if (item.document) {
@@ -906,7 +905,7 @@ class TrueVaultClient {
         if (!!perPage) {
             url += `&per_page=${perPage}`;
         }
-        const response = await this.performRequest(url);
+        const response = await this.performLegacyRequest(url);
         if (!!full) {
             response.data.items = response.data.items.map(item => {
                 if (item.document) {
@@ -938,7 +937,7 @@ class TrueVaultClient {
             requestDocumentIds = documentIds;
         }
 
-        const response = await this.performRequest(`v1/vaults/${vaultId}/documents/${requestDocumentIds.join(',')}`);
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/documents/${requestDocumentIds.join(',')}`);
         const documents = response.documents.map(doc => {
             doc.document = JSON.parse(atob(doc.document));
             return doc;
@@ -962,7 +961,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append("search_option", btoa(JSON.stringify(searchOption)));
 
-        const response = await this.performRequest(`v1/vaults/${vaultId}/search`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/search`, {
             method: 'POST',
             body: formData
         });
@@ -1001,7 +1000,7 @@ class TrueVaultClient {
             formData.append("schema_id", schemaId);
         }
 
-        const response = await this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
             method: 'PUT',
             body: formData
         });
@@ -1019,7 +1018,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append('owner_id', ownerId);
 
-        const response = await this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}/owner`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/documents/${documentId}/owner`, {
             method: 'PUT',
             body: formData
         });
@@ -1033,7 +1032,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async deleteDocument(vaultId, documentId) {
-        const response = await this.performRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
             method: 'DELETE'
         });
         return {
@@ -1057,7 +1056,7 @@ class TrueVaultClient {
             formData.append('owner_id', ownerId);
         }
 
-        const response = await this.performRequest(`v1/vaults/${vaultId}/blobs`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/blobs`, {
             method: 'POST',
             body: formData
         });
@@ -1134,7 +1133,7 @@ class TrueVaultClient {
         if (!!perPage) {
             url += `&per_page=${perPage}`;
         }
-        const response = await this.performRequest(url);
+        const response = await this.performLegacyRequest(url);
         return response.data
     }
 
@@ -1154,7 +1153,7 @@ class TrueVaultClient {
             formData.append('owner_id', ownerId);
         }
 
-        const resopnse = await this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
+        const resopnse = await this.performLegacyRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
             method: 'PUT',
             body: formData
         });
@@ -1172,7 +1171,7 @@ class TrueVaultClient {
         const formData = new FormData();
         formData.append('owner_id', ownerId);
 
-        const response = await this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}/owner`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/blobs/${blobId}/owner`, {
             method: 'PUT',
             body: formData
         });
@@ -1186,7 +1185,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async deleteBlob(vaultId, blobId) {
-        const response = await this.performRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
+        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/blobs/${blobId}`, {
             method: 'DELETE'
         });
         return response.blob;
@@ -1204,12 +1203,8 @@ class TrueVaultClient {
      */
     async sendEmailSendgrid(sendgridApiKey, userId, sendgridTemplateId, fromEmailSpecifier,
                             toEmailSpecifier, substitutions) {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-        const response = await this.performRequest(`v1/users/${userId}/message/email`, {
+        const response = await this.performJSONRequest(`v1/users/${userId}/message/email`, {
             method: 'POST',
-            headers: headers,
             body: JSON.stringify({
                 provider: 'SENDGRID',
                 auth: {sendgrid_api_key: sendgridApiKey},
@@ -1235,13 +1230,8 @@ class TrueVaultClient {
      * @returns {Promise.<String>}
      */
     async sendSMSTwilio(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody, mediaURLs) {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-
-        const response = await this.performRequest(`v1/users/${userId}/message/sms`, {
+        const response = await this.performJSONRequest(`v1/users/${userId}/message/sms`, {
             method: 'POST',
-            headers: headers,
             body: JSON.stringify({
                 provider: 'TWILIO',
                 auth: {
@@ -1270,12 +1260,8 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async createPasswordResetFlow(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-        const response = await this.performRequest(`v1/password_reset_flows`, {
+        const response = await this.performJSONRequest(`v1/password_reset_flows`, {
             method: 'POST',
-            headers: headers,
             body: JSON.stringify({
                 name,
                 sg_api_key: sendGridApiKey,
@@ -1293,12 +1279,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async listPasswordResetFlows() {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-        const response = await this.performRequest(`v1/password_reset_flows`, {
-            headers: headers
-        });
+        const response = await this.performJSONRequest(`v1/password_reset_flows`);
         return response.password_reset_flows;
     }
 
@@ -1309,12 +1290,8 @@ class TrueVaultClient {
      * @returns {Promise.<undefined>}
      */
     async sendPasswordResetEmail(flowId, username) {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-        await this.performRequest(`v1/password_reset_flows/${flowId}/email`, {
+        await this.performJSONRequest(`v1/password_reset_flows/${flowId}/email`, {
             method: 'POST',
-            headers: headers,
             body: JSON.stringify({
                 username
             })
