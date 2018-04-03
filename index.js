@@ -272,9 +272,8 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async readUser(userId) {
-        const response = await this.performLegacyRequest(`v1/users/${userId}?full=true`);
-        response.user.attributes = JSON.parse(atob(response.user.attributes));
-        return response.user;
+        const users = await this.readUsers([userId]);
+        return users[0];
     }
 
     /**
@@ -839,18 +838,18 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async createDocument(vaultId, schemaId, document, ownerId) {
-        const formData = new FormData();
-        formData.append('document', btoa(JSON.stringify(document)));
+        const body = {document};
 
-        if (!!schemaId) {
-            formData.append('schema_id', schemaId);
+        if (typeof schemaId === 'string') {
+            body.schemaId = schemaId;
         }
+
         if (typeof ownerId === 'string') {
-            formData.append('owner_id', ownerId);
+            body.ownerId = ownerId;
         }
-        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/documents`, {
+        const response = await this.performJSONRequest(`v2/vaults/${vaultId}/documents`, {
             method: 'POST',
-            body: formData
+            body: JSON.stringify(body)
         });
         return response.document;
     }
@@ -937,18 +936,8 @@ class TrueVaultClient {
             requestDocumentIds = documentIds;
         }
 
-        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/documents/${requestDocumentIds.join(',')}`);
-        const documents = response.documents.map(doc => {
-            doc.document = JSON.parse(atob(doc.document));
-            return doc;
-        });
-
-        if (documentIds.length === 1) {
-            // Only return the first result here, since there will be duplicate results due to our
-            // ID duplication in the request.
-            return [documents[0]];
-        }
-        return documents;
+        const response = await this.performJSONRequest(`v2/vaults/${vaultId}/documents/${requestDocumentIds.join(',')}`);
+        return response.documents;
     }
 
     /**
@@ -989,20 +978,19 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async updateDocument(vaultId, documentId, document, ownerId, schemaId) {
-        const formData = new FormData();
-        formData.append("document", btoa(JSON.stringify(document)));
+        const body = {document};
 
         if (typeof ownerId === 'string') {
-            formData.append("owner_id", ownerId);
+            body.owner_id = ownerId;
         }
 
         if (typeof schemaId === 'string') {
-            formData.append("schema_id", schemaId);
+            body.schema_id = schemaId;
         }
 
-        const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/documents/${documentId}`, {
+        const response = await this.performJSONRequest(`v2/vaults/${vaultId}/documents/${documentId}`, {
             method: 'PUT',
-            body: formData
+            body: JSON.stringify(body)
         });
         return response.document;
     }
