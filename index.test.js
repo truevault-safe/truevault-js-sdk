@@ -192,6 +192,14 @@ test('users', async () => {
         items: userSchemaWithUsername
     });
 
+    const fullUsers = await client.listUsers(true);
+    expect(typeof fullUsers[0].attributes).toBe("object");
+
+    const usersWithStatus = await client.listUsersWithStatus('PENDING');
+    const pendingUser = usersWithStatus.filter(u => u.id === newUserWithStatus.id)[0];
+    expect(pendingUser.id).toBe(newUserWithStatus.id);
+    expect(pendingUser.attributes).toBe(undefined);
+
     const userFromTV = await client.readUser(newUser.id);
     expect(userFromTV).toMatchSchema(userSchemaWithUsername);
 

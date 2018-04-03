@@ -223,10 +223,30 @@ class TrueVaultClient {
 
     /**
      * List all users in the account. See https://docs.truevault.com/users#list-all-users.
+     * @param [full=false] Whether to return user attributes and group IDs
      * @returns {Promise.<Array>}
      */
-    async listUsers() {
-        const response = await this.performRequest('v1/users?full=true');
+    async listUsers(full) {
+        return this.listUsersWithStatus(null, full);
+    }
+
+    async listUsersWithStatus(status, full) {
+        /**
+         * List all users in the account. See https://docs.truevault.com/users#list-all-users.
+         * @param [status=null] If ACTIVE, DEACTIVATED, PENDING, or LOCKED only returns users with that status
+         * @param [full=false] Whether to return user attributes and group IDs
+         * @returns {Promise.<Array>}
+         */
+        if (full !== true) {
+            full = false;
+        }
+        var path = `v1/users?full=${full}`;
+
+        if (status) {
+            path = `${path}&status=${status}`;
+        }
+
+        const response = await this.performRequest(path);
         return response.users.map(user => {
             if (user.attributes) {
                 user.attributes = JSON.parse(atob(user.attributes));
