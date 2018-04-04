@@ -1,8 +1,9 @@
 import {version} from './package.json'
 
-let URI = require('urijs');
+const URI = require('urijs');
 require('isomorphic-fetch');
 require('isomorphic-form-data');
+const {atob, btoa} = require('isomorphic-base64');
 
 /**
  * A client for the [TrueVault HTTP API](https://docs.truevault.com/).
