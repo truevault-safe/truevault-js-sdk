@@ -14,6 +14,9 @@
     "rest",
     "api"
   ],
+  "scripts": {
+    "test": "mocha --require babel-register --require babel-polyfill"
+  },
   "license": "BSD-3-Clause",
   "main": "build/index.js",
   "dependencies": {
@@ -23,17 +26,19 @@
     "urijs": "^1.18.12"
   },
   "devDependencies": {
+    "ajv": "^6.4.0",
     "babel-core": "^6.26.0",
     "babel-jest": "^22.4.3",
     "babel-loader": "^7.0.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.5.2",
+    "babel-register": "^6.26.0",
     "documentation": "^4.0.0-rc.1",
     "dotenv": "^5.0.1",
-    "jest": "^22.4.3",
-    "jest-json-schema": "^2.0.0",
+    "mocha": "^5.0.5",
     "otplib": "^8.0.1",
     "regenerator-runtime": "^0.11.1",
+    "should": "^13.2.1",
     "uuid": "^3.2.1",
     "webpack": "^2.6.1"
   }
