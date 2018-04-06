@@ -15,7 +15,8 @@
     "api"
   ],
   "scripts": {
-    "test": "mocha --require babel-register --require babel-polyfill"
+    "test": "mocha --require babel-register --require babel-polyfill",
+    "build-browser-tests": "webpack --config webpack.test-config.js"
   },
   "license": "BSD-3-Clause",
   "main": "build/index.js",
@@ -35,10 +36,12 @@
     "babel-register": "^6.26.0",
     "documentation": "^4.0.0-rc.1",
     "dotenv": "^5.0.1",
+    "dotenv-webpack": "^1.5.5",
     "mocha": "^5.0.5",
     "otplib": "^8.0.1",
     "regenerator-runtime": "^0.11.1",
     "should": "^13.2.1",
+    "string-to-stream": "^1.1.0",
     "uuid": "^3.2.1",
     "webpack": "^2.6.1"
   }

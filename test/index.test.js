@@ -1,17 +1,10 @@
-import path from 'path';
-import dotenv from 'dotenv';
-
-dotenv.config({path: path.resolve(process.cwd(), 'test.env')});
-
 import TrueVault from '../index';
 
 import uuid from 'uuid';
 import otplib from 'otplib';
 import {Readable} from 'stream';
-import fs from 'fs';
 import should from 'should';
 import Ajv from 'ajv';
-
 
 const USER_SCHEMA = {
     type: 'object',
@@ -26,6 +19,18 @@ const USER_SCHEMA = {
     required: ['account_id', 'id', 'status', 'username', 'mfa_enrolled']
 };
 
+if (typeof window === "undefined") {
+    // When run via the web runner, webpack-dotenv injects the contents of the test env dotfile. However, this
+    // doesn't happen for nodejs. To pick up the test environment variables, we need to invoke dotenv normally.
+    // We need to do so via eval to avoid webpack trying to bundle the path and dotenv modules when building for web.
+    // noinspection JSUnusedLocalSymbols
+    const dirname = __dirname;
+    eval(`
+const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config({path: path.resolve(dirname, 'test.env')});
+    `);
+}
 const TEST_TRUEVAULT_HOST = process.env.TEST_TRUEVAULT_HOST;
 const TEST_ACCOUNT_UUID = process.env.TEST_ACCOUNT_UUID;
 const TEST_USER_API_KEY = process.env.TEST_USER_API_KEY;

@@ -92,6 +92,9 @@ The integration tests are built with [Mocha](https://mochajs.org/). To run them,
 first copy `test.env.template` to `test.env` and populate `test.env` with values from your account. To run tests, do
 `yarn test`. You can run a subset of tests via `yarn test -g [filter regex]`
 
+To run in a browser, first rebuild the test file with webpack: `yarn build-browser-tests` 
+and then load test/index.html in a browser.
+
 ## Documentation
 
 This project uses [documentationjs](http://documentation.js.org/). To generate the docs:
