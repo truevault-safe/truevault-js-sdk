@@ -1,5 +1,5 @@
 # dependencies
-node_modules
+/node_modules
 
 # misc
 .DS_Store
@@ -12,3 +12,5 @@ yarn-error.log*
 # tests
 test.env
 coverage
+test/lambda.zip
+test/lambda/index.test.js

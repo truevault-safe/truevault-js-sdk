@@ -16,7 +16,8 @@
   ],
   "scripts": {
     "test": "mocha --require babel-register --require babel-polyfill",
-    "build-browser-tests": "webpack --config webpack.test-config.js"
+    "build-browser-tests": "webpack --config webpack.test-config.js",
+    "build-lambda-tests": "webpack --config webpack.lambda-test-config.js && pushd test/lambda && rm -f ../lambda.zip && zip -r ../lambda.zip . && popd"
   },
   "license": "BSD-3-Clause",
   "main": "build/index.js",

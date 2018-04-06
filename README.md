@@ -95,6 +95,12 @@ first copy `test.env.template` to `test.env` and populate `test.env` with values
 To run in a browser, first rebuild the test file with webpack: `yarn build-browser-tests` 
 and then load test/index.html in a browser.
 
+Running in AWS lambda is more complicated:
+
+1. Build a version of the tests for inclusion in lambda: `yarn build-lambda-tests`
+1. Create a new Lambda function. Choose Node 8.10 for the runtime, `run-lambda-tests.runTests` for the handler, 5 minutes for the timeout, and supply the generated lambda.zip.
+1. Perform a test invocation to run the tests. They take a few minutes to run, and no output appears until they complete.
+
 ## Documentation
 
 This project uses [documentationjs](http://documentation.js.org/). To generate the docs:

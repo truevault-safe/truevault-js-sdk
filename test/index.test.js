@@ -388,7 +388,9 @@ describe('TrueVaultClient', function () {
             // but on web Blob will be defined so the other branch runs.
             const fs = eval("require('fs')");
 
-            testBlobContentsFactory = () => fs.createReadStream(__filename);
+            const directory = process.env.LAMBDA_TASK_ROOT || __dirname;
+            const filePath = directory + '/' + 'index.test.js';
+            testBlobContentsFactory = () => fs.createReadStream(filePath);
         }
 
         const newBlobSchema = {
