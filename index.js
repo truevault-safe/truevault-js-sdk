@@ -138,6 +138,45 @@ class TrueVaultClient {
         return this.performLegacyRequest(path, options);
     }
 
+    performLegacyRequestWithProgress(method, url, formData, progressCallback, responseType) {
+        // We are using XMLHttpRequest here since fetch does not have a progress API
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            if (method.toLowerCase() === 'get') {
+                xhr.addEventListener('progress', progressCallback);
+                xhr.addEventListener('load', progressCallback);
+            } else {
+                xhr.upload.addEventListener('progress', progressCallback);
+                xhr.upload.addEventListener('load', progressCallback);
+            }
+
+            xhr.open(method, url);
+            xhr.setRequestHeader('Authorization', this.authHeader);
+            xhr.responseType = responseType;
+            xhr.onload = () => {
+                switch(responseType) {
+                    case "json":
+                        const responseJson = xhr.response;
+                        if (responseJson.result === 'error') {
+                            const error = new Error(responseJson.error.message);
+                            error.error = responseJson.error;
+                            reject(error);
+                        } else {
+                            resolve(responseJson);
+                        }
+                        break;
+                    case "blob":
+                        resolve(xhr.response);
+                        break;
+                    default:
+                        throw new Error(`Unsupported responseType: ${responseType}`);
+                }
+            };
+            xhr.onerror = () => reject(Error('Network error'));
+            xhr.send(formData);
+        });
+    }
+
     /**
      * Useful when you want to create a client starting from a user's username and password as opposed to an API key
      * or access token. The resulting TrueVaultClient has an accessToken property you can use to retrieve the raw
@@ -545,6 +584,7 @@ class TrueVaultClient {
             body: JSON.stringify({user_ids: userIds})
         });
     }
+
     /**
      * Remove users from a group. See https://docs.truevault.com/groups#remove-users-from-a-group
      * @param {string} groupId group to add to.
@@ -885,6 +925,7 @@ class TrueVaultClient {
         }
         return response.data;
     }
+
     /**
      * List documents in a schema. See https://docs.truevault.com/documents#list-all-documents-with-schema
      * @param {string} vaultId vault to look in.
@@ -1060,35 +1101,32 @@ class TrueVaultClient {
      * @param {string|null} [ownerId] the BLOB's owner.
      * @returns {Promise.<Object>}
      */
-    createBlobWithProgress(vaultId, file, progressCallback, ownerId) {
-        // We are using XMLHttpRequest here since fetch does not have a progress API
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
+    async createBlobWithProgress(vaultId, file, progressCallback, ownerId) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-            const formData = new FormData();
-            formData.append('file', file);
+        if (typeof ownerId === 'string') {
+            formData.append('owner_id', ownerId);
+        }
 
-            if (typeof ownerId === 'string') {
-                formData.append('owner_id', ownerId);
-            }
+        const createResponse = await this.performLegacyRequestWithProgress('post', `${this.host}/v1/vaults/${vaultId}/blobs`, formData, progressCallback, 'json');
+        return createResponse.blob;
+    }
 
-            xhr.upload.addEventListener('progress', progressCallback);
-            xhr.upload.addEventListener('load', progressCallback);
-            xhr.open('post', `${this.host}/v1/vaults/${vaultId}/blobs`);
-            xhr.setRequestHeader('Authorization', this.authHeader);
-            xhr.onload = () => {
-                const responseJson = JSON.parse(xhr.responseText);
-                if (responseJson.result === 'error') {
-                    const error = new Error(responseJson.error.message);
-                    error.error = responseJson.error;
-                    reject(error);
-                } else {
-                    resolve(responseJson);
-                }
-            };
-            xhr.onerror = () => reject(Error('Network error'));
-            xhr.send(formData);
-        });
+    async updateBlobWithProgress(vaultId, blobId, file, progressCallback, ownerId) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        if (typeof ownerId === 'string') {
+            formData.append('owner_id', ownerId);
+        }
+
+        const updateResponse = await this.performLegacyRequestWithProgress('put', `${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, formData, progressCallback, 'json');
+        return updateResponse.blob;
+    }
+
+    getBlobWithProgress(vaultId, blobId, progressCallback) {
+        return this.performLegacyRequestWithProgress('get', `${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, null, progressCallback, 'blob');
     }
 
     /**

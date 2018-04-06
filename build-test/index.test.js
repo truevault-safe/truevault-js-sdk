@@ -20050,8 +20050,7 @@ var _ajv2 = _interopRequireDefault(_ajv);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; } // TODO: figure out how to do this in a cross-platform way
-
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var USER_SCHEMA = {
     type: 'object',
@@ -20067,6 +20066,9 @@ var USER_SCHEMA = {
 };
 
 if (typeof window === "undefined") {
+    // When run via the web runner, webpack-dotenv injects the contents of the test env dotfile. However, this
+    // doesn't happen for nodejs. To pick up the test environment variables, we need to invoke dotenv normally.
+    // We need to do so via eval to avoid webpack trying to bundle the path and dotenv modules when building for web.
     // noinspection JSUnusedLocalSymbols
     var dirname = __dirname;
     eval('\nconst path = require(\'path\');\nconst dotenv = require(\'dotenv\');\ndotenv.config({path: path.resolve(dirname, \'test.env\')});\n    ');
@@ -51473,7 +51475,8 @@ module.exports = {
 		"api"
 	],
 	"scripts": {
-		"test": "mocha --require babel-register --require babel-polyfill"
+		"test": "mocha --require babel-register --require babel-polyfill",
+		"build-browser-tests": "webpack --config webpack.test-config.js"
 	},
 	"license": "BSD-3-Clause",
 	"main": "build/index.js",

@@ -62,7 +62,7 @@ should.Assertion.add('matchSchema', function (schema) {
 const client = new TrueVault({apiKey: TEST_USER_API_KEY}, TEST_TRUEVAULT_HOST);
 
 describe('TrueVaultClient', function () {
-    this.slow(1000);
+    this.slow(10 * 60 * 1000);
     this.timeout(10 * 60 * 1000);
 
     describe('login', function () {
@@ -378,22 +378,89 @@ describe('TrueVaultClient', function () {
     });
 
     describe('blobs', function () {
-        it('blobs', async function () {
+        let testBlobContentsFactory;
+        if (typeof Blob !== "undefined") {
+            // Must be running in a browser-like environment
+            testBlobContentsFactory = () => new Blob(['testing blob contents'], {type: 'text/plain'});
+        } else {
+            // Must be running in something node-like. This atrocity is needed to keep webpack from trying
+            // to load the fs module when building for web. Obviously this would fail if run in a web environment,
+            // but on web Blob will be defined so the other branch runs.
+            const fs = eval("require('fs')");
+
+            testBlobContentsFactory = () => fs.createReadStream(__filename);
+        }
+
+        const newBlobSchema = {
+            type: 'object',
+            properties: {
+                id: {type: 'string', format: 'uuid'},
+                filename: {type: 'string'},
+                size: {type: 'string'}
+            },
+            required: ['id', 'filename', 'size']
+        };
+
+        function testProgressCallbackFactory(tag) {
+            let receivedLoadEvent = false;
+            let receivedProgressEvent = false;
+
+            const ret = e => {
+                console.log(`${tag}: test progress callback received event`, e);
+                if (e.type === 'load') {
+                    receivedLoadEvent = true;
+                }
+                if (e.type === 'progress') {
+                    receivedProgressEvent = true;
+                }
+            };
+
+            ret.verify = () => {
+                if (!receivedLoadEvent) {
+                    should.fail(`Didn't receive 'load' event for ${tag}`);
+                }
+
+                if (!receivedProgressEvent) {
+                    should.fail(`Didn't receive 'progress' event for ${tag}`);
+                }
+            };
+
+            return ret;
+        }
+
+        if (typeof XMLHttpRequest === "undefined") {
+            it('blobs with progress tests can only run in the browser');
+        } else {
+            it('progress', async function () {
+                const newVault = await client.createVault(uniqueString());
+
+                const createProgressCallback = testProgressCallbackFactory("create");
+                const newBlob = await client.createBlobWithProgress(newVault.id, testBlobContentsFactory(), createProgressCallback);
+                newBlob.should.matchSchema(newBlobSchema);
+                createProgressCallback.verify();
+
+
+                const updateProgressCallback = testProgressCallbackFactory("update");
+                const updatedBlob = await client.updateBlobWithProgress(newVault.id, newBlob.id, testBlobContentsFactory(), updateProgressCallback);
+                updatedBlob.should.matchSchema(newBlobSchema);
+                updateProgressCallback.verify();
+
+                const getProgressCallback = testProgressCallbackFactory("get");
+                const blob = await client.getBlobWithProgress(newVault.id, newBlob.id, getProgressCallback);
+                blob.size.should.above(0);
+                blob.should.be.instanceOf(Blob);
+                getProgressCallback.verify();
+            });
+        }
+
+        it('non-progress', async function () {
             const vaultName = uniqueString();
             const newVault = await client.createVault(vaultName);
             const newVaultId = newVault.id;
 
-            const newBlob = await client.createBlob(newVaultId, fs.createReadStream(__filename));
+            const newBlob = await client.createBlob(newVaultId, testBlobContentsFactory());
 
-            newBlob.should.matchSchema({
-                type: 'object',
-                properties: {
-                    id: {type: 'string', format: 'uuid'},
-                    filename: {type: 'string'},
-                    size: {type: 'string'}
-                },
-                required: ['id', 'filename', 'size']
-            });
+            newBlob.should.matchSchema(newBlobSchema);
 
             const blobs = await client.listBlobs(newVaultId);
             const blobSchema = {
@@ -419,7 +486,7 @@ describe('TrueVaultClient', function () {
 
             await client.getBlob(newVaultId, newBlob.id);
 
-            const updateBlobResponse = await client.updateBlob(newVaultId, newBlob.id, fs.createReadStream(__filename));
+            const updateBlobResponse = await client.updateBlob(newVaultId, newBlob.id, testBlobContentsFactory());
             updateBlobResponse.should.matchSchema(blobSchema);
 
             const newUser = await client.createUser(uniqueString(), uniqueString());
