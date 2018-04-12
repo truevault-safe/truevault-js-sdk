@@ -54,7 +54,7 @@ should.Assertion.add('matchSchema', function (schema) {
     const validate = ajv.compile(schema);
     if (!validate(this.obj)) {
         const validationErrors = validate.errors.map(error => `  ${error.keyword} ${error.message}`);
-        const failureMessage = `object ${JSON.stringify(this.obj, null, 2)} doesn't confirm to schema ${JSON.stringify(schema, null, 2)}:\n${validationErrors.join("\n")}`
+        const failureMessage = `object ${JSON.stringify(this.obj, null, 2)} doesn't conform to schema ${JSON.stringify(schema, null, 2)}:\n${validationErrors.join("\n")}`
         should.fail(this.obj, schema, failureMessage);
     }
 });
