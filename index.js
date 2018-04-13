@@ -295,13 +295,13 @@ class TrueVaultClient {
         return this.listUsersWithStatus(null, full);
     }
 
+    /**
+     * List all users in the account. See https://docs.truevault.com/users#list-all-users.
+     * @param [status=null] If ACTIVE, DEACTIVATED, PENDING, or LOCKED only returns users with that status
+     * @param [full=false] Whether to return user attributes and group IDs
+     * @returns {Promise.<Array>}
+     */
     async listUsersWithStatus(status, full) {
-        /**
-         * List all users in the account. See https://docs.truevault.com/users#list-all-users.
-         * @param [status=null] If ACTIVE, DEACTIVATED, PENDING, or LOCKED only returns users with that status
-         * @param [full=false] Whether to return user attributes and group IDs
-         * @returns {Promise.<Array>}
-         */
         if (full !== true) {
             full = false;
         }
@@ -1126,6 +1126,15 @@ class TrueVaultClient {
         return createResponse.blob;
     }
 
+    /**
+     * Update a BLOB with a callback for progress updates. See https://docs.truevault.com/blobs#update-a-blob.
+     * @param {string} vaultId vault that contains the blob.
+     * @param {string} blobId the ID of the blob being updated
+     * @param {File|Blob} file the BLOB's contents.
+     * @param {function} progressCallback callback for XHR's `progress` and `load` events.
+     * @param {string|null} [ownerId] the BLOB's new owner.
+     * @returns {Promise<*>}
+     */
     async updateBlobWithProgress(vaultId, blobId, file, progressCallback, ownerId) {
         const formData = new tvFormData();
         formData.append('file', file);
@@ -1138,6 +1147,13 @@ class TrueVaultClient {
         return updateResponse.blob;
     }
 
+    /**
+     * Get a BLOB with a callback for progress updates. See https://docs.truevault.com/blobs#read-a-blob.
+     * @param {string} vaultId vault that contains the blob.
+     * @param {string} blobId the ID of the blob being read
+     * @param {function} progressCallback callback for XHR's `progress` and `load` events.
+     * @returns {Promise<{blob: *}>}
+     */
     async getBlobWithProgress(vaultId, blobId, progressCallback) {
         const xhr = await this.performLegacyRequestWithProgress('get', `${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, null, progressCallback, 'blob');
         return {blob: xhr.response};

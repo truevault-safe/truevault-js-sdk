@@ -5111,6 +5111,14 @@ var TrueVaultClient = function () {
 
             return listUsers;
         }()
+
+        /**
+         * List all users in the account. See https://docs.truevault.com/users#list-all-users.
+         * @param [status=null] If ACTIVE, DEACTIVATED, PENDING, or LOCKED only returns users with that status
+         * @param [full=false] Whether to return user attributes and group IDs
+         * @returns {Promise.<Array>}
+         */
+
     }, {
         key: 'listUsersWithStatus',
         value: function () {
@@ -5120,12 +5128,6 @@ var TrueVaultClient = function () {
                     while (1) {
                         switch (_context7.prev = _context7.next) {
                             case 0:
-                                /**
-                                 * List all users in the account. See https://docs.truevault.com/users#list-all-users.
-                                 * @param [status=null] If ACTIVE, DEACTIVATED, PENDING, or LOCKED only returns users with that status
-                                 * @param [full=false] Whether to return user attributes and group IDs
-                                 * @returns {Promise.<Array>}
-                                 */
                                 if (full !== true) {
                                     full = false;
                                 }
@@ -7244,6 +7246,17 @@ var TrueVaultClient = function () {
 
             return createBlobWithProgress;
         }()
+
+        /**
+         * Update a BLOB with a callback for progress updates. See https://docs.truevault.com/blobs#update-a-blob.
+         * @param {string} vaultId vault that contains the blob.
+         * @param {string} blobId the ID of the blob being updated
+         * @param {File|Blob} file the BLOB's contents.
+         * @param {function} progressCallback callback for XHR's `progress` and `load` events.
+         * @param {string|null} [ownerId] the BLOB's new owner.
+         * @returns {Promise<*>}
+         */
+
     }, {
         key: 'updateBlobWithProgress',
         value: function () {
@@ -7282,6 +7295,15 @@ var TrueVaultClient = function () {
 
             return updateBlobWithProgress;
         }()
+
+        /**
+         * Get a BLOB with a callback for progress updates. See https://docs.truevault.com/blobs#read-a-blob.
+         * @param {string} vaultId vault that contains the blob.
+         * @param {string} blobId the ID of the blob being read
+         * @param {function} progressCallback callback for XHR's `progress` and `load` events.
+         * @returns {Promise<{blob: *}>}
+         */
+
     }, {
         key: 'getBlobWithProgress',
         value: function () {
@@ -26679,7 +26701,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 module.exports = {
 	"name": "truevault",
 	"description": "The official TrueVault JavaScript SDK",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truevault/truevault-js-sdk"
