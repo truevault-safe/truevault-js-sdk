@@ -42673,6 +42673,10 @@ function escapeJsonPtr(str) {
 /***/ (function(module, exports) {
 
 module.exports = exports = window.fetch;
+
+// Needed for TypeScript and Webpack.
+exports.default = window.fetch.bind(window);
+
 exports.Headers = window.Headers;
 exports.Request = window.Request;
 exports.Response = window.Response;
@@ -51245,14 +51249,6 @@ module.exports = {
 	"license": "BSD-3-Clause",
 	"main": "build/index-node.js",
 	"browser": "build/index-web.js",
-	"dependencies": {
-		"base-64": "^0.1.0",
-		"cross-fetch": "^2.1.0",
-		"form-data": "^2.3.2",
-		"isomorphic-form-data": "^1.0.0",
-		"urijs": "^1.18.12",
-		"babel-preset-env": "^1.5.2"
-	},
 	"files": [
 		"build/index-node.js",
 		"build/index-web.js",
@@ -51260,6 +51256,14 @@ module.exports = {
 		"README.md",
 		"LICENSE"
 	],
+	"dependencies": {
+		"babel-preset-env": "^1.5.2",
+		"base-64": "^0.1.0",
+		"form-data": "^2.3.2",
+		"isomorphic-form-data": "^1.0.0",
+		"node-fetch": "^2.1.2",
+		"urijs": "^1.18.12"
+	},
 	"devDependencies": {
 		"ajv": "^6.4.0",
 		"babel-core": "^6.26.0",
