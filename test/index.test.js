@@ -441,16 +441,16 @@ describe('TrueVaultClient', function () {
                 newBlob.should.matchSchema(newBlobSchema);
                 createProgressCallback.verify();
 
-
                 const updateProgressCallback = testProgressCallbackFactory("update");
                 const updatedBlob = await client.updateBlobWithProgress(newVault.id, newBlob.id, testBlobContentsFactory(), updateProgressCallback);
                 updatedBlob.should.matchSchema(newBlobSchema);
                 updateProgressCallback.verify();
 
                 const getProgressCallback = testProgressCallbackFactory("get");
-                const blob = await client.getBlobWithProgress(newVault.id, newBlob.id, getProgressCallback);
-                blob.size.should.above(0);
-                blob.should.be.instanceOf(Blob);
+                const getBlobResponse = await client.getBlobWithProgress(newVault.id, newBlob.id, getProgressCallback);
+                console.log('gBR', getBlobResponse);
+                getBlobResponse.blob.size.should.above(0);
+                getBlobResponse.blob.should.be.instanceOf(Blob);
                 getProgressCallback.verify();
             });
         }
@@ -486,7 +486,9 @@ describe('TrueVaultClient', function () {
                 required: ['total', 'page', 'per_page', 'items']
             });
 
-            await client.getBlob(newVaultId, newBlob.id);
+            const response = await client.getBlob(newVaultId, newBlob.id);
+            const responseBlobLength = response.blob.read ? response.blob.read().length : response.blob.size;
+            responseBlobLength.should.above(0);
 
             const updateBlobResponse = await client.updateBlob(newVaultId, newBlob.id, testBlobContentsFactory());
             updateBlobResponse.should.matchSchema(blobSchema);

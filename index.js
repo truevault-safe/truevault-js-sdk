@@ -138,6 +138,16 @@ class TrueVaultClient {
         return this.performLegacyRequest(path, options);
     }
 
+    /**
+     * Performs a legacy (non-v2-JSON) request. By using XHR rather than fetch, it's able to supply progress
+     * information.
+     * @param method
+     * @param url
+     * @param formData
+     * @param progressCallback
+     * @param responseType
+     * @returns {Promise<XMLHTTPRequest>|Promise<Object>} A promise resolving to an XHR object for blobs, and the parsed JSON object for JSON
+     */
     performLegacyRequestWithProgress(method, url, formData, progressCallback, responseType) {
         // We are using XMLHttpRequest here since fetch does not have a progress API
         return new Promise((resolve, reject) => {
@@ -154,7 +164,7 @@ class TrueVaultClient {
             xhr.setRequestHeader('Authorization', this.authHeader);
             xhr.responseType = responseType;
             xhr.onload = () => {
-                switch(responseType) {
+                switch (responseType) {
                     case "json":
                         const responseJson = xhr.response;
                         if (responseJson.result === 'error') {
@@ -166,7 +176,7 @@ class TrueVaultClient {
                         }
                         break;
                     case "blob":
-                        resolve(xhr.response);
+                        resolve(xhr);
                         break;
                     default:
                         throw new Error(`Unsupported responseType: ${responseType}`);
@@ -1125,8 +1135,9 @@ class TrueVaultClient {
         return updateResponse.blob;
     }
 
-    getBlobWithProgress(vaultId, blobId, progressCallback) {
-        return this.performLegacyRequestWithProgress('get', `${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, null, progressCallback, 'blob');
+    async getBlobWithProgress(vaultId, blobId, progressCallback) {
+        const xhr = await this.performLegacyRequestWithProgress('get', `${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, null, progressCallback, 'blob');
+        return {blob: xhr.response};
     }
 
     /**
@@ -1142,7 +1153,10 @@ class TrueVaultClient {
         const response = await fetch(`${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, {
             headers: headers
         });
-        return response.blob ? response.blob() : response.body;
+
+        const blob = response.blob ? await response.blob() : response.body;
+
+        return {blob};
     }
 
     /**

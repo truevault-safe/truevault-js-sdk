@@ -1994,7 +1994,7 @@ module.exports = function(it){
 /***/ (function(module, exports, __webpack_require__) {
 
 var store      = __webpack_require__(80)('wks')
-  , uid        = __webpack_require__(45)
+  , uid        = __webpack_require__(46)
   , Symbol     = __webpack_require__(4).Symbol
   , USE_SYMBOL = typeof Symbol == 'function';
 
@@ -5548,7 +5548,7 @@ module.exports = __webpack_require__(8) ? function(object, key, value){
 var global    = __webpack_require__(4)
   , hide      = __webpack_require__(16)
   , has       = __webpack_require__(13)
-  , SRC       = __webpack_require__(45)('src')
+  , SRC       = __webpack_require__(46)('src')
   , TO_STRING = 'toString'
   , $toString = Function[TO_STRING]
   , TPL       = ('' + $toString).split(TO_STRING);
@@ -5887,20 +5887,20 @@ module.exports = {
 "use strict";
 
 if(__webpack_require__(8)){
-  var LIBRARY             = __webpack_require__(38)
+  var LIBRARY             = __webpack_require__(39)
     , global              = __webpack_require__(4)
     , fails               = __webpack_require__(5)
     , $export             = __webpack_require__(0)
     , $typed              = __webpack_require__(81)
     , $buffer             = __webpack_require__(114)
     , ctx                 = __webpack_require__(30)
-    , anInstance          = __webpack_require__(37)
+    , anInstance          = __webpack_require__(38)
     , propertyDesc        = __webpack_require__(35)
     , hide                = __webpack_require__(16)
-    , redefineAll         = __webpack_require__(42)
+    , redefineAll         = __webpack_require__(43)
     , toInteger           = __webpack_require__(36)
     , toLength            = __webpack_require__(11)
-    , toIndex             = __webpack_require__(44)
+    , toIndex             = __webpack_require__(45)
     , toPrimitive         = __webpack_require__(27)
     , has                 = __webpack_require__(13)
     , same                = __webpack_require__(172)
@@ -5908,11 +5908,11 @@ if(__webpack_require__(8)){
     , isObject            = __webpack_require__(6)
     , toObject            = __webpack_require__(12)
     , isArrayIter         = __webpack_require__(99)
-    , create              = __webpack_require__(39)
+    , create              = __webpack_require__(40)
     , getPrototypeOf      = __webpack_require__(21)
-    , gOPN                = __webpack_require__(40).f
+    , gOPN                = __webpack_require__(41).f
     , getIterFn           = __webpack_require__(116)
-    , uid                 = __webpack_require__(45)
+    , uid                 = __webpack_require__(46)
     , wks                 = __webpack_require__(7)
     , createArrayMethod   = __webpack_require__(25)
     , createArrayIncludes = __webpack_require__(71)
@@ -5920,7 +5920,7 @@ if(__webpack_require__(8)){
     , ArrayIterators      = __webpack_require__(117)
     , Iterators           = __webpack_require__(54)
     , $iterDetect         = __webpack_require__(77)
-    , setSpecies          = __webpack_require__(43)
+    , setSpecies          = __webpack_require__(44)
     , arrayFill           = __webpack_require__(92)
     , arrayCopyWithin     = __webpack_require__(152)
     , $DP                 = __webpack_require__(9)
@@ -6466,7 +6466,7 @@ CipherBase.prototype._toString = function (value, enc, fin) {
 /* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var META     = __webpack_require__(45)('meta')
+var META     = __webpack_require__(46)('meta')
   , isObject = __webpack_require__(6)
   , has      = __webpack_require__(13)
   , setDesc  = __webpack_require__(9).f
@@ -6546,182 +6546,6 @@ module.exports = function(it){
 
 /***/ }),
 /* 37 */
-/***/ (function(module, exports) {
-
-module.exports = function(it, Constructor, name, forbiddenField){
-  if(!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)){
-    throw TypeError(name + ': incorrect invocation!');
-  } return it;
-};
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports) {
-
-module.exports = false;
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-var anObject    = __webpack_require__(3)
-  , dPs         = __webpack_require__(165)
-  , enumBugKeys = __webpack_require__(95)
-  , IE_PROTO    = __webpack_require__(107)('IE_PROTO')
-  , Empty       = function(){ /* empty */ }
-  , PROTOTYPE   = 'prototype';
-
-// Create object with fake `null` prototype: use iframe Object with cleared prototype
-var createDict = function(){
-  // Thrash, waste and sodomy: IE GC bug
-  var iframe = __webpack_require__(94)('iframe')
-    , i      = enumBugKeys.length
-    , lt     = '<'
-    , gt     = '>'
-    , iframeDocument;
-  iframe.style.display = 'none';
-  __webpack_require__(97).appendChild(iframe);
-  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
-  // createDict = iframe.contentWindow.Object;
-  // html.removeChild(iframe);
-  iframeDocument = iframe.contentWindow.document;
-  iframeDocument.open();
-  iframeDocument.write(lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
-  iframeDocument.close();
-  createDict = iframeDocument.F;
-  while(i--)delete createDict[PROTOTYPE][enumBugKeys[i]];
-  return createDict();
-};
-
-module.exports = Object.create || function create(O, Properties){
-  var result;
-  if(O !== null){
-    Empty[PROTOTYPE] = anObject(O);
-    result = new Empty;
-    Empty[PROTOTYPE] = null;
-    // add "__proto__" for Object.getPrototypeOf polyfill
-    result[IE_PROTO] = O;
-  } else result = createDict();
-  return Properties === undefined ? result : dPs(result, Properties);
-};
-
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
-var $keys      = __webpack_require__(167)
-  , hiddenKeys = __webpack_require__(95).concat('length', 'prototype');
-
-exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O){
-  return $keys(O, hiddenKeys);
-};
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 19.1.2.14 / 15.2.3.14 Object.keys(O)
-var $keys       = __webpack_require__(167)
-  , enumBugKeys = __webpack_require__(95);
-
-module.exports = Object.keys || function keys(O){
-  return $keys(O, enumBugKeys);
-};
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var redefine = __webpack_require__(17);
-module.exports = function(target, src, safe){
-  for(var key in src)redefine(target, key, src[key], safe);
-  return target;
-};
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var global      = __webpack_require__(4)
-  , dP          = __webpack_require__(9)
-  , DESCRIPTORS = __webpack_require__(8)
-  , SPECIES     = __webpack_require__(7)('species');
-
-module.exports = function(KEY){
-  var C = global[KEY];
-  if(DESCRIPTORS && C && !C[SPECIES])dP.f(C, SPECIES, {
-    configurable: true,
-    get: function(){ return this; }
-  });
-};
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var toInteger = __webpack_require__(36)
-  , max       = Math.max
-  , min       = Math.min;
-module.exports = function(index, length){
-  index = toInteger(index);
-  return index < 0 ? max(index + length, 0) : min(index, length);
-};
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports) {
-
-var id = 0
-  , px = Math.random();
-module.exports = function(key){
-  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-};
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var hash = exports;
-
-hash.utils = __webpack_require__(477);
-hash.common = __webpack_require__(473);
-hash.sha = __webpack_require__(476);
-hash.ripemd = __webpack_require__(475);
-hash.hmac = __webpack_require__(474);
-
-// Proxy hash functions to the main object
-hash.sha1 = hash.sha.sha1;
-hash.sha256 = hash.sha.sha256;
-hash.sha224 = hash.sha.sha224;
-hash.sha384 = hash.sha.sha384;
-hash.sha512 = hash.sha.sha512;
-hash.ripemd160 = hash.ripemd.ripemd160;
-
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports) {
-
-module.exports = assert;
-
-function assert(val, msg) {
-  if (!val)
-    throw new Error(msg || 'Assertion failed');
-}
-
-assert.equal = function assertEqual(l, r, msg) {
-  if (l != r)
-    throw new Error(msg || ('Assertion failed: ' + l + ' != ' + r));
-};
-
-
-/***/ }),
-/* 48 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -6908,6 +6732,182 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports) {
+
+module.exports = function(it, Constructor, name, forbiddenField){
+  if(!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)){
+    throw TypeError(name + ': incorrect invocation!');
+  } return it;
+};
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports) {
+
+module.exports = false;
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+var anObject    = __webpack_require__(3)
+  , dPs         = __webpack_require__(165)
+  , enumBugKeys = __webpack_require__(95)
+  , IE_PROTO    = __webpack_require__(107)('IE_PROTO')
+  , Empty       = function(){ /* empty */ }
+  , PROTOTYPE   = 'prototype';
+
+// Create object with fake `null` prototype: use iframe Object with cleared prototype
+var createDict = function(){
+  // Thrash, waste and sodomy: IE GC bug
+  var iframe = __webpack_require__(94)('iframe')
+    , i      = enumBugKeys.length
+    , lt     = '<'
+    , gt     = '>'
+    , iframeDocument;
+  iframe.style.display = 'none';
+  __webpack_require__(97).appendChild(iframe);
+  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
+  // createDict = iframe.contentWindow.Object;
+  // html.removeChild(iframe);
+  iframeDocument = iframe.contentWindow.document;
+  iframeDocument.open();
+  iframeDocument.write(lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
+  iframeDocument.close();
+  createDict = iframeDocument.F;
+  while(i--)delete createDict[PROTOTYPE][enumBugKeys[i]];
+  return createDict();
+};
+
+module.exports = Object.create || function create(O, Properties){
+  var result;
+  if(O !== null){
+    Empty[PROTOTYPE] = anObject(O);
+    result = new Empty;
+    Empty[PROTOTYPE] = null;
+    // add "__proto__" for Object.getPrototypeOf polyfill
+    result[IE_PROTO] = O;
+  } else result = createDict();
+  return Properties === undefined ? result : dPs(result, Properties);
+};
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
+var $keys      = __webpack_require__(167)
+  , hiddenKeys = __webpack_require__(95).concat('length', 'prototype');
+
+exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O){
+  return $keys(O, hiddenKeys);
+};
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.14 / 15.2.3.14 Object.keys(O)
+var $keys       = __webpack_require__(167)
+  , enumBugKeys = __webpack_require__(95);
+
+module.exports = Object.keys || function keys(O){
+  return $keys(O, enumBugKeys);
+};
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var redefine = __webpack_require__(17);
+module.exports = function(target, src, safe){
+  for(var key in src)redefine(target, key, src[key], safe);
+  return target;
+};
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var global      = __webpack_require__(4)
+  , dP          = __webpack_require__(9)
+  , DESCRIPTORS = __webpack_require__(8)
+  , SPECIES     = __webpack_require__(7)('species');
+
+module.exports = function(KEY){
+  var C = global[KEY];
+  if(DESCRIPTORS && C && !C[SPECIES])dP.f(C, SPECIES, {
+    configurable: true,
+    get: function(){ return this; }
+  });
+};
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var toInteger = __webpack_require__(36)
+  , max       = Math.max
+  , min       = Math.min;
+module.exports = function(index, length){
+  index = toInteger(index);
+  return index < 0 ? max(index + length, 0) : min(index, length);
+};
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports) {
+
+var id = 0
+  , px = Math.random();
+module.exports = function(key){
+  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+};
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var hash = exports;
+
+hash.utils = __webpack_require__(477);
+hash.common = __webpack_require__(473);
+hash.sha = __webpack_require__(476);
+hash.ripemd = __webpack_require__(475);
+hash.hmac = __webpack_require__(474);
+
+// Proxy hash functions to the main object
+hash.sha1 = hash.sha.sha1;
+hash.sha256 = hash.sha.sha256;
+hash.sha224 = hash.sha.sha224;
+hash.sha384 = hash.sha.sha384;
+hash.sha512 = hash.sha.sha512;
+hash.ripemd160 = hash.ripemd.ripemd160;
+
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports) {
+
+module.exports = assert;
+
+function assert(val, msg) {
+  if (!val)
+    throw new Error(msg || 'Assertion failed');
+}
+
+assert.equal = function assertEqual(l, r, msg) {
+  if (l != r)
+    throw new Error(msg || ('Assertion failed: ' + l + ' != ' + r));
+};
 
 
 /***/ }),
@@ -7749,7 +7749,7 @@ function randomBytes (size, cb) {
   return bytes
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28), __webpack_require__(48)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28), __webpack_require__(37)))
 
 /***/ }),
 /* 67 */
@@ -8599,7 +8599,7 @@ exports.encrypt = function (self, chunk) {
 // true  -> Array#includes
 var toIObject = __webpack_require__(19)
   , toLength  = __webpack_require__(11)
-  , toIndex   = __webpack_require__(44);
+  , toIndex   = __webpack_require__(45);
 module.exports = function(IS_INCLUDES){
   return function($this, el, fromIndex){
     var O      = toIObject($this)
@@ -8626,10 +8626,10 @@ module.exports = function(IS_INCLUDES){
 var global            = __webpack_require__(4)
   , $export           = __webpack_require__(0)
   , redefine          = __webpack_require__(17)
-  , redefineAll       = __webpack_require__(42)
+  , redefineAll       = __webpack_require__(43)
   , meta              = __webpack_require__(34)
   , forOf             = __webpack_require__(53)
-  , anInstance        = __webpack_require__(37)
+  , anInstance        = __webpack_require__(38)
   , isObject          = __webpack_require__(6)
   , fails             = __webpack_require__(5)
   , $iterDetect       = __webpack_require__(77)
@@ -8826,7 +8826,7 @@ module.exports = function(exec, skipClosing){
 /***/ (function(module, exports, __webpack_require__) {
 
 // Forced replacement prototype accessors methods
-module.exports = __webpack_require__(38)|| !__webpack_require__(5)(function(){
+module.exports = __webpack_require__(39)|| !__webpack_require__(5)(function(){
   var K = Math.random();
   // In FF throws only define methods
   __defineSetter__.call(null, K, function(){ /* empty */});
@@ -8856,7 +8856,7 @@ module.exports = function(key){
 
 var global = __webpack_require__(4)
   , hide   = __webpack_require__(16)
-  , uid    = __webpack_require__(45)
+  , uid    = __webpack_require__(46)
   , TYPED  = uid('typed_array')
   , VIEW   = uid('view')
   , ABV    = !!(global.ArrayBuffer && global.DataView)
@@ -10035,7 +10035,7 @@ function getr(priv) {
 // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
 
 var toObject = __webpack_require__(12)
-  , toIndex  = __webpack_require__(44)
+  , toIndex  = __webpack_require__(45)
   , toLength = __webpack_require__(11);
 module.exports = function fill(value /*, start = 0, end = @length */){
   var O      = toObject(this)
@@ -10148,7 +10148,7 @@ module.exports = Array.isArray || function isArray(arg){
 
 "use strict";
 
-var create         = __webpack_require__(39)
+var create         = __webpack_require__(40)
   , descriptor     = __webpack_require__(35)
   , setToStringTag = __webpack_require__(55)
   , IteratorPrototype = {};
@@ -10167,7 +10167,7 @@ module.exports = function(Constructor, NAME, next){
 
 "use strict";
 
-var LIBRARY        = __webpack_require__(38)
+var LIBRARY        = __webpack_require__(39)
   , $export        = __webpack_require__(0)
   , redefine       = __webpack_require__(17)
   , hide           = __webpack_require__(16)
@@ -10369,7 +10369,7 @@ module.exports = {
 /***/ (function(module, exports, __webpack_require__) {
 
 var shared = __webpack_require__(80)('keys')
-  , uid    = __webpack_require__(45);
+  , uid    = __webpack_require__(46);
 module.exports = function(key){
   return shared[key] || (shared[key] = uid(key));
 };
@@ -10535,15 +10535,15 @@ module.exports = {
 
 var global         = __webpack_require__(4)
   , DESCRIPTORS    = __webpack_require__(8)
-  , LIBRARY        = __webpack_require__(38)
+  , LIBRARY        = __webpack_require__(39)
   , $typed         = __webpack_require__(81)
   , hide           = __webpack_require__(16)
-  , redefineAll    = __webpack_require__(42)
+  , redefineAll    = __webpack_require__(43)
   , fails          = __webpack_require__(5)
-  , anInstance     = __webpack_require__(37)
+  , anInstance     = __webpack_require__(38)
   , toInteger      = __webpack_require__(36)
   , toLength       = __webpack_require__(11)
-  , gOPN           = __webpack_require__(40).f
+  , gOPN           = __webpack_require__(41).f
   , dP             = __webpack_require__(9).f
   , arrayFill      = __webpack_require__(92)
   , setToStringTag = __webpack_require__(55)
@@ -10812,7 +10812,7 @@ exports[DATA_VIEW] = $DataView;
 
 var global         = __webpack_require__(4)
   , core           = __webpack_require__(29)
-  , LIBRARY        = __webpack_require__(38)
+  , LIBRARY        = __webpack_require__(39)
   , wksExt         = __webpack_require__(174)
   , defineProperty = __webpack_require__(9).f;
 module.exports = function(name){
@@ -11474,7 +11474,7 @@ function nextTick(fn, arg1, arg2, arg3) {
   }
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(48)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
 
 /***/ }),
 /* 123 */
@@ -12024,7 +12024,7 @@ function CorkedRequest(state) {
     }
   };
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(48), __webpack_require__(512).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37), __webpack_require__(512).setImmediate))
 
 /***/ }),
 /* 124 */
@@ -14868,7 +14868,7 @@ module.exports = function(it, msg){
 // 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
 
 var toObject = __webpack_require__(12)
-  , toIndex  = __webpack_require__(44)
+  , toIndex  = __webpack_require__(45)
   , toLength = __webpack_require__(11);
 
 module.exports = [].copyWithin || function copyWithin(target/*= 0*/, start/*= 0, end = @length*/){
@@ -14975,15 +14975,15 @@ module.exports = Function.bind || function bind(that /*, args... */){
 "use strict";
 
 var dP          = __webpack_require__(9).f
-  , create      = __webpack_require__(39)
-  , redefineAll = __webpack_require__(42)
+  , create      = __webpack_require__(40)
+  , redefineAll = __webpack_require__(43)
   , ctx         = __webpack_require__(30)
-  , anInstance  = __webpack_require__(37)
+  , anInstance  = __webpack_require__(38)
   , defined     = __webpack_require__(23)
   , forOf       = __webpack_require__(53)
   , $iterDefine = __webpack_require__(102)
   , step        = __webpack_require__(162)
-  , setSpecies  = __webpack_require__(43)
+  , setSpecies  = __webpack_require__(44)
   , DESCRIPTORS = __webpack_require__(8)
   , fastKey     = __webpack_require__(34).fastKey
   , SIZE        = DESCRIPTORS ? '_s' : 'size';
@@ -15136,11 +15136,11 @@ module.exports = function(NAME){
 
 "use strict";
 
-var redefineAll       = __webpack_require__(42)
+var redefineAll       = __webpack_require__(43)
   , getWeak           = __webpack_require__(34).getWeak
   , anObject          = __webpack_require__(3)
   , isObject          = __webpack_require__(6)
-  , anInstance        = __webpack_require__(37)
+  , anInstance        = __webpack_require__(38)
   , forOf             = __webpack_require__(53)
   , createArrayMethod = __webpack_require__(25)
   , $has              = __webpack_require__(13)
@@ -15279,7 +15279,7 @@ module.exports = Math.log1p || function log1p(x){
 "use strict";
 
 // 19.1.2.1 Object.assign(target, source, ...)
-var getKeys  = __webpack_require__(41)
+var getKeys  = __webpack_require__(42)
   , gOPS     = __webpack_require__(79)
   , pIE      = __webpack_require__(63)
   , toObject = __webpack_require__(12)
@@ -15317,7 +15317,7 @@ module.exports = !$assign || __webpack_require__(5)(function(){
 
 var dP       = __webpack_require__(9)
   , anObject = __webpack_require__(3)
-  , getKeys  = __webpack_require__(41);
+  , getKeys  = __webpack_require__(42);
 
 module.exports = __webpack_require__(8) ? Object.defineProperties : function defineProperties(O, Properties){
   anObject(O);
@@ -15335,7 +15335,7 @@ module.exports = __webpack_require__(8) ? Object.defineProperties : function def
 
 // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
 var toIObject = __webpack_require__(19)
-  , gOPN      = __webpack_require__(40).f
+  , gOPN      = __webpack_require__(41).f
   , toString  = {}.toString;
 
 var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
@@ -15380,7 +15380,7 @@ module.exports = function(object, names){
 /* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getKeys   = __webpack_require__(41)
+var getKeys   = __webpack_require__(42)
   , toIObject = __webpack_require__(19)
   , isEnum    = __webpack_require__(63).f;
 module.exports = function(isEntries){
@@ -15402,7 +15402,7 @@ module.exports = function(isEntries){
 /***/ (function(module, exports, __webpack_require__) {
 
 // all object keys, includes non-enumerable and symbols
-var gOPN     = __webpack_require__(40)
+var gOPN     = __webpack_require__(41)
   , gOPS     = __webpack_require__(79)
   , anObject = __webpack_require__(3)
   , Reflect  = __webpack_require__(4).Reflect;
@@ -16268,7 +16268,7 @@ if (process.browser) {
 }
 module.exports = defaultEncoding
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(48)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
 
 /***/ }),
 /* 190 */
@@ -17931,7 +17931,7 @@ function indexOf(xs, x) {
   }
   return -1;
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(48)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
 
 /***/ }),
 /* 197 */
@@ -20022,7 +20022,7 @@ if (getRandomValues) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(__dirname, __filename) {
+/* WEBPACK VAR INJECTION */(function(__dirname, process) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -20102,7 +20102,7 @@ _should2.default.Assertion.add('matchSchema', function (schema) {
         var validationErrors = validate.errors.map(function (error) {
             return '  ' + error.keyword + ' ' + error.message;
         });
-        var failureMessage = 'object ' + JSON.stringify(this.obj, null, 2) + ' doesn\'t confirm to schema ' + JSON.stringify(schema, null, 2) + ':\n' + validationErrors.join("\n");
+        var failureMessage = 'object ' + JSON.stringify(this.obj, null, 2) + ' doesn\'t conform to schema ' + JSON.stringify(schema, null, 2) + ':\n' + validationErrors.join("\n");
         _should2.default.fail(this.obj, schema, failureMessage);
     }
 });
@@ -20114,7 +20114,7 @@ describe('TrueVaultClient', function () {
     this.timeout(10 * 60 * 1000);
 
     describe('login', function () {
-        it('', _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+        it('works', _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
             var loginUserUsername, loginUserPassword, loginClient, currentUser, currentUserFull;
             return regeneratorRuntime.wrap(function _callee$(_context) {
                 while (1) {
@@ -20171,7 +20171,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('error handling', function () {
-        it('error handling', _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
+        it('works', _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
             return regeneratorRuntime.wrap(function _callee2$(_context2) {
                 while (1) {
                     switch (_context2.prev = _context2.next) {
@@ -20210,7 +20210,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('readCurrentUser', function () {
-        it('readCurrentUser', _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
+        it('returns current user', _asyncToGenerator(regeneratorRuntime.mark(function _callee3() {
             var user;
             return regeneratorRuntime.wrap(function _callee3$(_context3) {
                 while (1) {
@@ -20234,7 +20234,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('groups', function () {
-        it('groups', _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
+        it('works', _asyncToGenerator(regeneratorRuntime.mark(function _callee4() {
             var newGroup, groupSchema, fullGroup, updatedGroup, groups, newUser, addUsersResult, removeUsersResult, addUsersReturnIdsResult, removeUsersReturnIdsResult, deleteResult;
             return regeneratorRuntime.wrap(function _callee4$(_context4) {
                 while (1) {
@@ -20349,7 +20349,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('users', function () {
-        it('users', _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
+        it('works', _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
             var newUserSchema, updateSchemaResponse, schemaSchema, readUserSchemaResponse, newUser, userSchemaWithUsername, newUserWithStatus, users, fullUsers, usersWithStatus, pendingUser, userFromTV, usersFromTV, uniqueAttributeValue, userUpdatedAttributes, searchResultNotFull, searchResultFull, newUserAccessToken, newUserAPIKey, newUserPasswordUpdated, newUserStatusUpdated, newUserUsernameUpdated, newUserDeleted, updateCurrentUserResult, currentUserAfterUpdate;
             return regeneratorRuntime.wrap(function _callee5$(_context5) {
                 while (1) {
@@ -20648,7 +20648,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('user mfa', function () {
-        it('user mfa', _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+        it('works', _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
             var newUsername, newUserPassword, newUser, mfaEnrollmentInfo, secret, token1, token2, mfaFinalizationResult, token3, mfaUnrenrollResult;
             return regeneratorRuntime.wrap(function _callee6$(_context6) {
                 while (1) {
@@ -20727,8 +20727,10 @@ describe('TrueVaultClient', function () {
             // but on web Blob will be defined so the other branch runs.
             var fs = eval("require('fs')");
 
+            var directory = process.env.LAMBDA_TASK_ROOT || __dirname;
+            var filePath = directory + '/' + 'index.test.js';
             testBlobContentsFactory = function testBlobContentsFactory() {
-                return fs.createReadStream(__filename);
+                return fs.createReadStream(filePath);
             };
         }
 
@@ -20770,10 +20772,10 @@ describe('TrueVaultClient', function () {
         }
 
         if (typeof XMLHttpRequest === "undefined") {
-            it('blobs with progress tests can only run in the browser');
+            it('works with progress tests can only run in the browser');
         } else {
-            it('progress', _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
-                var newVault, createProgressCallback, newBlob, updateProgressCallback, updatedBlob, getProgressCallback, blob;
+            it('works with progress', _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+                var newVault, createProgressCallback, newBlob, updateProgressCallback, updatedBlob, getProgressCallback, getBlobResponse;
                 return regeneratorRuntime.wrap(function _callee7$(_context7) {
                     while (1) {
                         switch (_context7.prev = _context7.next) {
@@ -20808,13 +20810,14 @@ describe('TrueVaultClient', function () {
                                 return client.getBlobWithProgress(newVault.id, newBlob.id, getProgressCallback);
 
                             case 18:
-                                blob = _context7.sent;
+                                getBlobResponse = _context7.sent;
 
-                                blob.size.should.above(0);
-                                blob.should.be.instanceOf(Blob);
+                                console.log('gBR', getBlobResponse);
+                                getBlobResponse.blob.size.should.above(0);
+                                getBlobResponse.blob.should.be.instanceOf(Blob);
                                 getProgressCallback.verify();
 
-                            case 22:
+                            case 23:
                             case 'end':
                                 return _context7.stop();
                         }
@@ -20823,8 +20826,8 @@ describe('TrueVaultClient', function () {
             })));
         }
 
-        it('non-progress', _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
-            var vaultName, newVault, newVaultId, newBlob, blobs, blobSchema, updateBlobResponse, newUser, updateOwnerResponse, deleteResponse;
+        it('works without progress', _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+            var vaultName, newVault, newVaultId, newBlob, blobs, blobSchema, response, responseBlobLength, updateBlobResponse, newUser, updateOwnerResponse, deleteResponse;
             return regeneratorRuntime.wrap(function _callee8$(_context8) {
                 while (1) {
                     switch (_context8.prev = _context8.next) {
@@ -20876,36 +20879,41 @@ describe('TrueVaultClient', function () {
                             return client.getBlob(newVaultId, newBlob.id);
 
                         case 16:
-                            _context8.next = 18;
+                            response = _context8.sent;
+                            responseBlobLength = response.blob.read ? response.blob.read().length : response.blob.size;
+
+                            responseBlobLength.should.above(0);
+
+                            _context8.next = 21;
                             return client.updateBlob(newVaultId, newBlob.id, testBlobContentsFactory());
 
-                        case 18:
+                        case 21:
                             updateBlobResponse = _context8.sent;
 
                             updateBlobResponse.should.matchSchema(blobSchema);
 
-                            _context8.next = 22;
+                            _context8.next = 25;
                             return client.createUser(uniqueString(), uniqueString());
 
-                        case 22:
+                        case 25:
                             newUser = _context8.sent;
-                            _context8.next = 25;
+                            _context8.next = 28;
                             return client.updateBlobOwner(newVaultId, newBlob.id, newUser.id);
 
-                        case 25:
+                        case 28:
                             updateOwnerResponse = _context8.sent;
 
                             updateOwnerResponse.should.matchSchema(blobSchema);
 
-                            _context8.next = 29;
+                            _context8.next = 32;
                             return client.deleteBlob(newVaultId, newBlob.id);
 
-                        case 29:
+                        case 32:
                             deleteResponse = _context8.sent;
 
                             deleteResponse.should.matchSchema(blobSchema);
 
-                        case 31:
+                        case 34:
                         case 'end':
                             return _context8.stop();
                     }
@@ -20915,7 +20923,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('vaults and docs', function () {
-        it('vaults and docs', _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
+        it('works', _asyncToGenerator(regeneratorRuntime.mark(function _callee9() {
             var vaults, vaultSchema, newVault, vaultId, vaultFromTV, newVaultName, updatedVault, docAttributes, newDoc, documentSchema, newDocId, newUser, updateOwnerResponse, getDocsByIdResponse, fullDocs, docListSchema, updateDocumentResponse, newSchemaName, newSchema, schemaSchema, addedDocToSchemaResponse, schemaFromTrueVault, schemas, schemaToDelete, deleteSchemaResponse, indexedDoc, docsInSchema, searchResultsNotFull, searchResultsFull, newFields, newName, updateSchemaResponse, deleteDocumentResponse, vaultToDelete, deleteVaultResponse;
             return regeneratorRuntime.wrap(function _callee9$(_context9) {
                 while (1) {
@@ -21263,7 +21271,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('password reset flow', function () {
-        it('password reset flow', _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
+        it('works', _asyncToGenerator(regeneratorRuntime.mark(function _callee10() {
             var passwordResetFlowSchema, passwordResetFlowName, passwordResetFlow, passwordResetFlows, sendResult;
             return regeneratorRuntime.wrap(function _callee10$(_context10) {
                 while (1) {
@@ -21318,7 +21326,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('sendgrid', function () {
-        it('sendgrid', _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
+        it('works', _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
             var newUser, providerMessageId;
             return regeneratorRuntime.wrap(function _callee11$(_context11) {
                 while (1) {
@@ -21347,7 +21355,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('twilio', function () {
-        it('twilio', _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
+        it('works', _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
             var newUser;
             return regeneratorRuntime.wrap(function _callee12$(_context12) {
                 while (1) {
@@ -21380,7 +21388,7 @@ describe('TrueVaultClient', function () {
         })));
     });
 });
-/* WEBPACK VAR INJECTION */}.call(exports, "/", "/index.js"))
+/* WEBPACK VAR INJECTION */}.call(exports, "/", __webpack_require__(37)))
 
 /***/ }),
 /* 211 */
@@ -25723,7 +25731,7 @@ Entity.prototype.encode = function encode(data, enc, /* internal */ reporter) {
 var Reporter = __webpack_require__(59).Reporter;
 var EncoderBuffer = __webpack_require__(59).EncoderBuffer;
 var DecoderBuffer = __webpack_require__(59).DecoderBuffer;
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 
 // Supported tags
 var tags = [
@@ -26837,6 +26845,18 @@ var TrueVaultClient = function () {
 
             return performJSONRequest;
         }()
+
+        /**
+         * Performs a legacy (non-v2-JSON) request. By using XHR rather than fetch, it's able to supply progress
+         * information.
+         * @param method
+         * @param url
+         * @param formData
+         * @param progressCallback
+         * @param responseType
+         * @returns {Promise<XMLHTTPRequest>|Promise<Object>} A promise resolving to an XHR object for blobs, and the parsed JSON object for JSON
+         */
+
     }, {
         key: 'performLegacyRequestWithProgress',
         value: function performLegacyRequestWithProgress(method, url, formData, progressCallback, responseType) {
@@ -26869,7 +26889,7 @@ var TrueVaultClient = function () {
                             }
                             break;
                         case "blob":
-                            resolve(xhr.response);
+                            resolve(xhr);
                             break;
                         default:
                             throw new Error('Unsupported responseType: ' + responseType);
@@ -29233,9 +29253,34 @@ var TrueVaultClient = function () {
         }()
     }, {
         key: 'getBlobWithProgress',
-        value: function getBlobWithProgress(vaultId, blobId, progressCallback) {
-            return this.performLegacyRequestWithProgress('get', this.host + '/v1/vaults/' + vaultId + '/blobs/' + blobId, null, progressCallback, 'blob');
-        }
+        value: function () {
+            var _ref56 = _asyncToGenerator(regeneratorRuntime.mark(function _callee56(vaultId, blobId, progressCallback) {
+                var xhr;
+                return regeneratorRuntime.wrap(function _callee56$(_context56) {
+                    while (1) {
+                        switch (_context56.prev = _context56.next) {
+                            case 0:
+                                _context56.next = 2;
+                                return this.performLegacyRequestWithProgress('get', this.host + '/v1/vaults/' + vaultId + '/blobs/' + blobId, null, progressCallback, 'blob');
+
+                            case 2:
+                                xhr = _context56.sent;
+                                return _context56.abrupt('return', { blob: xhr.response });
+
+                            case 4:
+                            case 'end':
+                                return _context56.stop();
+                        }
+                    }
+                }, _callee56, this);
+            }));
+
+            function getBlobWithProgress(_x119, _x120, _x121) {
+                return _ref56.apply(this, arguments);
+            }
+
+            return getBlobWithProgress;
+        }()
 
         /**
          * Get a BLOB's contents. See https://docs.truevault.com/blobs#read-a-blob.
@@ -29247,34 +29292,53 @@ var TrueVaultClient = function () {
     }, {
         key: 'getBlob',
         value: function () {
-            var _ref56 = _asyncToGenerator(regeneratorRuntime.mark(function _callee56(vaultId, blobId) {
-                var headers, response;
-                return regeneratorRuntime.wrap(function _callee56$(_context56) {
+            var _ref57 = _asyncToGenerator(regeneratorRuntime.mark(function _callee57(vaultId, blobId) {
+                var headers, response, blob;
+                return regeneratorRuntime.wrap(function _callee57$(_context57) {
                     while (1) {
-                        switch (_context56.prev = _context56.next) {
+                        switch (_context57.prev = _context57.next) {
                             case 0:
                                 headers = {
                                     Authorization: this.authHeader
                                 };
-                                _context56.next = 3;
+                                _context57.next = 3;
                                 return fetch(this.host + '/v1/vaults/' + vaultId + '/blobs/' + blobId, {
                                     headers: headers
                                 });
 
                             case 3:
-                                response = _context56.sent;
-                                return _context56.abrupt('return', response.blob ? response.blob() : response.body);
+                                response = _context57.sent;
 
-                            case 5:
+                                if (!response.blob) {
+                                    _context57.next = 10;
+                                    break;
+                                }
+
+                                _context57.next = 7;
+                                return response.blob();
+
+                            case 7:
+                                _context57.t0 = _context57.sent;
+                                _context57.next = 11;
+                                break;
+
+                            case 10:
+                                _context57.t0 = response.body;
+
+                            case 11:
+                                blob = _context57.t0;
+                                return _context57.abrupt('return', { blob: blob });
+
+                            case 13:
                             case 'end':
-                                return _context56.stop();
+                                return _context57.stop();
                         }
                     }
-                }, _callee56, this);
+                }, _callee57, this);
             }));
 
-            function getBlob(_x119, _x120) {
-                return _ref56.apply(this, arguments);
+            function getBlob(_x122, _x123) {
+                return _ref57.apply(this, arguments);
             }
 
             return getBlob;
@@ -29291,11 +29355,11 @@ var TrueVaultClient = function () {
     }, {
         key: 'listBlobs',
         value: function () {
-            var _ref57 = _asyncToGenerator(regeneratorRuntime.mark(function _callee57(vaultId, page, perPage) {
+            var _ref58 = _asyncToGenerator(regeneratorRuntime.mark(function _callee58(vaultId, page, perPage) {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee57$(_context57) {
+                return regeneratorRuntime.wrap(function _callee58$(_context58) {
                     while (1) {
-                        switch (_context57.prev = _context57.next) {
+                        switch (_context58.prev = _context58.next) {
                             case 0:
                                 url = 'v1/vaults/' + vaultId + '/blobs?';
 
@@ -29305,23 +29369,23 @@ var TrueVaultClient = function () {
                                 if (!!perPage) {
                                     url += '&per_page=' + perPage;
                                 }
-                                _context57.next = 5;
+                                _context58.next = 5;
                                 return this.performLegacyRequest(url);
 
                             case 5:
-                                response = _context57.sent;
-                                return _context57.abrupt('return', response.data);
+                                response = _context58.sent;
+                                return _context58.abrupt('return', response.data);
 
                             case 7:
                             case 'end':
-                                return _context57.stop();
+                                return _context58.stop();
                         }
                     }
-                }, _callee57, this);
+                }, _callee58, this);
             }));
 
-            function listBlobs(_x121, _x122, _x123) {
-                return _ref57.apply(this, arguments);
+            function listBlobs(_x124, _x125, _x126) {
+                return _ref58.apply(this, arguments);
             }
 
             return listBlobs;
@@ -29339,11 +29403,11 @@ var TrueVaultClient = function () {
     }, {
         key: 'updateBlob',
         value: function () {
-            var _ref58 = _asyncToGenerator(regeneratorRuntime.mark(function _callee58(vaultId, blobId, file, ownerId) {
+            var _ref59 = _asyncToGenerator(regeneratorRuntime.mark(function _callee59(vaultId, blobId, file, ownerId) {
                 var formData, resopnse;
-                return regeneratorRuntime.wrap(function _callee58$(_context58) {
+                return regeneratorRuntime.wrap(function _callee59$(_context59) {
                     while (1) {
-                        switch (_context58.prev = _context58.next) {
+                        switch (_context59.prev = _context59.next) {
                             case 0:
                                 formData = new FormData();
 
@@ -29353,26 +29417,26 @@ var TrueVaultClient = function () {
                                     formData.append('owner_id', ownerId);
                                 }
 
-                                _context58.next = 5;
+                                _context59.next = 5;
                                 return this.performLegacyRequest('v1/vaults/' + vaultId + '/blobs/' + blobId, {
                                     method: 'PUT',
                                     body: formData
                                 });
 
                             case 5:
-                                resopnse = _context58.sent;
-                                return _context58.abrupt('return', resopnse.blob);
+                                resopnse = _context59.sent;
+                                return _context59.abrupt('return', resopnse.blob);
 
                             case 7:
                             case 'end':
-                                return _context58.stop();
+                                return _context59.stop();
                         }
                     }
-                }, _callee58, this);
+                }, _callee59, this);
             }));
 
-            function updateBlob(_x124, _x125, _x126, _x127) {
-                return _ref58.apply(this, arguments);
+            function updateBlob(_x127, _x128, _x129, _x130) {
+                return _ref59.apply(this, arguments);
             }
 
             return updateBlob;
@@ -29389,36 +29453,36 @@ var TrueVaultClient = function () {
     }, {
         key: 'updateBlobOwner',
         value: function () {
-            var _ref59 = _asyncToGenerator(regeneratorRuntime.mark(function _callee59(vaultId, blobId, ownerId) {
+            var _ref60 = _asyncToGenerator(regeneratorRuntime.mark(function _callee60(vaultId, blobId, ownerId) {
                 var formData, response;
-                return regeneratorRuntime.wrap(function _callee59$(_context59) {
+                return regeneratorRuntime.wrap(function _callee60$(_context60) {
                     while (1) {
-                        switch (_context59.prev = _context59.next) {
+                        switch (_context60.prev = _context60.next) {
                             case 0:
                                 formData = new FormData();
 
                                 formData.append('owner_id', ownerId);
 
-                                _context59.next = 4;
+                                _context60.next = 4;
                                 return this.performLegacyRequest('v1/vaults/' + vaultId + '/blobs/' + blobId + '/owner', {
                                     method: 'PUT',
                                     body: formData
                                 });
 
                             case 4:
-                                response = _context59.sent;
-                                return _context59.abrupt('return', response.blob);
+                                response = _context60.sent;
+                                return _context60.abrupt('return', response.blob);
 
                             case 6:
                             case 'end':
-                                return _context59.stop();
+                                return _context60.stop();
                         }
                     }
-                }, _callee59, this);
+                }, _callee60, this);
             }));
 
-            function updateBlobOwner(_x128, _x129, _x130) {
-                return _ref59.apply(this, arguments);
+            function updateBlobOwner(_x131, _x132, _x133) {
+                return _ref60.apply(this, arguments);
             }
 
             return updateBlobOwner;
@@ -29434,31 +29498,31 @@ var TrueVaultClient = function () {
     }, {
         key: 'deleteBlob',
         value: function () {
-            var _ref60 = _asyncToGenerator(regeneratorRuntime.mark(function _callee60(vaultId, blobId) {
+            var _ref61 = _asyncToGenerator(regeneratorRuntime.mark(function _callee61(vaultId, blobId) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee60$(_context60) {
+                return regeneratorRuntime.wrap(function _callee61$(_context61) {
                     while (1) {
-                        switch (_context60.prev = _context60.next) {
+                        switch (_context61.prev = _context61.next) {
                             case 0:
-                                _context60.next = 2;
+                                _context61.next = 2;
                                 return this.performLegacyRequest('v1/vaults/' + vaultId + '/blobs/' + blobId, {
                                     method: 'DELETE'
                                 });
 
                             case 2:
-                                response = _context60.sent;
-                                return _context60.abrupt('return', response.blob);
+                                response = _context61.sent;
+                                return _context61.abrupt('return', response.blob);
 
                             case 4:
                             case 'end':
-                                return _context60.stop();
+                                return _context61.stop();
                         }
                     }
-                }, _callee60, this);
+                }, _callee61, this);
             }));
 
-            function deleteBlob(_x131, _x132) {
-                return _ref60.apply(this, arguments);
+            function deleteBlob(_x134, _x135) {
+                return _ref61.apply(this, arguments);
             }
 
             return deleteBlob;
@@ -29478,13 +29542,13 @@ var TrueVaultClient = function () {
     }, {
         key: 'sendEmailSendgrid',
         value: function () {
-            var _ref61 = _asyncToGenerator(regeneratorRuntime.mark(function _callee61(sendgridApiKey, userId, sendgridTemplateId, fromEmailSpecifier, toEmailSpecifier, substitutions) {
+            var _ref62 = _asyncToGenerator(regeneratorRuntime.mark(function _callee62(sendgridApiKey, userId, sendgridTemplateId, fromEmailSpecifier, toEmailSpecifier, substitutions) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee61$(_context61) {
+                return regeneratorRuntime.wrap(function _callee62$(_context62) {
                     while (1) {
-                        switch (_context61.prev = _context61.next) {
+                        switch (_context62.prev = _context62.next) {
                             case 0:
-                                _context61.next = 2;
+                                _context62.next = 2;
                                 return this.performJSONRequest('v1/users/' + userId + '/message/email', {
                                     method: 'POST',
                                     body: JSON.stringify({
@@ -29498,19 +29562,19 @@ var TrueVaultClient = function () {
                                 });
 
                             case 2:
-                                response = _context61.sent;
-                                return _context61.abrupt('return', response.provider_message_id);
+                                response = _context62.sent;
+                                return _context62.abrupt('return', response.provider_message_id);
 
                             case 4:
                             case 'end':
-                                return _context61.stop();
+                                return _context62.stop();
                         }
                     }
-                }, _callee61, this);
+                }, _callee62, this);
             }));
 
-            function sendEmailSendgrid(_x133, _x134, _x135, _x136, _x137, _x138) {
-                return _ref61.apply(this, arguments);
+            function sendEmailSendgrid(_x136, _x137, _x138, _x139, _x140, _x141) {
+                return _ref62.apply(this, arguments);
             }
 
             return sendEmailSendgrid;
@@ -29532,13 +29596,13 @@ var TrueVaultClient = function () {
     }, {
         key: 'sendSMSTwilio',
         value: function () {
-            var _ref62 = _asyncToGenerator(regeneratorRuntime.mark(function _callee62(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody, mediaURLs) {
+            var _ref63 = _asyncToGenerator(regeneratorRuntime.mark(function _callee63(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody, mediaURLs) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee62$(_context62) {
+                return regeneratorRuntime.wrap(function _callee63$(_context63) {
                     while (1) {
-                        switch (_context62.prev = _context62.next) {
+                        switch (_context63.prev = _context63.next) {
                             case 0:
-                                _context62.next = 2;
+                                _context63.next = 2;
                                 return this.performJSONRequest('v1/users/' + userId + '/message/sms', {
                                     method: 'POST',
                                     body: JSON.stringify({
@@ -29556,19 +29620,19 @@ var TrueVaultClient = function () {
                                 });
 
                             case 2:
-                                response = _context62.sent;
-                                return _context62.abrupt('return', response.provider_message_id);
+                                response = _context63.sent;
+                                return _context63.abrupt('return', response.provider_message_id);
 
                             case 4:
                             case 'end':
-                                return _context62.stop();
+                                return _context63.stop();
                         }
                     }
-                }, _callee62, this);
+                }, _callee63, this);
             }));
 
-            function sendSMSTwilio(_x139, _x140, _x141, _x142, _x143, _x144, _x145, _x146) {
-                return _ref62.apply(this, arguments);
+            function sendSMSTwilio(_x142, _x143, _x144, _x145, _x146, _x147, _x148, _x149) {
+                return _ref63.apply(this, arguments);
             }
 
             return sendSMSTwilio;
@@ -29588,13 +29652,13 @@ var TrueVaultClient = function () {
     }, {
         key: 'createPasswordResetFlow',
         value: function () {
-            var _ref63 = _asyncToGenerator(regeneratorRuntime.mark(function _callee63(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
+            var _ref64 = _asyncToGenerator(regeneratorRuntime.mark(function _callee64(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee63$(_context63) {
+                return regeneratorRuntime.wrap(function _callee64$(_context64) {
                     while (1) {
-                        switch (_context63.prev = _context63.next) {
+                        switch (_context64.prev = _context64.next) {
                             case 0:
-                                _context63.next = 2;
+                                _context64.next = 2;
                                 return this.performJSONRequest('v1/password_reset_flows', {
                                     method: 'POST',
                                     body: JSON.stringify({
@@ -29608,19 +29672,19 @@ var TrueVaultClient = function () {
                                 });
 
                             case 2:
-                                response = _context63.sent;
-                                return _context63.abrupt('return', response.password_reset_flow);
+                                response = _context64.sent;
+                                return _context64.abrupt('return', response.password_reset_flow);
 
                             case 4:
                             case 'end':
-                                return _context63.stop();
+                                return _context64.stop();
                         }
                     }
-                }, _callee63, this);
+                }, _callee64, this);
             }));
 
-            function createPasswordResetFlow(_x147, _x148, _x149, _x150, _x151, _x152) {
-                return _ref63.apply(this, arguments);
+            function createPasswordResetFlow(_x150, _x151, _x152, _x153, _x154, _x155) {
+                return _ref64.apply(this, arguments);
             }
 
             return createPasswordResetFlow;
@@ -29634,29 +29698,29 @@ var TrueVaultClient = function () {
     }, {
         key: 'listPasswordResetFlows',
         value: function () {
-            var _ref64 = _asyncToGenerator(regeneratorRuntime.mark(function _callee64() {
+            var _ref65 = _asyncToGenerator(regeneratorRuntime.mark(function _callee65() {
                 var response;
-                return regeneratorRuntime.wrap(function _callee64$(_context64) {
+                return regeneratorRuntime.wrap(function _callee65$(_context65) {
                     while (1) {
-                        switch (_context64.prev = _context64.next) {
+                        switch (_context65.prev = _context65.next) {
                             case 0:
-                                _context64.next = 2;
+                                _context65.next = 2;
                                 return this.performJSONRequest('v1/password_reset_flows');
 
                             case 2:
-                                response = _context64.sent;
-                                return _context64.abrupt('return', response.password_reset_flows);
+                                response = _context65.sent;
+                                return _context65.abrupt('return', response.password_reset_flows);
 
                             case 4:
                             case 'end':
-                                return _context64.stop();
+                                return _context65.stop();
                         }
                     }
-                }, _callee64, this);
+                }, _callee65, this);
             }));
 
             function listPasswordResetFlows() {
-                return _ref64.apply(this, arguments);
+                return _ref65.apply(this, arguments);
             }
 
             return listPasswordResetFlows;
@@ -29672,12 +29736,12 @@ var TrueVaultClient = function () {
     }, {
         key: 'sendPasswordResetEmail',
         value: function () {
-            var _ref65 = _asyncToGenerator(regeneratorRuntime.mark(function _callee65(flowId, username) {
-                return regeneratorRuntime.wrap(function _callee65$(_context65) {
+            var _ref66 = _asyncToGenerator(regeneratorRuntime.mark(function _callee66(flowId, username) {
+                return regeneratorRuntime.wrap(function _callee66$(_context66) {
                     while (1) {
-                        switch (_context65.prev = _context65.next) {
+                        switch (_context66.prev = _context66.next) {
                             case 0:
-                                _context65.next = 2;
+                                _context66.next = 2;
                                 return this.performJSONRequest('v1/password_reset_flows/' + flowId + '/email', {
                                     method: 'POST',
                                     body: JSON.stringify({
@@ -29687,14 +29751,14 @@ var TrueVaultClient = function () {
 
                             case 2:
                             case 'end':
-                                return _context65.stop();
+                                return _context66.stop();
                         }
                     }
-                }, _callee65, this);
+                }, _callee66, this);
             }));
 
-            function sendPasswordResetEmail(_x153, _x154) {
-                return _ref65.apply(this, arguments);
+            function sendPasswordResetEmail(_x156, _x157) {
+                return _ref66.apply(this, arguments);
             }
 
             return sendPasswordResetEmail;
@@ -29722,29 +29786,29 @@ var TrueVaultClient = function () {
     }], [{
         key: 'login',
         value: function () {
-            var _ref66 = _asyncToGenerator(regeneratorRuntime.mark(function _callee66(accountId, username, password, mfaCode, host) {
+            var _ref67 = _asyncToGenerator(regeneratorRuntime.mark(function _callee67(accountId, username, password, mfaCode, host) {
                 var accessToken;
-                return regeneratorRuntime.wrap(function _callee66$(_context66) {
+                return regeneratorRuntime.wrap(function _callee67$(_context67) {
                     while (1) {
-                        switch (_context66.prev = _context66.next) {
+                        switch (_context67.prev = _context67.next) {
                             case 0:
-                                _context66.next = 2;
+                                _context67.next = 2;
                                 return TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host);
 
                             case 2:
-                                accessToken = _context66.sent;
-                                return _context66.abrupt('return', new TrueVaultClient({ 'accessToken': accessToken }, host));
+                                accessToken = _context67.sent;
+                                return _context67.abrupt('return', new TrueVaultClient({ 'accessToken': accessToken }, host));
 
                             case 4:
                             case 'end':
-                                return _context66.stop();
+                                return _context67.stop();
                         }
                     }
-                }, _callee66, this);
+                }, _callee67, this);
             }));
 
-            function login(_x155, _x156, _x157, _x158, _x159) {
-                return _ref66.apply(this, arguments);
+            function login(_x158, _x159, _x160, _x161, _x162) {
+                return _ref67.apply(this, arguments);
             }
 
             return login;
@@ -29764,11 +29828,11 @@ var TrueVaultClient = function () {
     }, {
         key: 'generateAccessToken',
         value: function () {
-            var _ref67 = _asyncToGenerator(regeneratorRuntime.mark(function _callee67(accountId, username, password, mfaCode, host) {
+            var _ref68 = _asyncToGenerator(regeneratorRuntime.mark(function _callee68(accountId, username, password, mfaCode, host) {
                 var formData, tvClient, response;
-                return regeneratorRuntime.wrap(function _callee67$(_context67) {
+                return regeneratorRuntime.wrap(function _callee68$(_context68) {
                     while (1) {
-                        switch (_context67.prev = _context67.next) {
+                        switch (_context68.prev = _context68.next) {
                             case 0:
                                 formData = new FormData();
 
@@ -29780,26 +29844,26 @@ var TrueVaultClient = function () {
                                 }
 
                                 tvClient = new TrueVaultClient(null, host);
-                                _context67.next = 8;
+                                _context68.next = 8;
                                 return tvClient.performLegacyRequest('v1/auth/login', {
                                     method: 'POST',
                                     body: formData
                                 });
 
                             case 8:
-                                response = _context67.sent;
-                                return _context67.abrupt('return', response.user.access_token);
+                                response = _context68.sent;
+                                return _context68.abrupt('return', response.user.access_token);
 
                             case 10:
                             case 'end':
-                                return _context67.stop();
+                                return _context68.stop();
                         }
                     }
-                }, _callee67, this);
+                }, _callee68, this);
             }));
 
-            function generateAccessToken(_x160, _x161, _x162, _x163, _x164) {
-                return _ref67.apply(this, arguments);
+            function generateAccessToken(_x163, _x164, _x165, _x166, _x167) {
+                return _ref68.apply(this, arguments);
             }
 
             return generateAccessToken;
@@ -31623,7 +31687,7 @@ module.exports = function(hint){
 /***/ (function(module, exports, __webpack_require__) {
 
 // all enumerable object keys, includes symbols
-var getKeys = __webpack_require__(41)
+var getKeys = __webpack_require__(42)
   , gOPS    = __webpack_require__(79)
   , pIE     = __webpack_require__(63);
 module.exports = function(it){
@@ -31642,7 +31706,7 @@ module.exports = function(it){
 /* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getKeys   = __webpack_require__(41)
+var getKeys   = __webpack_require__(42)
   , toIObject = __webpack_require__(19);
 module.exports = function(object, el){
   var O      = toIObject(object)
@@ -32025,7 +32089,7 @@ $export($export.P + $export.F * !__webpack_require__(24)([].reduce, true), 'Arra
 var $export    = __webpack_require__(0)
   , html       = __webpack_require__(97)
   , cof        = __webpack_require__(22)
-  , toIndex    = __webpack_require__(44)
+  , toIndex    = __webpack_require__(45)
   , toLength   = __webpack_require__(11)
   , arraySlice = [].slice;
 
@@ -32099,7 +32163,7 @@ $export($export.P + $export.F * (fails(function(){
 /* 294 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(43)('Array');
+__webpack_require__(44)('Array');
 
 /***/ }),
 /* 295 */
@@ -32540,7 +32604,7 @@ var global            = __webpack_require__(4)
   , inheritIfRequired = __webpack_require__(98)
   , toPrimitive       = __webpack_require__(27)
   , fails             = __webpack_require__(5)
-  , gOPN              = __webpack_require__(40).f
+  , gOPN              = __webpack_require__(41).f
   , gOPD              = __webpack_require__(20).f
   , dP                = __webpack_require__(9).f
   , $trim             = __webpack_require__(56).trim
@@ -32549,7 +32613,7 @@ var global            = __webpack_require__(4)
   , Base              = $Number
   , proto             = $Number.prototype
   // Opera ~12 has broken Object#toString
-  , BROKEN_COF        = cof(__webpack_require__(39)(proto)) == NUMBER
+  , BROKEN_COF        = cof(__webpack_require__(40)(proto)) == NUMBER
   , TRIM              = 'trim' in String.prototype;
 
 // 7.1.3 ToNumber(argument)
@@ -32857,7 +32921,7 @@ $export($export.S + $export.F, 'Object', {assign: __webpack_require__(164)});
 
 var $export = __webpack_require__(0)
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-$export($export.S, 'Object', {create: __webpack_require__(39)});
+$export($export.S, 'Object', {create: __webpack_require__(40)});
 
 /***/ }),
 /* 334 */
@@ -32979,7 +33043,7 @@ $export($export.S, 'Object', {is: __webpack_require__(172)});
 
 // 19.1.2.14 Object.keys(O)
 var toObject = __webpack_require__(12)
-  , $keys    = __webpack_require__(41);
+  , $keys    = __webpack_require__(42);
 
 __webpack_require__(26)('keys', function(){
   return function keys(it){
@@ -33063,14 +33127,14 @@ $export($export.G + $export.F * (parseInt != $parseInt), {parseInt: $parseInt});
 
 "use strict";
 
-var LIBRARY            = __webpack_require__(38)
+var LIBRARY            = __webpack_require__(39)
   , global             = __webpack_require__(4)
   , ctx                = __webpack_require__(30)
   , classof            = __webpack_require__(61)
   , $export            = __webpack_require__(0)
   , isObject           = __webpack_require__(6)
   , aFunction          = __webpack_require__(15)
-  , anInstance         = __webpack_require__(37)
+  , anInstance         = __webpack_require__(38)
   , forOf              = __webpack_require__(53)
   , speciesConstructor = __webpack_require__(108)
   , task               = __webpack_require__(113).set
@@ -33266,7 +33330,7 @@ if(!USE_NATIVE){
     this._h = 0;              // <- rejection state, 0 - default, 1 - handled, 2 - unhandled
     this._n = false;          // <- notify
   };
-  Internal.prototype = __webpack_require__(42)($Promise.prototype, {
+  Internal.prototype = __webpack_require__(43)($Promise.prototype, {
     // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
     then: function then(onFulfilled, onRejected){
       var reaction    = newPromiseCapability(speciesConstructor(this, $Promise));
@@ -33293,7 +33357,7 @@ if(!USE_NATIVE){
 
 $export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: $Promise});
 __webpack_require__(55)($Promise, PROMISE);
-__webpack_require__(43)(PROMISE);
+__webpack_require__(44)(PROMISE);
 Wrapper = __webpack_require__(29)[PROMISE];
 
 // statics
@@ -33389,7 +33453,7 @@ $export($export.S + $export.F * !__webpack_require__(5)(function(){
 
 // 26.1.2 Reflect.construct(target, argumentsList [, newTarget])
 var $export    = __webpack_require__(0)
-  , create     = __webpack_require__(39)
+  , create     = __webpack_require__(40)
   , aFunction  = __webpack_require__(15)
   , anObject   = __webpack_require__(3)
   , isObject   = __webpack_require__(6)
@@ -33688,7 +33752,7 @@ $export($export.S, 'Reflect', {set: set});
 var global            = __webpack_require__(4)
   , inheritIfRequired = __webpack_require__(98)
   , dP                = __webpack_require__(9).f
-  , gOPN              = __webpack_require__(40).f
+  , gOPN              = __webpack_require__(41).f
   , isRegExp          = __webpack_require__(76)
   , $flags            = __webpack_require__(74)
   , $RegExp           = global.RegExp
@@ -33727,7 +33791,7 @@ if(__webpack_require__(8) && (!CORRECT_NEW || __webpack_require__(5)(function(){
   __webpack_require__(17)(global, 'RegExp', $RegExp);
 }
 
-__webpack_require__(43)('RegExp');
+__webpack_require__(44)('RegExp');
 
 /***/ }),
 /* 367 */
@@ -34019,7 +34083,7 @@ __webpack_require__(18)('fontsize', function(createHTML){
 /***/ (function(module, exports, __webpack_require__) {
 
 var $export        = __webpack_require__(0)
-  , toIndex        = __webpack_require__(44)
+  , toIndex        = __webpack_require__(45)
   , fromCharCode   = String.fromCharCode
   , $fromCodePoint = String.fromCodePoint;
 
@@ -34248,7 +34312,7 @@ var global         = __webpack_require__(4)
   , $fails         = __webpack_require__(5)
   , shared         = __webpack_require__(80)
   , setToStringTag = __webpack_require__(55)
-  , uid            = __webpack_require__(45)
+  , uid            = __webpack_require__(46)
   , wks            = __webpack_require__(7)
   , wksExt         = __webpack_require__(174)
   , wksDefine      = __webpack_require__(115)
@@ -34259,11 +34323,11 @@ var global         = __webpack_require__(4)
   , toIObject      = __webpack_require__(19)
   , toPrimitive    = __webpack_require__(27)
   , createDesc     = __webpack_require__(35)
-  , _create        = __webpack_require__(39)
+  , _create        = __webpack_require__(40)
   , gOPNExt        = __webpack_require__(166)
   , $GOPD          = __webpack_require__(20)
   , $DP            = __webpack_require__(9)
-  , $keys          = __webpack_require__(41)
+  , $keys          = __webpack_require__(42)
   , gOPD           = $GOPD.f
   , dP             = $DP.f
   , gOPN           = gOPNExt.f
@@ -34386,11 +34450,11 @@ if(!USE_NATIVE){
 
   $GOPD.f = $getOwnPropertyDescriptor;
   $DP.f   = $defineProperty;
-  __webpack_require__(40).f = gOPNExt.f = $getOwnPropertyNames;
+  __webpack_require__(41).f = gOPNExt.f = $getOwnPropertyNames;
   __webpack_require__(63).f  = $propertyIsEnumerable;
   __webpack_require__(79).f = $getOwnPropertySymbols;
 
-  if(DESCRIPTORS && !__webpack_require__(38)){
+  if(DESCRIPTORS && !__webpack_require__(39)){
     redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
   }
 
@@ -34483,7 +34547,7 @@ var $export      = __webpack_require__(0)
   , $typed       = __webpack_require__(81)
   , buffer       = __webpack_require__(114)
   , anObject     = __webpack_require__(3)
-  , toIndex      = __webpack_require__(44)
+  , toIndex      = __webpack_require__(45)
   , toLength     = __webpack_require__(11)
   , isObject     = __webpack_require__(6)
   , ArrayBuffer  = __webpack_require__(4).ArrayBuffer
@@ -34523,7 +34587,7 @@ $export($export.P + $export.U + $export.F * __webpack_require__(5)(function(){
   }
 });
 
-__webpack_require__(43)(ARRAY_BUFFER);
+__webpack_require__(44)(ARRAY_BUFFER);
 
 /***/ }),
 /* 396 */
@@ -34924,8 +34988,8 @@ var $export     = __webpack_require__(0)
   , OBSERVABLE  = __webpack_require__(7)('observable')
   , aFunction   = __webpack_require__(15)
   , anObject    = __webpack_require__(3)
-  , anInstance  = __webpack_require__(37)
-  , redefineAll = __webpack_require__(42)
+  , anInstance  = __webpack_require__(38)
+  , redefineAll = __webpack_require__(43)
   , hide        = __webpack_require__(16)
   , forOf       = __webpack_require__(53)
   , RETURN      = forOf.RETURN;
@@ -35113,7 +35177,7 @@ hide($Observable.prototype, OBSERVABLE, function(){ return this; });
 
 $export($export.G, {Observable: $Observable});
 
-__webpack_require__(43)('Observable');
+__webpack_require__(44)('Observable');
 
 /***/ }),
 /* 423 */
@@ -35971,7 +36035,7 @@ var publicEncrypt = __webpack_require__(492)
 "use strict";
 
 
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 var inherits = __webpack_require__(2);
 
 var proto = {};
@@ -36043,7 +36107,7 @@ proto._update = function _update(inp, inOff, out, outOff) {
 "use strict";
 
 
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 
 function Cipher(options) {
   this.options = options;
@@ -36191,7 +36255,7 @@ Cipher.prototype._finalDecrypt = function _finalDecrypt() {
 "use strict";
 
 
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 var inherits = __webpack_require__(2);
 
 var des = __webpack_require__(118);
@@ -36341,7 +36405,7 @@ DES.prototype._decrypt = function _decrypt(state, lStart, rStart, out, off) {
 "use strict";
 
 
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 var inherits = __webpack_require__(2);
 
 var des = __webpack_require__(118);
@@ -38881,7 +38945,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
 
 var curves = exports;
 
-var hash = __webpack_require__(46);
+var hash = __webpack_require__(47);
 var elliptic = __webpack_require__(14);
 
 var assert = elliptic.utils.assert;
@@ -39606,7 +39670,7 @@ Signature.prototype.toDER = function toDER(enc) {
 "use strict";
 
 
-var hash = __webpack_require__(46);
+var hash = __webpack_require__(47);
 var elliptic = __webpack_require__(14);
 var utils = elliptic.utils;
 var assert = utils.assert;
@@ -40695,7 +40759,7 @@ module.exports = {
 
 var utils = exports;
 var BN = __webpack_require__(10);
-var minAssert = __webpack_require__(47);
+var minAssert = __webpack_require__(48);
 var minUtils = __webpack_require__(184);
 
 utils.assert = minAssert;
@@ -40971,7 +41035,7 @@ module.exports = HashBase
 /* 473 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var hash = __webpack_require__(46);
+var hash = __webpack_require__(47);
 var utils = hash.utils;
 var assert = utils.assert;
 
@@ -41070,7 +41134,7 @@ BlockHash.prototype._pad = function pad() {
 
 var hmac = exports;
 
-var hash = __webpack_require__(46);
+var hash = __webpack_require__(47);
 var utils = hash.utils;
 var assert = utils.assert;
 
@@ -41122,7 +41186,7 @@ Hmac.prototype.digest = function digest(enc) {
 /* 475 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var hash = __webpack_require__(46);
+var hash = __webpack_require__(47);
 var utils = hash.utils;
 
 var rotl32 = utils.rotl32;
@@ -41272,7 +41336,7 @@ var sh = [
 /* 476 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var hash = __webpack_require__(46);
+var hash = __webpack_require__(47);
 var utils = hash.utils;
 var assert = utils.assert;
 
@@ -42108,9 +42172,9 @@ exports.shr64_lo = shr64_lo;
 "use strict";
 
 
-var hash = __webpack_require__(46);
+var hash = __webpack_require__(47);
 var utils = __webpack_require__(184);
-var assert = __webpack_require__(47);
+var assert = __webpack_require__(48);
 
 function HmacDRBG(options) {
   if (!(this instanceof HmacDRBG))
@@ -42960,7 +43024,7 @@ module.exports = function (password, salt, iterations, keylen, digest, callback)
   }), callback)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28), __webpack_require__(48)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28), __webpack_require__(37)))
 
 /***/ }),
 /* 492 */
@@ -43579,7 +43643,7 @@ module.exports = __webpack_require__(123);
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28), __webpack_require__(48)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28), __webpack_require__(37)))
 
 /***/ }),
 /* 503 */
@@ -51476,7 +51540,8 @@ module.exports = {
 	],
 	"scripts": {
 		"test": "mocha --require babel-register --require babel-polyfill",
-		"build-browser-tests": "webpack --config webpack.test-config.js"
+		"build-browser-tests": "webpack --config webpack.test-config.js",
+		"build-lambda-tests": "webpack --config webpack.lambda-test-config.js && pushd test/lambda && rm -f ../lambda.zip && zip -r ../lambda.zip . && popd"
 	},
 	"license": "BSD-3-Clause",
 	"main": "build/index.js",

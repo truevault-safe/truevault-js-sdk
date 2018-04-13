@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "./build";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 307);
+/******/ 	return __webpack_require__(__webpack_require__.s = 308);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -4306,7 +4306,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(304)(module), __webpack_require__(85)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(305)(module), __webpack_require__(85)))
 
 /***/ }),
 /* 117 */
@@ -4319,15 +4319,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _package = __webpack_require__(306);
+var _package = __webpack_require__(307);
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var URI = __webpack_require__(303);
-__webpack_require__(301);
+var URI = __webpack_require__(304);
 __webpack_require__(302);
+__webpack_require__(303);
+
+var _require = __webpack_require__(301),
+    atob = _require.atob,
+    btoa = _require.btoa;
 
 /**
  * A client for the [TrueVault HTTP API](https://docs.truevault.com/).
@@ -4372,6 +4376,7 @@ __webpack_require__(302);
  * @param {object} authn Authentication info, or null if no authentication info is to be used.
  * @param {string} host optional parameter specifying TV API host; defaults to https://api.truevault.com
  */
+
 
 var TrueVaultClient = function () {
     function TrueVaultClient(authn, host) {
@@ -4507,6 +4512,62 @@ var TrueVaultClient = function () {
 
             return performJSONRequest;
         }()
+
+        /**
+         * Performs a legacy (non-v2-JSON) request. By using XHR rather than fetch, it's able to supply progress
+         * information.
+         * @param method
+         * @param url
+         * @param formData
+         * @param progressCallback
+         * @param responseType
+         * @returns {Promise<XMLHTTPRequest>|Promise<Object>} A promise resolving to an XHR object for blobs, and the parsed JSON object for JSON
+         */
+
+    }, {
+        key: 'performLegacyRequestWithProgress',
+        value: function performLegacyRequestWithProgress(method, url, formData, progressCallback, responseType) {
+            var _this = this;
+
+            // We are using XMLHttpRequest here since fetch does not have a progress API
+            return new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest();
+                if (method.toLowerCase() === 'get') {
+                    xhr.addEventListener('progress', progressCallback);
+                    xhr.addEventListener('load', progressCallback);
+                } else {
+                    xhr.upload.addEventListener('progress', progressCallback);
+                    xhr.upload.addEventListener('load', progressCallback);
+                }
+
+                xhr.open(method, url);
+                xhr.setRequestHeader('Authorization', _this.authHeader);
+                xhr.responseType = responseType;
+                xhr.onload = function () {
+                    switch (responseType) {
+                        case "json":
+                            var responseJson = xhr.response;
+                            if (responseJson.result === 'error') {
+                                var error = new Error(responseJson.error.message);
+                                error.error = responseJson.error;
+                                reject(error);
+                            } else {
+                                resolve(responseJson);
+                            }
+                            break;
+                        case "blob":
+                            resolve(xhr);
+                            break;
+                        default:
+                            throw new Error('Unsupported responseType: ' + responseType);
+                    }
+                };
+                xhr.onerror = function () {
+                    return reject(Error('Network error'));
+                };
+                xhr.send(formData);
+            });
+        }
 
         /**
          * Useful when you want to create a client starting from a user's username and password as opposed to an API key
@@ -5523,6 +5584,7 @@ var TrueVaultClient = function () {
 
             return addUsersToGroup;
         }()
+
         /**
          * Remove users from a group. See https://docs.truevault.com/groups#remove-users-from-a-group
          * @param {string} groupId group to add to.
@@ -6402,6 +6464,7 @@ var TrueVaultClient = function () {
 
             return listDocuments;
         }()
+
         /**
          * List documents in a schema. See https://docs.truevault.com/documents#list-all-documents-with-schema
          * @param {string} vaultId vault to look in.
@@ -6781,40 +6844,110 @@ var TrueVaultClient = function () {
 
     }, {
         key: 'createBlobWithProgress',
-        value: function createBlobWithProgress(vaultId, file, progressCallback, ownerId) {
-            var _this = this;
+        value: function () {
+            var _ref54 = _asyncToGenerator(regeneratorRuntime.mark(function _callee54(vaultId, file, progressCallback, ownerId) {
+                var formData, createResponse;
+                return regeneratorRuntime.wrap(function _callee54$(_context54) {
+                    while (1) {
+                        switch (_context54.prev = _context54.next) {
+                            case 0:
+                                formData = new FormData();
 
-            // We are using XMLHttpRequest here since fetch does not have a progress API
-            return new Promise(function (resolve, reject) {
-                var xhr = new XMLHttpRequest();
+                                formData.append('file', file);
 
-                var formData = new FormData();
-                formData.append('file', file);
+                                if (typeof ownerId === 'string') {
+                                    formData.append('owner_id', ownerId);
+                                }
 
-                if (typeof ownerId === 'string') {
-                    formData.append('owner_id', ownerId);
-                }
+                                _context54.next = 5;
+                                return this.performLegacyRequestWithProgress('post', this.host + '/v1/vaults/' + vaultId + '/blobs', formData, progressCallback, 'json');
 
-                xhr.upload.addEventListener('progress', progressCallback);
-                xhr.upload.addEventListener('load', progressCallback);
-                xhr.open('post', _this.host + '/v1/vaults/' + vaultId + '/blobs');
-                xhr.setRequestHeader('Authorization', _this.authHeader);
-                xhr.onload = function () {
-                    var responseJson = JSON.parse(xhr.responseText);
-                    if (responseJson.result === 'error') {
-                        var error = new Error(responseJson.error.message);
-                        error.error = responseJson.error;
-                        reject(error);
-                    } else {
-                        resolve(responseJson);
+                            case 5:
+                                createResponse = _context54.sent;
+                                return _context54.abrupt('return', createResponse.blob);
+
+                            case 7:
+                            case 'end':
+                                return _context54.stop();
+                        }
                     }
-                };
-                xhr.onerror = function () {
-                    return reject(Error('Network error'));
-                };
-                xhr.send(formData);
-            });
-        }
+                }, _callee54, this);
+            }));
+
+            function createBlobWithProgress(_x110, _x111, _x112, _x113) {
+                return _ref54.apply(this, arguments);
+            }
+
+            return createBlobWithProgress;
+        }()
+    }, {
+        key: 'updateBlobWithProgress',
+        value: function () {
+            var _ref55 = _asyncToGenerator(regeneratorRuntime.mark(function _callee55(vaultId, blobId, file, progressCallback, ownerId) {
+                var formData, updateResponse;
+                return regeneratorRuntime.wrap(function _callee55$(_context55) {
+                    while (1) {
+                        switch (_context55.prev = _context55.next) {
+                            case 0:
+                                formData = new FormData();
+
+                                formData.append('file', file);
+
+                                if (typeof ownerId === 'string') {
+                                    formData.append('owner_id', ownerId);
+                                }
+
+                                _context55.next = 5;
+                                return this.performLegacyRequestWithProgress('put', this.host + '/v1/vaults/' + vaultId + '/blobs/' + blobId, formData, progressCallback, 'json');
+
+                            case 5:
+                                updateResponse = _context55.sent;
+                                return _context55.abrupt('return', updateResponse.blob);
+
+                            case 7:
+                            case 'end':
+                                return _context55.stop();
+                        }
+                    }
+                }, _callee55, this);
+            }));
+
+            function updateBlobWithProgress(_x114, _x115, _x116, _x117, _x118) {
+                return _ref55.apply(this, arguments);
+            }
+
+            return updateBlobWithProgress;
+        }()
+    }, {
+        key: 'getBlobWithProgress',
+        value: function () {
+            var _ref56 = _asyncToGenerator(regeneratorRuntime.mark(function _callee56(vaultId, blobId, progressCallback) {
+                var xhr;
+                return regeneratorRuntime.wrap(function _callee56$(_context56) {
+                    while (1) {
+                        switch (_context56.prev = _context56.next) {
+                            case 0:
+                                _context56.next = 2;
+                                return this.performLegacyRequestWithProgress('get', this.host + '/v1/vaults/' + vaultId + '/blobs/' + blobId, null, progressCallback, 'blob');
+
+                            case 2:
+                                xhr = _context56.sent;
+                                return _context56.abrupt('return', { blob: xhr.response });
+
+                            case 4:
+                            case 'end':
+                                return _context56.stop();
+                        }
+                    }
+                }, _callee56, this);
+            }));
+
+            function getBlobWithProgress(_x119, _x120, _x121) {
+                return _ref56.apply(this, arguments);
+            }
+
+            return getBlobWithProgress;
+        }()
 
         /**
          * Get a BLOB's contents. See https://docs.truevault.com/blobs#read-a-blob.
@@ -6826,34 +6959,53 @@ var TrueVaultClient = function () {
     }, {
         key: 'getBlob',
         value: function () {
-            var _ref54 = _asyncToGenerator(regeneratorRuntime.mark(function _callee54(vaultId, blobId) {
-                var headers, response;
-                return regeneratorRuntime.wrap(function _callee54$(_context54) {
+            var _ref57 = _asyncToGenerator(regeneratorRuntime.mark(function _callee57(vaultId, blobId) {
+                var headers, response, blob;
+                return regeneratorRuntime.wrap(function _callee57$(_context57) {
                     while (1) {
-                        switch (_context54.prev = _context54.next) {
+                        switch (_context57.prev = _context57.next) {
                             case 0:
                                 headers = {
                                     Authorization: this.authHeader
                                 };
-                                _context54.next = 3;
+                                _context57.next = 3;
                                 return fetch(this.host + '/v1/vaults/' + vaultId + '/blobs/' + blobId, {
                                     headers: headers
                                 });
 
                             case 3:
-                                response = _context54.sent;
-                                return _context54.abrupt('return', response.blob ? response.blob() : response.body);
+                                response = _context57.sent;
 
-                            case 5:
+                                if (!response.blob) {
+                                    _context57.next = 10;
+                                    break;
+                                }
+
+                                _context57.next = 7;
+                                return response.blob();
+
+                            case 7:
+                                _context57.t0 = _context57.sent;
+                                _context57.next = 11;
+                                break;
+
+                            case 10:
+                                _context57.t0 = response.body;
+
+                            case 11:
+                                blob = _context57.t0;
+                                return _context57.abrupt('return', { blob: blob });
+
+                            case 13:
                             case 'end':
-                                return _context54.stop();
+                                return _context57.stop();
                         }
                     }
-                }, _callee54, this);
+                }, _callee57, this);
             }));
 
-            function getBlob(_x110, _x111) {
-                return _ref54.apply(this, arguments);
+            function getBlob(_x122, _x123) {
+                return _ref57.apply(this, arguments);
             }
 
             return getBlob;
@@ -6870,11 +7022,11 @@ var TrueVaultClient = function () {
     }, {
         key: 'listBlobs',
         value: function () {
-            var _ref55 = _asyncToGenerator(regeneratorRuntime.mark(function _callee55(vaultId, page, perPage) {
+            var _ref58 = _asyncToGenerator(regeneratorRuntime.mark(function _callee58(vaultId, page, perPage) {
                 var url, response;
-                return regeneratorRuntime.wrap(function _callee55$(_context55) {
+                return regeneratorRuntime.wrap(function _callee58$(_context58) {
                     while (1) {
-                        switch (_context55.prev = _context55.next) {
+                        switch (_context58.prev = _context58.next) {
                             case 0:
                                 url = 'v1/vaults/' + vaultId + '/blobs?';
 
@@ -6884,23 +7036,23 @@ var TrueVaultClient = function () {
                                 if (!!perPage) {
                                     url += '&per_page=' + perPage;
                                 }
-                                _context55.next = 5;
+                                _context58.next = 5;
                                 return this.performLegacyRequest(url);
 
                             case 5:
-                                response = _context55.sent;
-                                return _context55.abrupt('return', response.data);
+                                response = _context58.sent;
+                                return _context58.abrupt('return', response.data);
 
                             case 7:
                             case 'end':
-                                return _context55.stop();
+                                return _context58.stop();
                         }
                     }
-                }, _callee55, this);
+                }, _callee58, this);
             }));
 
-            function listBlobs(_x112, _x113, _x114) {
-                return _ref55.apply(this, arguments);
+            function listBlobs(_x124, _x125, _x126) {
+                return _ref58.apply(this, arguments);
             }
 
             return listBlobs;
@@ -6918,11 +7070,11 @@ var TrueVaultClient = function () {
     }, {
         key: 'updateBlob',
         value: function () {
-            var _ref56 = _asyncToGenerator(regeneratorRuntime.mark(function _callee56(vaultId, blobId, file, ownerId) {
+            var _ref59 = _asyncToGenerator(regeneratorRuntime.mark(function _callee59(vaultId, blobId, file, ownerId) {
                 var formData, resopnse;
-                return regeneratorRuntime.wrap(function _callee56$(_context56) {
+                return regeneratorRuntime.wrap(function _callee59$(_context59) {
                     while (1) {
-                        switch (_context56.prev = _context56.next) {
+                        switch (_context59.prev = _context59.next) {
                             case 0:
                                 formData = new FormData();
 
@@ -6932,26 +7084,26 @@ var TrueVaultClient = function () {
                                     formData.append('owner_id', ownerId);
                                 }
 
-                                _context56.next = 5;
+                                _context59.next = 5;
                                 return this.performLegacyRequest('v1/vaults/' + vaultId + '/blobs/' + blobId, {
                                     method: 'PUT',
                                     body: formData
                                 });
 
                             case 5:
-                                resopnse = _context56.sent;
-                                return _context56.abrupt('return', resopnse.blob);
+                                resopnse = _context59.sent;
+                                return _context59.abrupt('return', resopnse.blob);
 
                             case 7:
                             case 'end':
-                                return _context56.stop();
+                                return _context59.stop();
                         }
                     }
-                }, _callee56, this);
+                }, _callee59, this);
             }));
 
-            function updateBlob(_x115, _x116, _x117, _x118) {
-                return _ref56.apply(this, arguments);
+            function updateBlob(_x127, _x128, _x129, _x130) {
+                return _ref59.apply(this, arguments);
             }
 
             return updateBlob;
@@ -6968,36 +7120,36 @@ var TrueVaultClient = function () {
     }, {
         key: 'updateBlobOwner',
         value: function () {
-            var _ref57 = _asyncToGenerator(regeneratorRuntime.mark(function _callee57(vaultId, blobId, ownerId) {
+            var _ref60 = _asyncToGenerator(regeneratorRuntime.mark(function _callee60(vaultId, blobId, ownerId) {
                 var formData, response;
-                return regeneratorRuntime.wrap(function _callee57$(_context57) {
+                return regeneratorRuntime.wrap(function _callee60$(_context60) {
                     while (1) {
-                        switch (_context57.prev = _context57.next) {
+                        switch (_context60.prev = _context60.next) {
                             case 0:
                                 formData = new FormData();
 
                                 formData.append('owner_id', ownerId);
 
-                                _context57.next = 4;
+                                _context60.next = 4;
                                 return this.performLegacyRequest('v1/vaults/' + vaultId + '/blobs/' + blobId + '/owner', {
                                     method: 'PUT',
                                     body: formData
                                 });
 
                             case 4:
-                                response = _context57.sent;
-                                return _context57.abrupt('return', response.blob);
+                                response = _context60.sent;
+                                return _context60.abrupt('return', response.blob);
 
                             case 6:
                             case 'end':
-                                return _context57.stop();
+                                return _context60.stop();
                         }
                     }
-                }, _callee57, this);
+                }, _callee60, this);
             }));
 
-            function updateBlobOwner(_x119, _x120, _x121) {
-                return _ref57.apply(this, arguments);
+            function updateBlobOwner(_x131, _x132, _x133) {
+                return _ref60.apply(this, arguments);
             }
 
             return updateBlobOwner;
@@ -7013,31 +7165,31 @@ var TrueVaultClient = function () {
     }, {
         key: 'deleteBlob',
         value: function () {
-            var _ref58 = _asyncToGenerator(regeneratorRuntime.mark(function _callee58(vaultId, blobId) {
+            var _ref61 = _asyncToGenerator(regeneratorRuntime.mark(function _callee61(vaultId, blobId) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee58$(_context58) {
+                return regeneratorRuntime.wrap(function _callee61$(_context61) {
                     while (1) {
-                        switch (_context58.prev = _context58.next) {
+                        switch (_context61.prev = _context61.next) {
                             case 0:
-                                _context58.next = 2;
+                                _context61.next = 2;
                                 return this.performLegacyRequest('v1/vaults/' + vaultId + '/blobs/' + blobId, {
                                     method: 'DELETE'
                                 });
 
                             case 2:
-                                response = _context58.sent;
-                                return _context58.abrupt('return', response.blob);
+                                response = _context61.sent;
+                                return _context61.abrupt('return', response.blob);
 
                             case 4:
                             case 'end':
-                                return _context58.stop();
+                                return _context61.stop();
                         }
                     }
-                }, _callee58, this);
+                }, _callee61, this);
             }));
 
-            function deleteBlob(_x122, _x123) {
-                return _ref58.apply(this, arguments);
+            function deleteBlob(_x134, _x135) {
+                return _ref61.apply(this, arguments);
             }
 
             return deleteBlob;
@@ -7057,13 +7209,13 @@ var TrueVaultClient = function () {
     }, {
         key: 'sendEmailSendgrid',
         value: function () {
-            var _ref59 = _asyncToGenerator(regeneratorRuntime.mark(function _callee59(sendgridApiKey, userId, sendgridTemplateId, fromEmailSpecifier, toEmailSpecifier, substitutions) {
+            var _ref62 = _asyncToGenerator(regeneratorRuntime.mark(function _callee62(sendgridApiKey, userId, sendgridTemplateId, fromEmailSpecifier, toEmailSpecifier, substitutions) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee59$(_context59) {
+                return regeneratorRuntime.wrap(function _callee62$(_context62) {
                     while (1) {
-                        switch (_context59.prev = _context59.next) {
+                        switch (_context62.prev = _context62.next) {
                             case 0:
-                                _context59.next = 2;
+                                _context62.next = 2;
                                 return this.performJSONRequest('v1/users/' + userId + '/message/email', {
                                     method: 'POST',
                                     body: JSON.stringify({
@@ -7077,19 +7229,19 @@ var TrueVaultClient = function () {
                                 });
 
                             case 2:
-                                response = _context59.sent;
-                                return _context59.abrupt('return', response.provider_message_id);
+                                response = _context62.sent;
+                                return _context62.abrupt('return', response.provider_message_id);
 
                             case 4:
                             case 'end':
-                                return _context59.stop();
+                                return _context62.stop();
                         }
                     }
-                }, _callee59, this);
+                }, _callee62, this);
             }));
 
-            function sendEmailSendgrid(_x124, _x125, _x126, _x127, _x128, _x129) {
-                return _ref59.apply(this, arguments);
+            function sendEmailSendgrid(_x136, _x137, _x138, _x139, _x140, _x141) {
+                return _ref62.apply(this, arguments);
             }
 
             return sendEmailSendgrid;
@@ -7111,13 +7263,13 @@ var TrueVaultClient = function () {
     }, {
         key: 'sendSMSTwilio',
         value: function () {
-            var _ref60 = _asyncToGenerator(regeneratorRuntime.mark(function _callee60(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody, mediaURLs) {
+            var _ref63 = _asyncToGenerator(regeneratorRuntime.mark(function _callee63(twilioAccountSid, twilioKeySid, twilioKeySecret, userId, fromNumberSpecifier, toNumberSpecifier, messageBody, mediaURLs) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee60$(_context60) {
+                return regeneratorRuntime.wrap(function _callee63$(_context63) {
                     while (1) {
-                        switch (_context60.prev = _context60.next) {
+                        switch (_context63.prev = _context63.next) {
                             case 0:
-                                _context60.next = 2;
+                                _context63.next = 2;
                                 return this.performJSONRequest('v1/users/' + userId + '/message/sms', {
                                     method: 'POST',
                                     body: JSON.stringify({
@@ -7135,19 +7287,19 @@ var TrueVaultClient = function () {
                                 });
 
                             case 2:
-                                response = _context60.sent;
-                                return _context60.abrupt('return', response.provider_message_id);
+                                response = _context63.sent;
+                                return _context63.abrupt('return', response.provider_message_id);
 
                             case 4:
                             case 'end':
-                                return _context60.stop();
+                                return _context63.stop();
                         }
                     }
-                }, _callee60, this);
+                }, _callee63, this);
             }));
 
-            function sendSMSTwilio(_x130, _x131, _x132, _x133, _x134, _x135, _x136, _x137) {
-                return _ref60.apply(this, arguments);
+            function sendSMSTwilio(_x142, _x143, _x144, _x145, _x146, _x147, _x148, _x149) {
+                return _ref63.apply(this, arguments);
             }
 
             return sendSMSTwilio;
@@ -7167,13 +7319,13 @@ var TrueVaultClient = function () {
     }, {
         key: 'createPasswordResetFlow',
         value: function () {
-            var _ref61 = _asyncToGenerator(regeneratorRuntime.mark(function _callee61(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
+            var _ref64 = _asyncToGenerator(regeneratorRuntime.mark(function _callee64(name, sendGridTemplateId, sendGridApiKey, userEmailValueSpec, fromEmailValueSpec, substitutions) {
                 var response;
-                return regeneratorRuntime.wrap(function _callee61$(_context61) {
+                return regeneratorRuntime.wrap(function _callee64$(_context64) {
                     while (1) {
-                        switch (_context61.prev = _context61.next) {
+                        switch (_context64.prev = _context64.next) {
                             case 0:
-                                _context61.next = 2;
+                                _context64.next = 2;
                                 return this.performJSONRequest('v1/password_reset_flows', {
                                     method: 'POST',
                                     body: JSON.stringify({
@@ -7187,19 +7339,19 @@ var TrueVaultClient = function () {
                                 });
 
                             case 2:
-                                response = _context61.sent;
-                                return _context61.abrupt('return', response.password_reset_flow);
+                                response = _context64.sent;
+                                return _context64.abrupt('return', response.password_reset_flow);
 
                             case 4:
                             case 'end':
-                                return _context61.stop();
+                                return _context64.stop();
                         }
                     }
-                }, _callee61, this);
+                }, _callee64, this);
             }));
 
-            function createPasswordResetFlow(_x138, _x139, _x140, _x141, _x142, _x143) {
-                return _ref61.apply(this, arguments);
+            function createPasswordResetFlow(_x150, _x151, _x152, _x153, _x154, _x155) {
+                return _ref64.apply(this, arguments);
             }
 
             return createPasswordResetFlow;
@@ -7213,29 +7365,29 @@ var TrueVaultClient = function () {
     }, {
         key: 'listPasswordResetFlows',
         value: function () {
-            var _ref62 = _asyncToGenerator(regeneratorRuntime.mark(function _callee62() {
+            var _ref65 = _asyncToGenerator(regeneratorRuntime.mark(function _callee65() {
                 var response;
-                return regeneratorRuntime.wrap(function _callee62$(_context62) {
+                return regeneratorRuntime.wrap(function _callee65$(_context65) {
                     while (1) {
-                        switch (_context62.prev = _context62.next) {
+                        switch (_context65.prev = _context65.next) {
                             case 0:
-                                _context62.next = 2;
+                                _context65.next = 2;
                                 return this.performJSONRequest('v1/password_reset_flows');
 
                             case 2:
-                                response = _context62.sent;
-                                return _context62.abrupt('return', response.password_reset_flows);
+                                response = _context65.sent;
+                                return _context65.abrupt('return', response.password_reset_flows);
 
                             case 4:
                             case 'end':
-                                return _context62.stop();
+                                return _context65.stop();
                         }
                     }
-                }, _callee62, this);
+                }, _callee65, this);
             }));
 
             function listPasswordResetFlows() {
-                return _ref62.apply(this, arguments);
+                return _ref65.apply(this, arguments);
             }
 
             return listPasswordResetFlows;
@@ -7251,12 +7403,12 @@ var TrueVaultClient = function () {
     }, {
         key: 'sendPasswordResetEmail',
         value: function () {
-            var _ref63 = _asyncToGenerator(regeneratorRuntime.mark(function _callee63(flowId, username) {
-                return regeneratorRuntime.wrap(function _callee63$(_context63) {
+            var _ref66 = _asyncToGenerator(regeneratorRuntime.mark(function _callee66(flowId, username) {
+                return regeneratorRuntime.wrap(function _callee66$(_context66) {
                     while (1) {
-                        switch (_context63.prev = _context63.next) {
+                        switch (_context66.prev = _context66.next) {
                             case 0:
-                                _context63.next = 2;
+                                _context66.next = 2;
                                 return this.performJSONRequest('v1/password_reset_flows/' + flowId + '/email', {
                                     method: 'POST',
                                     body: JSON.stringify({
@@ -7266,14 +7418,14 @@ var TrueVaultClient = function () {
 
                             case 2:
                             case 'end':
-                                return _context63.stop();
+                                return _context66.stop();
                         }
                     }
-                }, _callee63, this);
+                }, _callee66, this);
             }));
 
-            function sendPasswordResetEmail(_x144, _x145) {
-                return _ref63.apply(this, arguments);
+            function sendPasswordResetEmail(_x156, _x157) {
+                return _ref66.apply(this, arguments);
             }
 
             return sendPasswordResetEmail;
@@ -7301,29 +7453,29 @@ var TrueVaultClient = function () {
     }], [{
         key: 'login',
         value: function () {
-            var _ref64 = _asyncToGenerator(regeneratorRuntime.mark(function _callee64(accountId, username, password, mfaCode, host) {
+            var _ref67 = _asyncToGenerator(regeneratorRuntime.mark(function _callee67(accountId, username, password, mfaCode, host) {
                 var accessToken;
-                return regeneratorRuntime.wrap(function _callee64$(_context64) {
+                return regeneratorRuntime.wrap(function _callee67$(_context67) {
                     while (1) {
-                        switch (_context64.prev = _context64.next) {
+                        switch (_context67.prev = _context67.next) {
                             case 0:
-                                _context64.next = 2;
+                                _context67.next = 2;
                                 return TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host);
 
                             case 2:
-                                accessToken = _context64.sent;
-                                return _context64.abrupt('return', new TrueVaultClient({ 'accessToken': accessToken }, host));
+                                accessToken = _context67.sent;
+                                return _context67.abrupt('return', new TrueVaultClient({ 'accessToken': accessToken }, host));
 
                             case 4:
                             case 'end':
-                                return _context64.stop();
+                                return _context67.stop();
                         }
                     }
-                }, _callee64, this);
+                }, _callee67, this);
             }));
 
-            function login(_x146, _x147, _x148, _x149, _x150) {
-                return _ref64.apply(this, arguments);
+            function login(_x158, _x159, _x160, _x161, _x162) {
+                return _ref67.apply(this, arguments);
             }
 
             return login;
@@ -7343,11 +7495,11 @@ var TrueVaultClient = function () {
     }, {
         key: 'generateAccessToken',
         value: function () {
-            var _ref65 = _asyncToGenerator(regeneratorRuntime.mark(function _callee65(accountId, username, password, mfaCode, host) {
+            var _ref68 = _asyncToGenerator(regeneratorRuntime.mark(function _callee68(accountId, username, password, mfaCode, host) {
                 var formData, tvClient, response;
-                return regeneratorRuntime.wrap(function _callee65$(_context65) {
+                return regeneratorRuntime.wrap(function _callee68$(_context68) {
                     while (1) {
-                        switch (_context65.prev = _context65.next) {
+                        switch (_context68.prev = _context68.next) {
                             case 0:
                                 formData = new FormData();
 
@@ -7359,26 +7511,26 @@ var TrueVaultClient = function () {
                                 }
 
                                 tvClient = new TrueVaultClient(null, host);
-                                _context65.next = 8;
+                                _context68.next = 8;
                                 return tvClient.performLegacyRequest('v1/auth/login', {
                                     method: 'POST',
                                     body: formData
                                 });
 
                             case 8:
-                                response = _context65.sent;
-                                return _context65.abrupt('return', response.user.access_token);
+                                response = _context68.sent;
+                                return _context68.abrupt('return', response.user.access_token);
 
                             case 10:
                             case 'end':
-                                return _context65.stop();
+                                return _context68.stop();
                         }
                     }
-                }, _callee65, this);
+                }, _callee68, this);
             }));
 
-            function generateAccessToken(_x151, _x152, _x153, _x154, _x155) {
-                return _ref65.apply(this, arguments);
+            function generateAccessToken(_x163, _x164, _x165, _x166, _x167) {
+                return _ref68.apply(this, arguments);
             }
 
             return generateAccessToken;
@@ -12273,23 +12425,34 @@ module.exports = __webpack_require__(24);
 /* 301 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// the whatwg-fetch polyfill installs the fetch() function
-// on the global object (window or self)
-//
-// Return that as the export for use in Webpack, Browserify etc.
-__webpack_require__(305);
-module.exports = self.fetch.bind(self);
+"use strict";
+
+
+exports.atob = self.atob.bind(self);
+exports.btoa = self.btoa.bind(self);
 
 
 /***/ }),
 /* 302 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// the whatwg-fetch polyfill installs the fetch() function
+// on the global object (window or self)
+//
+// Return that as the export for use in Webpack, Browserify etc.
+__webpack_require__(306);
+module.exports = self.fetch.bind(self);
+
+
+/***/ }),
+/* 303 */
 /***/ (function(module, exports) {
 
 module.exports = window.FormData
 
 
 /***/ }),
-/* 303 */
+/* 304 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -14597,7 +14760,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 304 */
+/* 305 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -14625,7 +14788,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 305 */
+/* 306 */
 /***/ (function(module, exports) {
 
 (function(self) {
@@ -15097,7 +15260,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 306 */
+/* 307 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -15116,32 +15279,42 @@ module.exports = {
 		"rest",
 		"api"
 	],
+	"scripts": {
+		"test": "mocha --require babel-register --require babel-polyfill",
+		"build-browser-tests": "webpack --config webpack.test-config.js",
+		"build-lambda-tests": "webpack --config webpack.lambda-test-config.js && pushd test/lambda && rm -f ../lambda.zip && zip -r ../lambda.zip . && popd"
+	},
 	"license": "BSD-3-Clause",
 	"main": "build/index.js",
 	"dependencies": {
+		"isomorphic-base64": "^1.0.2",
 		"isomorphic-fetch": "^2.2.1",
 		"isomorphic-form-data": "^1.0.0",
 		"urijs": "^1.18.12"
 	},
 	"devDependencies": {
+		"ajv": "^6.4.0",
 		"babel-core": "^6.26.0",
 		"babel-jest": "^22.4.3",
 		"babel-loader": "^7.0.0",
 		"babel-polyfill": "^6.23.0",
 		"babel-preset-env": "^1.5.2",
+		"babel-register": "^6.26.0",
 		"documentation": "^4.0.0-rc.1",
 		"dotenv": "^5.0.1",
-		"jest": "^22.4.3",
-		"jest-json-schema": "^2.0.0",
+		"dotenv-webpack": "^1.5.5",
+		"mocha": "^5.0.5",
 		"otplib": "^8.0.1",
 		"regenerator-runtime": "^0.11.1",
+		"should": "^13.2.1",
+		"string-to-stream": "^1.1.0",
 		"uuid": "^3.2.1",
 		"webpack": "^2.6.1"
 	}
 };
 
 /***/ }),
-/* 307 */
+/* 308 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(118);
