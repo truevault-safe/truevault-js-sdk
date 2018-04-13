@@ -86,7 +86,7 @@ Test out the SDK with this simple [JSFiddle](https://jsfiddle.net/TrueVault/wq4e
 
 Make changes to `index.js` and then bundle them into `build/index.js` with webpack:
 
-`yarn webpack`
+`yarn build`
 
 The integration tests are built with [Mocha](https://mochajs.org/). To run them,
 first copy `test.env.template` to `test.env` and populate `test.env` with values from your account. To run tests, do

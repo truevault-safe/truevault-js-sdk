@@ -448,7 +448,6 @@ describe('TrueVaultClient', function () {
 
                 const getProgressCallback = testProgressCallbackFactory("get");
                 const getBlobResponse = await client.getBlobWithProgress(newVault.id, newBlob.id, getProgressCallback);
-                console.log('gBR', getBlobResponse);
                 getBlobResponse.blob.size.should.above(0);
                 getBlobResponse.blob.should.be.instanceOf(Blob);
                 getProgressCallback.verify();

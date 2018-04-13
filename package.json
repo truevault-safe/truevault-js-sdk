@@ -15,16 +15,27 @@
     "api"
   ],
   "scripts": {
-    "test": "mocha --require babel-register --require babel-polyfill",
-    "build-browser-tests": "webpack --config webpack.test-config.js",
-    "build-lambda-tests": "webpack --config webpack.lambda-test-config.js && pushd test/lambda && rm -f ../lambda.zip && zip -r ../lambda.zip . && popd"
+    "test": "mocha --require babel-register --require babel-polyfill --require isomorphic-form-data",
+    "build-browser-tests": "webpack --config webpack.browser-test-config.js",
+    "build-lambda-tests": "webpack --config webpack.lambda-test-config.js && pushd test/lambda && rm -f ../lambda.zip && zip -r ../lambda.zip . && popd",
+    "build": "webpack --config webpack.node-config.js && webpack --config webpack.browser-config.js"
   },
   "license": "BSD-3-Clause",
-  "main": "build/index.js",
+  "main": "build/index-node.js",
+  "browser": "build/index-web.js",
+  "files": [
+    "build/index-node.js",
+    "build/index-web.js",
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
-    "isomorphic-base64": "^1.0.2",
-    "isomorphic-fetch": "^2.2.1",
+    "babel-preset-env": "^1.5.2",
+    "base-64": "^0.1.0",
+    "form-data": "^2.3.2",
     "isomorphic-form-data": "^1.0.0",
+    "node-fetch": "^2.1.2",
     "urijs": "^1.18.12"
   },
   "devDependencies": {
@@ -33,7 +44,6 @@
     "babel-jest": "^22.4.3",
     "babel-loader": "^7.0.0",
     "babel-polyfill": "^6.23.0",
-    "babel-preset-env": "^1.5.2",
     "babel-register": "^6.26.0",
     "documentation": "^4.0.0-rc.1",
     "dotenv": "^5.0.1",

@@ -1,9 +1,12 @@
 import {version} from './package.json'
+import nodeFetch from 'node-fetch';
+import URI from 'urijs';
+import base64 from 'base-64';
+import nodeFormData from 'form-data';
 
-const URI = require('urijs');
-require('isomorphic-fetch');
-require('isomorphic-form-data');
-const {atob, btoa} = require('isomorphic-base64');
+const tvFetch = typeof fetch !== "undefined" ? fetch : nodeFetch;
+const tvFormData = typeof FormData !== "undefined" ? FormData : nodeFormData;
+
 
 /**
  * A client for the [TrueVault HTTP API](https://docs.truevault.com/).
@@ -106,7 +109,7 @@ class TrueVaultClient {
             .addQuery("_tv_sdk", version)
             .toString();
 
-        const response = await fetch(uri, options);
+        const response = await tvFetch(uri, options);
         const responseBody = await response.text();
 
         let json;
@@ -216,7 +219,7 @@ class TrueVaultClient {
      * @returns {Promise.<string>}
      */
     static async generateAccessToken(accountId, username, password, mfaCode, host) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append("account_id", accountId);
         formData.append("username", username);
         formData.append("password", password);
@@ -257,7 +260,7 @@ class TrueVaultClient {
         const response = await this.performLegacyRequest(`v1/auth/me?full=${full}`);
         const user = response.user;
         if (user.attributes) {
-            user.attributes = JSON.parse(atob(user.attributes));
+            user.attributes = JSON.parse(base64.decode(user.attributes));
         }
         return user;
     }
@@ -268,8 +271,8 @@ class TrueVaultClient {
      * @returns {Promise<Object>}
      */
     async updateCurrentUser(attributes) {
-        const formData = new FormData();
-        formData.append("attributes", btoa(JSON.stringify(attributes)));
+        const formData = new tvFormData();
+        formData.append("attributes", base64.encode(JSON.stringify(attributes)));
 
         const response = await this.performLegacyRequest('v1/auth/me?full=true', {
             method: 'PUT',
@@ -278,7 +281,7 @@ class TrueVaultClient {
 
         const user = response.user;
         if (user.attributes) {
-            user.attributes = JSON.parse(atob(user.attributes));
+            user.attributes = JSON.parse(base64.decode(user.attributes));
         }
         return user;
     }
@@ -311,7 +314,7 @@ class TrueVaultClient {
         const response = await this.performLegacyRequest(path);
         return response.users.map(user => {
             if (user.attributes) {
-                user.attributes = JSON.parse(atob(user.attributes));
+                user.attributes = JSON.parse(base64.decode(user.attributes));
             }
             return user;
         });
@@ -345,11 +348,11 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async createUser(username, password, attributes, groupIds, status) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append("username", username);
         formData.append("password", password);
         if (attributes) {
-            formData.append("attributes", btoa(JSON.stringify(attributes)));
+            formData.append("attributes", base64.encode(JSON.stringify(attributes)));
         }
         if (groupIds) {
             formData.append("group_ids", groupIds.join(","));
@@ -371,8 +374,8 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async updateUserAttributes(userId, attributes) {
-        const formData = new FormData();
-        formData.append("attributes", btoa(JSON.stringify(attributes)));
+        const formData = new tvFormData();
+        formData.append("attributes", base64.encode(JSON.stringify(attributes)));
 
         const response = await this.performLegacyRequest(`v1/users/${userId}`, {
             method: 'PUT',
@@ -388,7 +391,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async updateUserStatus(userId, status) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append("status", status);
 
         const response = await this.performLegacyRequest(`v1/users/${userId}`, {
@@ -405,7 +408,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async updateUserUsername(userId, newUsername) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append("username", newUsername);
 
         const response = await this.performLegacyRequest(`v1/users/${userId}`, {
@@ -422,7 +425,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async updateUserPassword(userId, newPassword) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append("password", newPassword);
 
         const response = await this.performLegacyRequest(`v1/users/${userId}`, {
@@ -514,9 +517,9 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async createGroup(name, policy, userIds) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append("name", name);
-        formData.append("policy", btoa(JSON.stringify(policy)));
+        formData.append("policy", base64.encode(JSON.stringify(policy)));
         if (!!userIds) {
             formData.append("user_ids", userIds.join(','));
         }
@@ -535,13 +538,13 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async updateGroup(groupId, name, policy) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         if (!!name) {
             formData.append("name", name);
         }
 
         if (!!policy) {
-            formData.append("policy", btoa(JSON.stringify(policy)));
+            formData.append("policy", base64.encode(JSON.stringify(policy)));
         }
 
         const response = await this.performLegacyRequest(`v1/groups/${groupId}`, {
@@ -614,7 +617,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async addUsersToGroupReturnUserIds(groupId, userIds) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append('operation', 'APPEND');
         formData.append('user_ids', userIds.join(','));
 
@@ -632,7 +635,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async removeUsersFromGroupReturnUserIds(groupId, userIds) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append('operation', 'REMOVE');
         formData.append('user_ids', userIds.join(','));
 
@@ -649,8 +652,8 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async searchUsers(searchOption) {
-        const formData = new FormData();
-        formData.append("search_option", btoa(JSON.stringify(searchOption)));
+        const formData = new tvFormData();
+        formData.append("search_option", base64.encode(JSON.stringify(searchOption)));
 
         const response = await this.performLegacyRequest(`v1/users/search`, {
             method: 'POST',
@@ -659,7 +662,7 @@ class TrueVaultClient {
 
         const documents = response.data.documents.map(doc => {
             if (doc.attributes) {
-                doc.attributes = JSON.parse(atob(doc.attributes));
+                doc.attributes = JSON.parse(base64.decode(doc.attributes));
             }
             return doc;
         });
@@ -693,7 +696,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async createVault(name) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append("name", name);
 
         const response = await this.performLegacyRequest('v1/vaults', {
@@ -721,7 +724,7 @@ class TrueVaultClient {
      * @returns {Promise<Object>}
      */
     async updateVault(vaultId, name) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append('name', name);
 
         const response = await this.performLegacyRequest(`v1/vaults/${vaultId}`, {
@@ -754,8 +757,8 @@ class TrueVaultClient {
      */
     async createSchema(vaultId, name, fields) {
         const schemaDefinition = {name, fields};
-        const formData = new FormData();
-        formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
+        const formData = new tvFormData();
+        formData.append("schema", base64.encode(JSON.stringify(schemaDefinition)));
 
         const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/schemas`, {
             method: 'POST',
@@ -774,8 +777,8 @@ class TrueVaultClient {
      */
     async updateSchema(vaultId, schemaId, name, fields) {
         const schemaDefinition = {name, fields};
-        const formData = new FormData();
-        formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
+        const formData = new tvFormData();
+        formData.append("schema", base64.encode(JSON.stringify(schemaDefinition)));
 
         const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/schemas/${schemaId}`, {
             method: 'PUT',
@@ -826,8 +829,8 @@ class TrueVaultClient {
      */
     async createUserSchema(accountId, name, fields) {
         const schemaDefinition = {name, fields};
-        const formData = new FormData();
-        formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
+        const formData = new tvFormData();
+        formData.append("schema", base64.encode(JSON.stringify(schemaDefinition)));
 
         const response = await this.performLegacyRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'POST',
@@ -857,8 +860,8 @@ class TrueVaultClient {
      */
     async updateUserSchema(accountId, name, fields) {
         const schemaDefinition = {name, fields};
-        const formData = new FormData();
-        formData.append("schema", btoa(JSON.stringify(schemaDefinition)));
+        const formData = new tvFormData();
+        formData.append("schema", base64.encode(JSON.stringify(schemaDefinition)));
 
         const response = await this.performLegacyRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'PUT',
@@ -875,7 +878,7 @@ class TrueVaultClient {
     async deleteUserSchema(accountId) {
         const response = await this.performLegacyRequest(`v1/accounts/${accountId}/user_schema`, {
             method: 'DELETE',
-            body: new FormData()
+            body: new tvFormData()
         });
         return response.user_schema;
     }
@@ -928,7 +931,7 @@ class TrueVaultClient {
         if (!!full) {
             response.data.items = response.data.items.map(item => {
                 if (item.document) {
-                    item.document = JSON.parse(atob(item.document));
+                    item.document = JSON.parse(base64.decode(item.document));
                 }
                 return item;
             });
@@ -960,7 +963,7 @@ class TrueVaultClient {
         if (!!full) {
             response.data.items = response.data.items.map(item => {
                 if (item.document) {
-                    item.document = JSON.parse(atob(item.document));
+                    item.document = JSON.parse(base64.decode(item.document));
                 }
                 return item;
             });
@@ -999,8 +1002,8 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async searchDocuments(vaultId, searchOption) {
-        const formData = new FormData();
-        formData.append("search_option", btoa(JSON.stringify(searchOption)));
+        const formData = new tvFormData();
+        formData.append("search_option", base64.encode(JSON.stringify(searchOption)));
 
         const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/search`, {
             method: 'POST',
@@ -1009,7 +1012,7 @@ class TrueVaultClient {
 
         const documents = response.data.documents.map(doc => {
             if (doc.document) {
-                doc.document = JSON.parse(atob(doc.document));
+                doc.document = JSON.parse(base64.decode(doc.document));
             }
             return doc;
         });
@@ -1055,7 +1058,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async updateDocumentOwner(vaultId, documentId, ownerId) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append('owner_id', ownerId);
 
         const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/documents/${documentId}/owner`, {
@@ -1089,7 +1092,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async createBlob(vaultId, file, ownerId) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append('file', file);
 
         if (typeof ownerId === 'string') {
@@ -1112,7 +1115,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async createBlobWithProgress(vaultId, file, progressCallback, ownerId) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append('file', file);
 
         if (typeof ownerId === 'string') {
@@ -1124,7 +1127,7 @@ class TrueVaultClient {
     }
 
     async updateBlobWithProgress(vaultId, blobId, file, progressCallback, ownerId) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append('file', file);
 
         if (typeof ownerId === 'string') {
@@ -1150,7 +1153,7 @@ class TrueVaultClient {
         const headers = {
             Authorization: this.authHeader
         };
-        const response = await fetch(`${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, {
+        const response = await tvFetch(`${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, {
             headers: headers
         });
 
@@ -1187,7 +1190,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async updateBlob(vaultId, blobId, file, ownerId) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append('file', file);
 
         if (typeof ownerId === 'string') {
@@ -1209,7 +1212,7 @@ class TrueVaultClient {
      * @returns {Promise.<Object>}
      */
     async updateBlobOwner(vaultId, blobId, ownerId) {
-        const formData = new FormData();
+        const formData = new tvFormData();
         formData.append('owner_id', ownerId);
 
         const response = await this.performLegacyRequest(`v1/vaults/${vaultId}/blobs/${blobId}/owner`, {
@@ -1340,7 +1343,7 @@ class TrueVaultClient {
     }
 
     static _makeHeaderForUsername(username) {
-        return `Basic ${btoa(username + ':')}`;
+        return `Basic ${base64.encode(username + ':')}`;
     };
 }
 
