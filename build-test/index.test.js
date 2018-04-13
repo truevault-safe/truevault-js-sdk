@@ -51227,7 +51227,7 @@ exports.createContext = Script.createContext = function (context) {
 module.exports = {
 	"name": "truevault",
 	"description": "The official TrueVault JavaScript SDK",
-	"version": "0.11.0",
+	"version": "1.0.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truevault/truevault-js-sdk"
