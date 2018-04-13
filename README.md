@@ -86,7 +86,20 @@ Test out the SDK with this simple [JSFiddle](https://jsfiddle.net/TrueVault/wq4e
 
 Make changes to `index.js` and then bundle them into `build/index.js` with webpack:
 
-`yarn webpack`
+`yarn build`
+
+The integration tests are built with [Mocha](https://mochajs.org/). To run them,
+first copy `test.env.template` to `test.env` and populate `test.env` with values from your account. To run tests, do
+`yarn test`. You can run a subset of tests via `yarn test -g [filter regex]`
+
+To run in a browser, first rebuild the test file with webpack: `yarn build-browser-tests` 
+and then load test/index.html in a browser.
+
+Running in AWS lambda is more complicated:
+
+1. Build a version of the tests for inclusion in lambda: `yarn build-lambda-tests`
+1. Create a new Lambda function. Choose Node 8.10 for the runtime, `run-lambda-tests.runTests` for the handler, 5 minutes for the timeout, and supply the generated lambda.zip.
+1. Perform a test invocation to run the tests. They take a few minutes to run, and no output appears until they complete.
 
 ## Documentation
 

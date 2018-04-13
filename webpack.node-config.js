@@ -1,13 +1,14 @@
 const path = require('path');
 
 module.exports = {
+    target: "node",
     entry: ["babel-polyfill", "./index.js"],
     output: {
         path: path.join(__dirname, 'build'),
         publicPath: './build',
-        filename: 'index.js',
+        filename: 'index-node.js',
         library: 'TrueVaultClient',
-        libraryTarget: "umd"
+        libraryTarget: 'umd'
     },
     module: {
         loaders: [
