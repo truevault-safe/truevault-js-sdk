@@ -66,7 +66,7 @@ describe('TrueVaultClient', function () {
     this.timeout(10 * 60 * 1000);
 
     describe('login', function () {
-        it('', async function () {
+        it('works', async function () {
             const loginUserUsername = uniqueString();
             const loginUserPassword = 'testpassword';
             await client.createUser(loginUserUsername, loginUserPassword);
@@ -87,7 +87,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('error handling', function () {
-        it('error handling', async function () {
+        it('works', async function () {
             try {
                 await TrueVault.login(TEST_ACCOUNT_UUID, 'invalid', 'invalid', undefined, TEST_TRUEVAULT_HOST);
                 should.fail(null, null, 'Should have thrown');
@@ -107,7 +107,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('readCurrentUser', function () {
-        it('readCurrentUser', async function () {
+        it('returns current user', async function () {
             const user = await client.readCurrentUser();
             user.should.matchSchema(USER_SCHEMA);
         });
@@ -115,7 +115,7 @@ describe('TrueVaultClient', function () {
 
 
     describe('groups', function () {
-        it('groups', async function () {
+        it('works', async function () {
             const newGroup = await client.createGroup(uniqueString(), []);
             const groupSchema = {
                 type: 'object',
@@ -170,7 +170,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('users', function () {
-        it('users', async function () {
+        it('works', async function () {
             try {
                 // We pre-create the user schema and you can't delete user schemas without deleting all users, so in practice
                 // this will always fail
@@ -342,7 +342,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('user mfa', function () {
-        it('user mfa', async function () {
+        it('works', async function () {
             const newUsername = uniqueString();
             const newUserPassword = 'password';
             const newUser = await client.createUser(newUsername, newUserPassword);
@@ -431,9 +431,9 @@ describe('TrueVaultClient', function () {
         }
 
         if (typeof XMLHttpRequest === "undefined") {
-            it('blobs with progress tests can only run in the browser');
+            it('works with progress tests can only run in the browser');
         } else {
-            it('progress', async function () {
+            it('works with progress', async function () {
                 const newVault = await client.createVault(uniqueString());
 
                 const createProgressCallback = testProgressCallbackFactory("create");
@@ -455,7 +455,7 @@ describe('TrueVaultClient', function () {
             });
         }
 
-        it('non-progress', async function () {
+        it('works without progress', async function () {
             const vaultName = uniqueString();
             const newVault = await client.createVault(vaultName);
             const newVaultId = newVault.id;
@@ -503,7 +503,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('vaults and docs', function () {
-        it('vaults and docs', async function () {
+        it('works', async function () {
             const vaults = await client.listVaults();
             const vaultSchema = {
                 type: 'object',
@@ -726,7 +726,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('password reset flow', function () {
-        it('password reset flow', async function () {
+        it('works', async function () {
             const passwordResetFlowSchema = {
                 type: 'object',
                 properties: {
@@ -761,7 +761,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('sendgrid', function () {
-        it('sendgrid', async function () {
+        it('works', async function () {
             const newUser = await client.createUser(uniqueString(), uniqueString(), {email: 'test@example.com'});
 
             const providerMessageId = await client.sendEmailSendgrid(
@@ -777,7 +777,7 @@ describe('TrueVaultClient', function () {
     });
 
     describe('twilio', function () {
-        it('twilio', async function () {
+        it('works', async function () {
             const newUser = await client.createUser(uniqueString(), uniqueString(), {phone: '+15558675309'});
 
             try {
