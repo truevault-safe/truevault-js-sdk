@@ -51249,7 +51249,7 @@ exports.createContext = Script.createContext = function (context) {
 module.exports = {
 	"name": "truevault",
 	"description": "The official TrueVault JavaScript SDK",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truevault/truevault-js-sdk"
@@ -51301,6 +51301,7 @@ module.exports = {
 		"regenerator-runtime": "^0.11.1",
 		"should": "^13.2.1",
 		"string-to-stream": "^1.1.0",
+		"uglifyjs-webpack-plugin": "^1.2.4",
 		"uuid": "^3.2.1",
 		"webpack": "^2.6.1"
 	}

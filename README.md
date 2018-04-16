@@ -8,7 +8,7 @@ _Note: This SDK is only supported for the latest release of Chrome._
 
 Simply copy this line into your HTML:
 ```html
-<script src="https://unpkg.com/truevault/build/index.js"></script>
+<script src="https://unpkg.com/truevault@1.0.2/build/index-web.js"></script>
 ```
 
 ## Install using yarn / npm
@@ -117,9 +117,9 @@ This SDK is released under the [BSD 3-Clause License](LICENSE).
 
 ## Releasing a new version
 
-- Rebuild `build/index.js`; see above
-- Rebuild documentation; see above
 - Update version in `package.json`
+- Rebuild distribution files; see above
+- Rebuild documentation; see above
 - Commit
 - `npm publish`
 - Tag
