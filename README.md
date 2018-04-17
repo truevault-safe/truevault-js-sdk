@@ -2,7 +2,7 @@
 
 The official JavaScript SDK for TrueVault. For more information about TrueVault, check out our [website](https://www.truevault.com) and [API documentation](https://docs.truevault.com). To see how the SDK is used in a real application, check out the [TrueVault React Sample App](https://github.com/truevault/tv-react-js-sample-app). You can also browse the [documentation for this SDK](https://truevault.github.io/truevault-js-sdk).
 
-_Note: This SDK is only supported for the latest release of Chrome._
+_Note: This SDK is supported on Node JS, AWS Lambda, React Native, and modern browsers (tested in Chrome)._
 
 ## Install using unpkg CDN
 
