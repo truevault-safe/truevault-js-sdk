@@ -3,6 +3,7 @@ import nodeFetch from 'node-fetch';
 import URI from 'urijs';
 import base64 from 'base-64';
 import nodeFormData from 'form-data';
+import contentDisposition from 'content-disposition';
 
 const tvFetch = typeof fetch !== "undefined" ? fetch : nodeFetch;
 const tvFormData = typeof FormData !== "undefined" ? FormData : nodeFormData;
@@ -1156,7 +1157,10 @@ class TrueVaultClient {
      */
     async getBlobWithProgress(vaultId, blobId, progressCallback) {
         const xhr = await this.performLegacyRequestWithProgress('get', `${this.host}/v1/vaults/${vaultId}/blobs/${blobId}`, null, progressCallback, 'blob');
-        return {blob: xhr.response};
+        const contentType = xhr.getResponseHeader("Content-Type");
+        const contentDisposition = xhr.getResponseHeader("Content-Disposition");
+        const fileName = TrueVaultClient._extractFilenameFromContentDispositionHeader(contentDisposition);
+        return {blob: xhr.response, contentType, fileName};
     }
 
     /**
@@ -1174,8 +1178,11 @@ class TrueVaultClient {
         });
 
         const blob = response.blob ? await response.blob() : response.body;
+        const contentType = response.headers.get('Content-Type');
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const fileName = TrueVaultClient._extractFilenameFromContentDispositionHeader(contentDisposition);
 
-        return {blob};
+        return {blob, contentType, fileName};
     }
 
     /**
@@ -1361,6 +1368,17 @@ class TrueVaultClient {
     static _makeHeaderForUsername(username) {
         return `Basic ${base64.encode(username + ':')}`;
     };
+
+    static _extractFilenameFromContentDispositionHeader(contentDispositionHeader) {
+        // The contentDisposition library chokes on non-string input, so we check for that case (e. g. empty filename,
+        // invalid server response) and bail.
+        if (!contentDispositionHeader) {
+            return;
+        }
+        const parsedContentDisposition = contentDisposition.parse(contentDispositionHeader);
+        const params = parsedContentDisposition.parameters || {};
+        return params.filename;
+    }
 }
 
 module.exports = TrueVaultClient;
