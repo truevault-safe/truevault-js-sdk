@@ -381,7 +381,12 @@ describe('TrueVaultClient', function () {
         let testBlobContentsFactory;
         if (typeof Blob !== "undefined") {
             // Must be running in a browser-like environment
-            testBlobContentsFactory = () => new Blob(['testing blob contents'], {type: 'text/plain'});
+            testBlobContentsFactory = () => {
+                const blob = new Blob(['testing blob contents'], {type: 'text/plain'});
+                blob.name = 'thename';
+                blob.filename = 'thefilename';
+                return blob;
+            };
         } else {
             // Must be running in something node-like. This atrocity is needed to keep webpack from trying
             // to load the fs module when building for web. Obviously this would fail if run in a web environment,
@@ -452,6 +457,25 @@ describe('TrueVaultClient', function () {
                 getBlobResponse.blob.should.be.instanceOf(Blob);
                 getProgressCallback.verify();
             });
+        }
+
+        if (typeof File === "undefined") {
+            it('supplies filename test can only be run in the browser');
+        } else {
+            it('supplies filename', async function() {
+                const newVault = await client.createVault(uniqueString());
+                const vaultId = newVault.id;
+
+                const filename = "testingfile";
+                const file = new File([testBlobContentsFactory()], filename);
+                const newBlob = await client.createBlob(vaultId, file);
+
+                const blobFromTV = await client.getBlob(vaultId, newBlob.id);
+                blobFromTV.fileName.should.equal(filename);
+
+                const blobFromTVProgress = await client.getBlobWithProgress(vaultId, newBlob.id, testProgressCallbackFactory("getfilename"));
+                blobFromTVProgress.fileName.should.equal(filename);
+            })
         }
 
         it('works without progress', async function () {
