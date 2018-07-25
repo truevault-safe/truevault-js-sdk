@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>truevault 1.1.0 | Documentation</title>
+  <title>truevault 1.2.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div class='fixed xs-hide fix-3 overflow-auto max-height-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>truevault</h3>
-          <div class='mb1'><code>1.1.0</code></div>
+          <div class='mb1'><code>1.2.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -571,7 +571,7 @@ and lambda methods.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>login(accountId, username, password, mfaCode?, host?)</span>
+            <span class='code strong strong truncate'>login(accountId, username, password, mfaCode?, host?, notValidAfter?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -585,7 +585,7 @@ TrueVault access token if needed (e. g. to save in localStorage).
 See <a href="https://docs.truevault.com/authentication#login-a-user">https://docs.truevault.com/authentication#login-a-user</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>login(accountId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, username: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, password: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, mfaCode: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, host: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="#truevaultclient">TrueVaultClient</a>></div>
+  <div class='pre p1 fill-light mt0'>login(accountId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, username: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, password: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, mfaCode: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, host: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, notValidAfter: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="#truevaultclient">TrueVaultClient</a>></div>
   
   
 
@@ -641,6 +641,15 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
             <span class='code bold'>host</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    host optional parameter specifying TV API host; defaults to 
 <a href="https://api.truevault.com">https://api.truevault.com</a>
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>notValidAfter</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>?)</code>
+	    notValidAfter optional parameter specifying when the returned access token expires
 
           </div>
           
@@ -679,7 +688,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>generateAccessToken(accountId, username, password, mfaCode?, host?)</span>
+            <span class='code strong strong truncate'>generateAccessToken(accountId, username, password, mfaCode?, host?, notValidAfter?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -691,7 +700,7 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
 See <a href="https://docs.truevault.com/authentication#login-a-user">https://docs.truevault.com/authentication#login-a-user</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>generateAccessToken(accountId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, username: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, password: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, mfaCode: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, host: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
+  <div class='pre p1 fill-light mt0'>generateAccessToken(accountId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, username: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, password: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, mfaCode: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, host: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, notValidAfter: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
   
   
 
@@ -747,6 +756,15 @@ See <a href="https://docs.truevault.com/authentication#login-a-user">https://doc
             <span class='code bold'>host</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    host optional parameter specifying TV API host; defaults to 
 <a href="https://api.truevault.com">https://api.truevault.com</a>
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>notValidAfter</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>?)</code>
+	    notValidAfter optional parameter specifying when the returned access token expires
 
           </div>
           
@@ -2022,7 +2040,7 @@ information.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>createUserAccessToken(userId)</span>
+            <span class='code strong strong truncate'>createUserAccessToken(userId, notValidAfter?)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -2033,7 +2051,7 @@ information.</p>
   <p>Create an access token for a user. See <a href="https://docs.truevault.com/users#create-access-token-for-a-user">https://docs.truevault.com/users#create-access-token-for-a-user</a>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>createUserAccessToken(userId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
+  <div class='pre p1 fill-light mt0'>createUserAccessToken(userId: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, notValidAfter: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>?): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
   
   
 
@@ -2052,6 +2070,15 @@ information.</p>
           <div>
             <span class='code bold'>userId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    user id.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>notValidAfter</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>?)</code>
+	    notValidAfter optional parameter specifying when the returned access token expires
 
           </div>
           

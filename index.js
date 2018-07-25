@@ -201,10 +201,11 @@ class TrueVaultClient {
      * @param {string} password user's password.
      * @param {string} [mfaCode] current MFA code, if user has MFA configured.
      * @param {string} [host] host optional parameter specifying TV API host; defaults to https://api.truevault.com
+     * @param {Date} [notValidAfter] notValidAfter optional parameter specifying when the returned access token expires
      * @returns {Promise.<TrueVaultClient>}
      */
-    static async login(accountId, username, password, mfaCode, host) {
-        const accessToken = await TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host);
+    static async login(accountId, username, password, mfaCode, host, notValidAfter) {
+        const accessToken = await TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host, notValidAfter);
 
         return new TrueVaultClient({'accessToken': accessToken}, host);
     }
@@ -217,15 +218,19 @@ class TrueVaultClient {
      * @param {string} password user's password.
      * @param {string} [mfaCode] current MFA code, if user has MFA configured.
      * @param {string} [host] host optional parameter specifying TV API host; defaults to https://api.truevault.com
+     * @param {Date} [notValidAfter] notValidAfter optional parameter specifying when the returned access token expires
      * @returns {Promise.<string>}
      */
-    static async generateAccessToken(accountId, username, password, mfaCode, host) {
+    static async generateAccessToken(accountId, username, password, mfaCode, host, notValidAfter) {
         const formData = new tvFormData();
         formData.append("account_id", accountId);
         formData.append("username", username);
         formData.append("password", password);
         if (!!mfaCode) {
             formData.append("mfa_code", mfaCode);
+        }
+        if (!!notValidAfter) {
+            formData.append("not_valid_after", notValidAfter.toISOString());
         }
 
         const tvClient = new TrueVaultClient(null, host);
@@ -461,10 +466,16 @@ class TrueVaultClient {
     /**
      * Create an access token for a user. See https://docs.truevault.com/users#create-access-token-for-a-user.
      * @param {string} userId user id.
+     * @param {Date} [notValidAfter] notValidAfter optional parameter specifying when the returned access token expires
      * @returns {Promise.<string>}
      */
-    async createUserAccessToken(userId) {
-        const response = await this.performLegacyRequest(`v1/users/${userId}/access_token`, {method: 'POST'});
+    async createUserAccessToken(userId, notValidAfter) {
+        const formData = new tvFormData();
+        if (!!notValidAfter) {
+            formData.append("not_valid_after ", notValidAfter.toISOString());
+        }
+
+        const response = await this.performLegacyRequest(`v1/users/${userId}/access_token`, {method: 'POST', body: formData});
         return response.user.access_token;
     }
 

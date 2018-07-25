@@ -4947,6 +4947,7 @@ var TrueVaultClient = function () {
          * @param {string} password user's password.
          * @param {string} [mfaCode] current MFA code, if user has MFA configured.
          * @param {string} [host] host optional parameter specifying TV API host; defaults to https://api.truevault.com
+         * @param {Date} [notValidAfter] notValidAfter optional parameter specifying when the returned access token expires
          * @returns {Promise.<TrueVaultClient>}
          */
 
@@ -5557,26 +5558,33 @@ var TrueVaultClient = function () {
         /**
          * Create an access token for a user. See https://docs.truevault.com/users#create-access-token-for-a-user.
          * @param {string} userId user id.
+         * @param {Date} [notValidAfter] notValidAfter optional parameter specifying when the returned access token expires
          * @returns {Promise.<string>}
          */
 
     }, {
         key: 'createUserAccessToken',
         value: function () {
-            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(userId) {
-                var response;
+            var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17(userId, notValidAfter) {
+                var formData, response;
                 return regeneratorRuntime.wrap(function _callee17$(_context17) {
                     while (1) {
                         switch (_context17.prev = _context17.next) {
                             case 0:
-                                _context17.next = 2;
-                                return this.performLegacyRequest('v1/users/' + userId + '/access_token', { method: 'POST' });
+                                formData = new tvFormData();
 
-                            case 2:
+                                if (!!notValidAfter) {
+                                    formData.append("not_valid_after ", notValidAfter.toISOString());
+                                }
+
+                                _context17.next = 4;
+                                return this.performLegacyRequest('v1/users/' + userId + '/access_token', { method: 'POST', body: formData });
+
+                            case 4:
                                 response = _context17.sent;
                                 return _context17.abrupt('return', response.user.access_token);
 
-                            case 4:
+                            case 6:
                             case 'end':
                                 return _context17.stop();
                         }
@@ -5584,7 +5592,7 @@ var TrueVaultClient = function () {
                 }, _callee17, this);
             }));
 
-            function createUserAccessToken(_x27) {
+            function createUserAccessToken(_x27, _x28) {
                 return _ref17.apply(this, arguments);
             }
 
@@ -5625,7 +5633,7 @@ var TrueVaultClient = function () {
                 }, _callee18, this);
             }));
 
-            function startUserMfaEnrollment(_x28, _x29) {
+            function startUserMfaEnrollment(_x29, _x30) {
                 return _ref18.apply(this, arguments);
             }
 
@@ -5662,7 +5670,7 @@ var TrueVaultClient = function () {
                 }, _callee19, this);
             }));
 
-            function finalizeMfaEnrollment(_x30, _x31, _x32) {
+            function finalizeMfaEnrollment(_x31, _x32, _x33) {
                 return _ref19.apply(this, arguments);
             }
 
@@ -5699,7 +5707,7 @@ var TrueVaultClient = function () {
                 }, _callee20, this);
             }));
 
-            function unenrollMfa(_x33, _x34, _x35) {
+            function unenrollMfa(_x34, _x35, _x36) {
                 return _ref20.apply(this, arguments);
             }
 
@@ -5748,7 +5756,7 @@ var TrueVaultClient = function () {
                 }, _callee21, this);
             }));
 
-            function createGroup(_x36, _x37, _x38) {
+            function createGroup(_x37, _x38, _x39) {
                 return _ref21.apply(this, arguments);
             }
 
@@ -5800,7 +5808,7 @@ var TrueVaultClient = function () {
                 }, _callee22, this);
             }));
 
-            function updateGroup(_x39, _x40, _x41) {
+            function updateGroup(_x40, _x41, _x42) {
                 return _ref22.apply(this, arguments);
             }
 
@@ -5839,7 +5847,7 @@ var TrueVaultClient = function () {
                 }, _callee23, this);
             }));
 
-            function deleteGroup(_x42) {
+            function deleteGroup(_x43) {
                 return _ref23.apply(this, arguments);
             }
 
@@ -5912,7 +5920,7 @@ var TrueVaultClient = function () {
                 }, _callee25, this);
             }));
 
-            function readFullGroup(_x43) {
+            function readFullGroup(_x44) {
                 return _ref25.apply(this, arguments);
             }
 
@@ -5948,7 +5956,7 @@ var TrueVaultClient = function () {
                 }, _callee26, this);
             }));
 
-            function addUsersToGroup(_x44, _x45) {
+            function addUsersToGroup(_x45, _x46) {
                 return _ref26.apply(this, arguments);
             }
 
@@ -5983,7 +5991,7 @@ var TrueVaultClient = function () {
                 }, _callee27, this);
             }));
 
-            function removeUsersFromGroup(_x46, _x47) {
+            function removeUsersFromGroup(_x47, _x48) {
                 return _ref27.apply(this, arguments);
             }
 
@@ -6029,7 +6037,7 @@ var TrueVaultClient = function () {
                 }, _callee28, this);
             }));
 
-            function addUsersToGroupReturnUserIds(_x48, _x49) {
+            function addUsersToGroupReturnUserIds(_x49, _x50) {
                 return _ref28.apply(this, arguments);
             }
 
@@ -6075,7 +6083,7 @@ var TrueVaultClient = function () {
                 }, _callee29, this);
             }));
 
-            function removeUsersFromGroupReturnUserIds(_x50, _x51) {
+            function removeUsersFromGroupReturnUserIds(_x51, _x52) {
                 return _ref29.apply(this, arguments);
             }
 
@@ -6128,7 +6136,7 @@ var TrueVaultClient = function () {
                 }, _callee30, this);
             }));
 
-            function searchUsers(_x52) {
+            function searchUsers(_x53) {
                 return _ref30.apply(this, arguments);
             }
 
@@ -6172,7 +6180,7 @@ var TrueVaultClient = function () {
                 }, _callee31, this);
             }));
 
-            function listVaults(_x53, _x54) {
+            function listVaults(_x54, _x55) {
                 return _ref31.apply(this, arguments);
             }
 
@@ -6216,7 +6224,7 @@ var TrueVaultClient = function () {
                 }, _callee32, this);
             }));
 
-            function createVault(_x55) {
+            function createVault(_x56) {
                 return _ref32.apply(this, arguments);
             }
 
@@ -6253,7 +6261,7 @@ var TrueVaultClient = function () {
                 }, _callee33, this);
             }));
 
-            function readVault(_x56) {
+            function readVault(_x57) {
                 return _ref33.apply(this, arguments);
             }
 
@@ -6298,7 +6306,7 @@ var TrueVaultClient = function () {
                 }, _callee34, this);
             }));
 
-            function updateVault(_x57, _x58) {
+            function updateVault(_x58, _x59) {
                 return _ref34.apply(this, arguments);
             }
 
@@ -6337,7 +6345,7 @@ var TrueVaultClient = function () {
                 }, _callee35, this);
             }));
 
-            function deleteVault(_x59) {
+            function deleteVault(_x60) {
                 return _ref35.apply(this, arguments);
             }
 
@@ -6384,7 +6392,7 @@ var TrueVaultClient = function () {
                 }, _callee36, this);
             }));
 
-            function createSchema(_x60, _x61, _x62) {
+            function createSchema(_x61, _x62, _x63) {
                 return _ref36.apply(this, arguments);
             }
 
@@ -6432,7 +6440,7 @@ var TrueVaultClient = function () {
                 }, _callee37, this);
             }));
 
-            function updateSchema(_x63, _x64, _x65, _x66) {
+            function updateSchema(_x64, _x65, _x66, _x67) {
                 return _ref37.apply(this, arguments);
             }
 
@@ -6470,7 +6478,7 @@ var TrueVaultClient = function () {
                 }, _callee38, this);
             }));
 
-            function readSchema(_x67, _x68) {
+            function readSchema(_x68, _x69) {
                 return _ref38.apply(this, arguments);
             }
 
@@ -6507,7 +6515,7 @@ var TrueVaultClient = function () {
                 }, _callee39, this);
             }));
 
-            function listSchemas(_x69) {
+            function listSchemas(_x70) {
                 return _ref39.apply(this, arguments);
             }
 
@@ -6542,7 +6550,7 @@ var TrueVaultClient = function () {
                 }, _callee40, this);
             }));
 
-            function deleteSchema(_x70, _x71) {
+            function deleteSchema(_x71, _x72) {
                 return _ref40.apply(this, arguments);
             }
 
@@ -6589,7 +6597,7 @@ var TrueVaultClient = function () {
                 }, _callee41, this);
             }));
 
-            function createUserSchema(_x72, _x73, _x74) {
+            function createUserSchema(_x73, _x74, _x75) {
                 return _ref41.apply(this, arguments);
             }
 
@@ -6628,7 +6636,7 @@ var TrueVaultClient = function () {
                 }, _callee42, this);
             }));
 
-            function readUserSchema(_x75) {
+            function readUserSchema(_x76) {
                 return _ref42.apply(this, arguments);
             }
 
@@ -6675,7 +6683,7 @@ var TrueVaultClient = function () {
                 }, _callee43, this);
             }));
 
-            function updateUserSchema(_x76, _x77, _x78) {
+            function updateUserSchema(_x77, _x78, _x79) {
                 return _ref43.apply(this, arguments);
             }
 
@@ -6715,7 +6723,7 @@ var TrueVaultClient = function () {
                 }, _callee44, this);
             }));
 
-            function deleteUserSchema(_x79) {
+            function deleteUserSchema(_x80) {
                 return _ref44.apply(this, arguments);
             }
 
@@ -6768,7 +6776,7 @@ var TrueVaultClient = function () {
                 }, _callee45, this);
             }));
 
-            function createDocument(_x80, _x81, _x82, _x83) {
+            function createDocument(_x81, _x82, _x83, _x84) {
                 return _ref45.apply(this, arguments);
             }
 
@@ -6828,7 +6836,7 @@ var TrueVaultClient = function () {
                 }, _callee46, this);
             }));
 
-            function listDocuments(_x84, _x85, _x86, _x87) {
+            function listDocuments(_x85, _x86, _x87, _x88) {
                 return _ref46.apply(this, arguments);
             }
 
@@ -6889,7 +6897,7 @@ var TrueVaultClient = function () {
                 }, _callee47, this);
             }));
 
-            function listDocumentsInSchema(_x88, _x89, _x90, _x91, _x92) {
+            function listDocumentsInSchema(_x89, _x90, _x91, _x92, _x93) {
                 return _ref47.apply(this, arguments);
             }
 
@@ -6948,7 +6956,7 @@ var TrueVaultClient = function () {
                 }, _callee48, this);
             }));
 
-            function getDocuments(_x93, _x94) {
+            function getDocuments(_x94, _x95) {
                 return _ref48.apply(this, arguments);
             }
 
@@ -7002,7 +7010,7 @@ var TrueVaultClient = function () {
                 }, _callee49, this);
             }));
 
-            function searchDocuments(_x95, _x96) {
+            function searchDocuments(_x96, _x97) {
                 return _ref49.apply(this, arguments);
             }
 
@@ -7057,7 +7065,7 @@ var TrueVaultClient = function () {
                 }, _callee50, this);
             }));
 
-            function updateDocument(_x97, _x98, _x99, _x100, _x101) {
+            function updateDocument(_x98, _x99, _x100, _x101, _x102) {
                 return _ref50.apply(this, arguments);
             }
 
@@ -7103,7 +7111,7 @@ var TrueVaultClient = function () {
                 }, _callee51, this);
             }));
 
-            function updateDocumentOwner(_x102, _x103, _x104) {
+            function updateDocumentOwner(_x103, _x104, _x105) {
                 return _ref51.apply(this, arguments);
             }
 
@@ -7146,7 +7154,7 @@ var TrueVaultClient = function () {
                 }, _callee52, this);
             }));
 
-            function deleteDocument(_x105, _x106) {
+            function deleteDocument(_x106, _x107) {
                 return _ref52.apply(this, arguments);
             }
 
@@ -7196,7 +7204,7 @@ var TrueVaultClient = function () {
                 }, _callee53, this);
             }));
 
-            function createBlob(_x107, _x108, _x109) {
+            function createBlob(_x108, _x109, _x110) {
                 return _ref53.apply(this, arguments);
             }
 
@@ -7244,7 +7252,7 @@ var TrueVaultClient = function () {
                 }, _callee54, this);
             }));
 
-            function createBlobWithProgress(_x110, _x111, _x112, _x113) {
+            function createBlobWithProgress(_x111, _x112, _x113, _x114) {
                 return _ref54.apply(this, arguments);
             }
 
@@ -7293,7 +7301,7 @@ var TrueVaultClient = function () {
                 }, _callee55, this);
             }));
 
-            function updateBlobWithProgress(_x114, _x115, _x116, _x117, _x118) {
+            function updateBlobWithProgress(_x115, _x116, _x117, _x118, _x119) {
                 return _ref55.apply(this, arguments);
             }
 
@@ -7335,7 +7343,7 @@ var TrueVaultClient = function () {
                 }, _callee56, this);
             }));
 
-            function getBlobWithProgress(_x119, _x120, _x121) {
+            function getBlobWithProgress(_x120, _x121, _x122) {
                 return _ref56.apply(this, arguments);
             }
 
@@ -7400,7 +7408,7 @@ var TrueVaultClient = function () {
                 }, _callee57, this);
             }));
 
-            function getBlob(_x122, _x123) {
+            function getBlob(_x123, _x124) {
                 return _ref57.apply(this, arguments);
             }
 
@@ -7447,7 +7455,7 @@ var TrueVaultClient = function () {
                 }, _callee58, this);
             }));
 
-            function listBlobs(_x124, _x125, _x126) {
+            function listBlobs(_x125, _x126, _x127) {
                 return _ref58.apply(this, arguments);
             }
 
@@ -7498,7 +7506,7 @@ var TrueVaultClient = function () {
                 }, _callee59, this);
             }));
 
-            function updateBlob(_x127, _x128, _x129, _x130) {
+            function updateBlob(_x128, _x129, _x130, _x131) {
                 return _ref59.apply(this, arguments);
             }
 
@@ -7544,7 +7552,7 @@ var TrueVaultClient = function () {
                 }, _callee60, this);
             }));
 
-            function updateBlobOwner(_x131, _x132, _x133) {
+            function updateBlobOwner(_x132, _x133, _x134) {
                 return _ref60.apply(this, arguments);
             }
 
@@ -7584,7 +7592,7 @@ var TrueVaultClient = function () {
                 }, _callee61, this);
             }));
 
-            function deleteBlob(_x134, _x135) {
+            function deleteBlob(_x135, _x136) {
                 return _ref61.apply(this, arguments);
             }
 
@@ -7636,7 +7644,7 @@ var TrueVaultClient = function () {
                 }, _callee62, this);
             }));
 
-            function sendEmailSendgrid(_x136, _x137, _x138, _x139, _x140, _x141) {
+            function sendEmailSendgrid(_x137, _x138, _x139, _x140, _x141, _x142) {
                 return _ref62.apply(this, arguments);
             }
 
@@ -7694,7 +7702,7 @@ var TrueVaultClient = function () {
                 }, _callee63, this);
             }));
 
-            function sendSMSTwilio(_x142, _x143, _x144, _x145, _x146, _x147, _x148, _x149) {
+            function sendSMSTwilio(_x143, _x144, _x145, _x146, _x147, _x148, _x149, _x150) {
                 return _ref63.apply(this, arguments);
             }
 
@@ -7746,7 +7754,7 @@ var TrueVaultClient = function () {
                 }, _callee64, this);
             }));
 
-            function createPasswordResetFlow(_x150, _x151, _x152, _x153, _x154, _x155) {
+            function createPasswordResetFlow(_x151, _x152, _x153, _x154, _x155, _x156) {
                 return _ref64.apply(this, arguments);
             }
 
@@ -7820,7 +7828,7 @@ var TrueVaultClient = function () {
                 }, _callee66, this);
             }));
 
-            function sendPasswordResetEmail(_x156, _x157) {
+            function sendPasswordResetEmail(_x157, _x158) {
                 return _ref66.apply(this, arguments);
             }
 
@@ -7849,14 +7857,14 @@ var TrueVaultClient = function () {
     }], [{
         key: 'login',
         value: function () {
-            var _ref67 = _asyncToGenerator(regeneratorRuntime.mark(function _callee67(accountId, username, password, mfaCode, host) {
+            var _ref67 = _asyncToGenerator(regeneratorRuntime.mark(function _callee67(accountId, username, password, mfaCode, host, notValidAfter) {
                 var accessToken;
                 return regeneratorRuntime.wrap(function _callee67$(_context67) {
                     while (1) {
                         switch (_context67.prev = _context67.next) {
                             case 0:
                                 _context67.next = 2;
-                                return TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host);
+                                return TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host, notValidAfter);
 
                             case 2:
                                 accessToken = _context67.sent;
@@ -7870,7 +7878,7 @@ var TrueVaultClient = function () {
                 }, _callee67, this);
             }));
 
-            function login(_x158, _x159, _x160, _x161, _x162) {
+            function login(_x159, _x160, _x161, _x162, _x163, _x164) {
                 return _ref67.apply(this, arguments);
             }
 
@@ -7885,13 +7893,14 @@ var TrueVaultClient = function () {
          * @param {string} password user's password.
          * @param {string} [mfaCode] current MFA code, if user has MFA configured.
          * @param {string} [host] host optional parameter specifying TV API host; defaults to https://api.truevault.com
+         * @param {Date} [notValidAfter] notValidAfter optional parameter specifying when the returned access token expires
          * @returns {Promise.<string>}
          */
 
     }, {
         key: 'generateAccessToken',
         value: function () {
-            var _ref68 = _asyncToGenerator(regeneratorRuntime.mark(function _callee68(accountId, username, password, mfaCode, host) {
+            var _ref68 = _asyncToGenerator(regeneratorRuntime.mark(function _callee68(accountId, username, password, mfaCode, host, notValidAfter) {
                 var formData, tvClient, response;
                 return regeneratorRuntime.wrap(function _callee68$(_context68) {
                     while (1) {
@@ -7905,19 +7914,22 @@ var TrueVaultClient = function () {
                                 if (!!mfaCode) {
                                     formData.append("mfa_code", mfaCode);
                                 }
+                                if (!!notValidAfter) {
+                                    formData.append("not_valid_after", notValidAfter.toISOString());
+                                }
 
                                 tvClient = new TrueVaultClient(null, host);
-                                _context68.next = 8;
+                                _context68.next = 9;
                                 return tvClient.performLegacyRequest('v1/auth/login', {
                                     method: 'POST',
                                     body: formData
                                 });
 
-                            case 8:
+                            case 9:
                                 response = _context68.sent;
                                 return _context68.abrupt('return', response.user.access_token);
 
-                            case 10:
+                            case 11:
                             case 'end':
                                 return _context68.stop();
                         }
@@ -7925,7 +7937,7 @@ var TrueVaultClient = function () {
                 }, _callee68, this);
             }));
 
-            function generateAccessToken(_x163, _x164, _x165, _x166, _x167) {
+            function generateAccessToken(_x165, _x166, _x167, _x168, _x169, _x170) {
                 return _ref68.apply(this, arguments);
             }
 
@@ -27175,7 +27187,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 module.exports = {
 	"name": "truevault",
 	"description": "The official TrueVault JavaScript SDK",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truevault/truevault-js-sdk"
