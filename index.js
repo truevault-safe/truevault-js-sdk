@@ -907,11 +907,11 @@ class TrueVaultClient {
         const body = {document};
 
         if (typeof schemaId === 'string') {
-            body.schemaId = schemaId;
+            body.schema_id = schemaId;
         }
 
         if (typeof ownerId === 'string') {
-            body.ownerId = ownerId;
+            body.owner_id = ownerId;
         }
         const response = await this.performJSONRequest(`v2/vaults/${vaultId}/documents`, {
             method: 'POST',
