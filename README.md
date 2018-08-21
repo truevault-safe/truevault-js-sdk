@@ -8,7 +8,7 @@ _Note: This SDK is supported on Node JS, AWS Lambda, React Native, and modern br
 
 Simply copy this line into your HTML:
 ```html
-<script src="https://unpkg.com/truevault@1.2.1/build/index-web.js"></script>
+<script src="https://unpkg.com/truevault@1.3.0/build/index-web.js"></script>
 ```
 
 ## Install using yarn / npm
@@ -86,6 +86,8 @@ Test out the SDK with this simple [JSFiddle](https://jsfiddle.net/TrueVault/wq4e
 
 Make changes to `index.js` and then bundle them into `build/index.js` with webpack:
 
+`yarn install`
+
 `yarn build`
 
 The integration tests are built with [Mocha](https://mochajs.org/). To run them,
@@ -117,7 +119,7 @@ This SDK is released under the [BSD 3-Clause License](LICENSE).
 
 ## Releasing a new version
 
-- Update version in `package.json`
+- Update version in `package.json`, update the version in the Readme.
 - Rebuild distribution files; see above
 - Rebuild documentation; see above
 - Commit
