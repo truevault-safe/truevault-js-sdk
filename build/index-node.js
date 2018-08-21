@@ -6752,11 +6752,11 @@ var TrueVaultClient = function () {
 
 
                                 if (typeof schemaId === 'string') {
-                                    body.schemaId = schemaId;
+                                    body.schema_id = schemaId;
                                 }
 
                                 if (typeof ownerId === 'string') {
-                                    body.ownerId = ownerId;
+                                    body.owner_id = ownerId;
                                 }
                                 _context45.next = 5;
                                 return this.performJSONRequest('v2/vaults/' + vaultId + '/documents', {
@@ -27187,7 +27187,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 module.exports = {
 	"name": "truevault",
 	"description": "The official TrueVault JavaScript SDK",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truevault/truevault-js-sdk"
