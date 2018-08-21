@@ -739,6 +739,11 @@ describe('TrueVaultClient', function () {
                 required: ['documents', 'info']
             });
 
+            const user = await client.createUser(uniqueString(), uniqueString());
+            const docWithOwner = await client.createDocument(vaultId, undefined, {foo: 'who'}, user.id);
+            docWithOwner.owner_id.should.equal(user.id);
+
+
             const newFields = [];
             const newName = uniqueString();
             const updateSchemaResponse = await client.updateSchema(vaultId, newSchema.id, newName, newFields);
