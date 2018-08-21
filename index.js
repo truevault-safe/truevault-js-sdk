@@ -1436,7 +1436,7 @@ class TrueVaultClient {
      * @returns {Promise.<Array>}
      */
     async listScopedAccessTokens() {
-        const response = await this.performJSONRequest(`v1/scoped_access_tokens`)
+        const response = await this.performJSONRequest(`v1/scoped_access_tokens`);
         return response.data.items;
     }
 
