@@ -7834,6 +7834,214 @@ var TrueVaultClient = function () {
 
             return sendPasswordResetEmail;
         }()
+
+        /**
+         * Link a Scoped Access Token to a Password Reset Flow. See https://docs.truevault.com/passwordresetflow#link-a-scoped-access-token-to-a-password-reset-flow
+         * @param {string} flowId
+         * @param {string} tokenId
+         * @returns {Promise.<undefined>}
+         */
+
+    }, {
+        key: 'linkScopedAccessTokenToPasswordResetFlow',
+        value: function () {
+            var _ref67 = _asyncToGenerator(regeneratorRuntime.mark(function _callee67(flowId, tokenId) {
+                return regeneratorRuntime.wrap(function _callee67$(_context67) {
+                    while (1) {
+                        switch (_context67.prev = _context67.next) {
+                            case 0:
+                                _context67.next = 2;
+                                return this.performJSONRequest('v1/password_reset_flows/' + flowId + '/link_sat', {
+                                    method: 'POST',
+                                    body: JSON.stringify({
+                                        scoped_access_token_id: tokenId
+                                    })
+                                });
+
+                            case 2:
+                                return _context67.abrupt('return', _context67.sent);
+
+                            case 3:
+                            case 'end':
+                                return _context67.stop();
+                        }
+                    }
+                }, _callee67, this);
+            }));
+
+            function linkScopedAccessTokenToPasswordResetFlow(_x159, _x160) {
+                return _ref67.apply(this, arguments);
+            }
+
+            return linkScopedAccessTokenToPasswordResetFlow;
+        }()
+
+        /**
+         * Create a new Scoped Access Token. See: https://docs.truevault.com/scopedaccesstokens#create-a-scoped-access-token
+         * @param {string} name
+         * @param {Array} policy See https://docs.truevault.com/groups for policy definition documentation
+         * @param {Date} [notValidAfter] notValidAfter optional parameter specifying when the returned access token expires
+         * @param {number} [allowedUses] allowedUses optional parameter specifying number of allowed uses
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'createScopedAccessToken',
+        value: function () {
+            var _ref68 = _asyncToGenerator(regeneratorRuntime.mark(function _callee68(name, policy, notValidAfter, allowedUses) {
+                var jsonPayload, response;
+                return regeneratorRuntime.wrap(function _callee68$(_context68) {
+                    while (1) {
+                        switch (_context68.prev = _context68.next) {
+                            case 0:
+                                jsonPayload = {
+                                    name: name,
+                                    policy: policy
+                                };
+
+
+                                if (!!notValidAfter) {
+                                    jsonPayload['not_valid_after'] = notValidAfter.toISOString();
+                                }
+
+                                if (!!allowedUses) {
+                                    jsonPayload['allowed_uses'] = allowedUses;
+                                }
+
+                                _context68.next = 5;
+                                return this.performJSONRequest('v1/scoped_access_tokens', {
+                                    method: 'POST',
+                                    body: JSON.stringify(jsonPayload)
+                                });
+
+                            case 5:
+                                response = _context68.sent;
+                                return _context68.abrupt('return', response.scoped_access_token);
+
+                            case 7:
+                            case 'end':
+                                return _context68.stop();
+                        }
+                    }
+                }, _callee68, this);
+            }));
+
+            function createScopedAccessToken(_x161, _x162, _x163, _x164) {
+                return _ref68.apply(this, arguments);
+            }
+
+            return createScopedAccessToken;
+        }()
+
+        /**
+         * Get a Scoped Access Token. See https://docs.truevault.com/scopedaccesstokens#get-a-scoped-access-token
+         * @param {string} tokenId the token to get
+         * @returns {Promise.<Object>}
+         */
+
+    }, {
+        key: 'getScopedAccessToken',
+        value: function () {
+            var _ref69 = _asyncToGenerator(regeneratorRuntime.mark(function _callee69(tokenId) {
+                var response;
+                return regeneratorRuntime.wrap(function _callee69$(_context69) {
+                    while (1) {
+                        switch (_context69.prev = _context69.next) {
+                            case 0:
+                                _context69.next = 2;
+                                return this.performJSONRequest('v1/scoped_access_tokens/' + tokenId);
+
+                            case 2:
+                                response = _context69.sent;
+                                return _context69.abrupt('return', response.scoped_access_token);
+
+                            case 4:
+                            case 'end':
+                                return _context69.stop();
+                        }
+                    }
+                }, _callee69, this);
+            }));
+
+            function getScopedAccessToken(_x165) {
+                return _ref69.apply(this, arguments);
+            }
+
+            return getScopedAccessToken;
+        }()
+
+        /**
+         * List all Scoped Access Tokens. See https://docs.truevault.com/scopedaccesstokens#list-scoped-access-tokens
+         * @returns {Promise.<Array>}
+         */
+
+    }, {
+        key: 'listScopedAccessTokens',
+        value: function () {
+            var _ref70 = _asyncToGenerator(regeneratorRuntime.mark(function _callee70() {
+                var response;
+                return regeneratorRuntime.wrap(function _callee70$(_context70) {
+                    while (1) {
+                        switch (_context70.prev = _context70.next) {
+                            case 0:
+                                _context70.next = 2;
+                                return this.performJSONRequest('v1/scoped_access_tokens');
+
+                            case 2:
+                                response = _context70.sent;
+                                return _context70.abrupt('return', response.data.items);
+
+                            case 4:
+                            case 'end':
+                                return _context70.stop();
+                        }
+                    }
+                }, _callee70, this);
+            }));
+
+            function listScopedAccessTokens() {
+                return _ref70.apply(this, arguments);
+            }
+
+            return listScopedAccessTokens;
+        }()
+
+        /**
+         * Delete a Scoped Access Token. See https://docs.truevault.com/scopedaccesstokens#delete-a-scoped-access-token
+         * @param {string} tokenId the token to delete
+         * @returns {Promise.<undefined>}
+         */
+
+    }, {
+        key: 'deleteScopedAccessToken',
+        value: function () {
+            var _ref71 = _asyncToGenerator(regeneratorRuntime.mark(function _callee71(tokenId) {
+                return regeneratorRuntime.wrap(function _callee71$(_context71) {
+                    while (1) {
+                        switch (_context71.prev = _context71.next) {
+                            case 0:
+                                _context71.next = 2;
+                                return this.performJSONRequest('v1/scoped_access_tokens/' + tokenId, {
+                                    method: 'DELETE'
+                                });
+
+                            case 2:
+                                return _context71.abrupt('return', _context71.sent);
+
+                            case 3:
+                            case 'end':
+                                return _context71.stop();
+                        }
+                    }
+                }, _callee71, this);
+            }));
+
+            function deleteScopedAccessToken(_x166) {
+                return _ref71.apply(this, arguments);
+            }
+
+            return deleteScopedAccessToken;
+        }()
     }, {
         key: 'accessToken',
         get: function get() {
@@ -7857,29 +8065,29 @@ var TrueVaultClient = function () {
     }], [{
         key: 'login',
         value: function () {
-            var _ref67 = _asyncToGenerator(regeneratorRuntime.mark(function _callee67(accountId, username, password, mfaCode, host, notValidAfter) {
+            var _ref72 = _asyncToGenerator(regeneratorRuntime.mark(function _callee72(accountId, username, password, mfaCode, host, notValidAfter) {
                 var accessToken;
-                return regeneratorRuntime.wrap(function _callee67$(_context67) {
+                return regeneratorRuntime.wrap(function _callee72$(_context72) {
                     while (1) {
-                        switch (_context67.prev = _context67.next) {
+                        switch (_context72.prev = _context72.next) {
                             case 0:
-                                _context67.next = 2;
+                                _context72.next = 2;
                                 return TrueVaultClient.generateAccessToken(accountId, username, password, mfaCode, host, notValidAfter);
 
                             case 2:
-                                accessToken = _context67.sent;
-                                return _context67.abrupt('return', new TrueVaultClient({ 'accessToken': accessToken }, host));
+                                accessToken = _context72.sent;
+                                return _context72.abrupt('return', new TrueVaultClient({ 'accessToken': accessToken }, host));
 
                             case 4:
                             case 'end':
-                                return _context67.stop();
+                                return _context72.stop();
                         }
                     }
-                }, _callee67, this);
+                }, _callee72, this);
             }));
 
-            function login(_x159, _x160, _x161, _x162, _x163, _x164) {
-                return _ref67.apply(this, arguments);
+            function login(_x167, _x168, _x169, _x170, _x171, _x172) {
+                return _ref72.apply(this, arguments);
             }
 
             return login;
@@ -7900,11 +8108,11 @@ var TrueVaultClient = function () {
     }, {
         key: 'generateAccessToken',
         value: function () {
-            var _ref68 = _asyncToGenerator(regeneratorRuntime.mark(function _callee68(accountId, username, password, mfaCode, host, notValidAfter) {
+            var _ref73 = _asyncToGenerator(regeneratorRuntime.mark(function _callee73(accountId, username, password, mfaCode, host, notValidAfter) {
                 var formData, tvClient, response;
-                return regeneratorRuntime.wrap(function _callee68$(_context68) {
+                return regeneratorRuntime.wrap(function _callee73$(_context73) {
                     while (1) {
-                        switch (_context68.prev = _context68.next) {
+                        switch (_context73.prev = _context73.next) {
                             case 0:
                                 formData = new tvFormData();
 
@@ -7919,26 +8127,26 @@ var TrueVaultClient = function () {
                                 }
 
                                 tvClient = new TrueVaultClient(null, host);
-                                _context68.next = 9;
+                                _context73.next = 9;
                                 return tvClient.performLegacyRequest('v1/auth/login', {
                                     method: 'POST',
                                     body: formData
                                 });
 
                             case 9:
-                                response = _context68.sent;
-                                return _context68.abrupt('return', response.user.access_token);
+                                response = _context73.sent;
+                                return _context73.abrupt('return', response.user.access_token);
 
                             case 11:
                             case 'end':
-                                return _context68.stop();
+                                return _context73.stop();
                         }
                     }
-                }, _callee68, this);
+                }, _callee73, this);
             }));
 
-            function generateAccessToken(_x165, _x166, _x167, _x168, _x169, _x170) {
-                return _ref68.apply(this, arguments);
+            function generateAccessToken(_x173, _x174, _x175, _x176, _x177, _x178) {
+                return _ref73.apply(this, arguments);
             }
 
             return generateAccessToken;
@@ -27187,7 +27395,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 module.exports = {
 	"name": "truevault",
 	"description": "The official TrueVault JavaScript SDK",
-	"version": "1.2.1",
+	"version": "1.3.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truevault/truevault-js-sdk"
