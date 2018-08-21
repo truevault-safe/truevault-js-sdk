@@ -8,7 +8,7 @@ _Note: This SDK is supported on Node JS, AWS Lambda, React Native, and modern br
 
 Simply copy this line into your HTML:
 ```html
-<script src="https://unpkg.com/truevault@1.0.2/build/index-web.js"></script>
+<script src="https://unpkg.com/truevault@1.2.1/build/index-web.js"></script>
 ```
 
 ## Install using yarn / npm
