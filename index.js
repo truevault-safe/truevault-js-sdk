@@ -1376,6 +1376,81 @@ class TrueVaultClient {
         });
     }
 
+    /**
+     * Link a Scoped Access Token to a Password Reset Flow. See https://docs.truevault.com/passwordresetflow#link-a-scoped-access-token-to-a-password-reset-flow
+     * @param {string} flowId
+     * @param {string} tokenId
+     * @returns {Promise.<undefined>}
+     */
+    async linkScopedAccessTokenToPasswordResetFlow(flowId, tokenId) {
+        return await this.performJSONRequest(`v1/password_reset_flows/${flowId}/link_sat`, {
+            method: 'POST',
+            body: JSON.stringify({
+                scoped_access_token_id: tokenId
+            })
+        });
+    }
+
+    /**
+     * Create a new Scoped Access Token. See: https://docs.truevault.com/scopedaccesstokens#create-a-scoped-access-token
+     * @param {string} name
+     * @param {Array} policy See https://docs.truevault.com/groups for policy definition documentation
+     * @param {Date} [notValidAfter] notValidAfter optional parameter specifying when the returned access token expires
+     * @param {number} [allowedUses] allowedUses optional parameter specifying number of allowed uses
+     * @returns {Promise.<Object>}
+     */
+    async createScopedAccessToken(name, policy, notValidAfter, allowedUses) {
+        var jsonPayload = {
+            name: name,
+            policy: policy
+        };
+
+        if (!!notValidAfter) {
+            jsonPayload['not_valid_after'] = notValidAfter.toISOString();
+        }
+
+        if (!!allowedUses) {
+            jsonPayload['allowed_uses'] = allowedUses;
+        }
+
+        const response = await this.performJSONRequest(`v1/scoped_access_tokens`, {
+            method: 'POST',
+            body: JSON.stringify(jsonPayload)
+        });
+
+        return response.scoped_access_token;
+    }
+
+    /**
+     * Get a Scoped Access Token. See https://docs.truevault.com/scopedaccesstokens#get-a-scoped-access-token
+     * @param {string} tokenId the token to get
+     * @returns {Promise.<Object>}
+     */
+    async getScopedAccessToken(tokenId) {
+        const response = await this.performJSONRequest(`v1/scoped_access_tokens/${tokenId}`);
+        return response.scoped_access_token;
+    }
+
+    /**
+     * List all Scoped Access Tokens. See https://docs.truevault.com/scopedaccesstokens#list-scoped-access-tokens
+     * @returns {Promise.<Array>}
+     */
+    async listScopedAccessTokens() {
+        const response = await this.performJSONRequest(`v1/scoped_access_tokens`);
+        return response.data.items;
+    }
+
+    /**
+     * Delete a Scoped Access Token. See https://docs.truevault.com/scopedaccesstokens#delete-a-scoped-access-token
+     * @param {string} tokenId the token to delete
+     * @returns {Promise.<undefined>}
+     */
+    async deleteScopedAccessToken(tokenId) {
+        return await this.performJSONRequest(`v1/scoped_access_tokens/${tokenId}`, {
+            method: 'DELETE'
+        });
+    }
+
     static _makeHeaderForUsername(username) {
         return `Basic ${base64.encode(username + ':')}`;
     };

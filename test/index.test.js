@@ -1,5 +1,6 @@
 import TrueVault from '../index';
 
+import base64 from 'base-64';
 import uuid from 'uuid';
 import otplib from 'otplib';
 import {Readable} from 'stream';
@@ -799,6 +800,13 @@ describe('TrueVaultClient', function () {
 
             const sendResult = await client.sendPasswordResetEmail(passwordResetFlow.id, uniqueString());
             should(sendResult).be.undefined();
+
+            const sat = await client.createScopedAccessToken(
+                uniqueString(),
+                [{Resources: [`Vault::`], Activities: 'C'}],
+                new Date(new Date().getTime() + 10000), undefined);
+
+            await client.linkScopedAccessTokenToPasswordResetFlow(passwordResetFlow.id, sat.id);
         });
     });
 
@@ -838,4 +846,78 @@ describe('TrueVaultClient', function () {
             }
         });
     });
+
+    describe('scoped access tokens', function () {
+        it('works', async function () {
+            // The target for testing authz from SAT
+            const subjectVault = await client.createVault(uniqueString());
+
+            const policy = [{Resources: [`Vault::${subjectVault.id}`], Activities: "R"}];
+            const future = new Date(new Date().getTime() + 10000);
+            const allowedUses = 33;
+            const name = uniqueString();
+            const sat = await client.createScopedAccessToken(name, policy, future, allowedUses);
+
+            sat.name.should.equal(name);
+            sat.policy.should.deepEqual(policy);
+            new Date(sat.not_valid_after).should.eql(future);
+            sat.allowed_uses.should.equal(allowedUses);
+
+            // Use the SAT to list the subject vault
+            const satHttpBasic = base64.encode(`${sat.http_auth.username}:${sat.http_auth.password}`);
+            const satClient = new TrueVault({httpBasic: satHttpBasic}, TEST_TRUEVAULT_HOST);
+            await satClient.readVault(subjectVault.id);
+
+            // Read all SATs
+            const satList = await client.listScopedAccessTokens();
+            let singleSatSchema = {
+                type: 'object',
+                properties: {
+                    allowed_uses: {type: ['null', 'number']},
+                    consumed_uses: {type: 'number'},
+                    name: {type: 'string'},
+                    not_valid_after: {type: 'string'},
+                    policy: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                Activities: {type: 'string'},
+                                Resources: {type: 'array', items: {type: 'string'}}
+                            }
+                        }
+                    },
+                },
+                required: ['allowed_uses', 'consumed_uses', 'name', 'not_valid_after', 'policy']
+            };
+            const satListSchema = {
+                type: 'array',
+                items: singleSatSchema
+            };
+            satList.should.matchSchema(satListSchema);
+
+            const satGetResult = await client.getScopedAccessToken(sat.id);
+            satGetResult.should.matchSchema(singleSatSchema);
+
+            // Delete the SAT and it shouldn't work as auth
+            await client.deleteScopedAccessToken(sat.id);
+
+            try {
+                await satClient.readVault(subjectVault.id);
+                should.fail(null, null, 'Should have thrown');
+            } catch (e) {
+                e.error.should.matchSchema({
+                    type: 'object',
+                    properties: {
+                        code: {type: 'string'},
+                        message: {type: 'string'},
+                        type: {type: 'string'}
+                    },
+                    required: ['code', 'message', 'type']
+                });
+                e.transaction_id.should.matchSchema({type: 'string', format: 'uuid'});
+            }
+        });
+    });
+
 });
