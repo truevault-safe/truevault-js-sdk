@@ -59,6 +59,17 @@ should.Assertion.add('matchSchema', function (schema) {
     }
 });
 
+should.Assertion.add('containItemWithId', function(id) {
+    const doesContainItemWithId = this.obj.some(function(item) {
+        return item.id == id;
+    });
+
+    if (!doesContainItemWithId) {
+        const failureMessage = `Item with id ${id} not found in ${JSON.stringify(this.obj)}.`;
+        should.fail(this.obj, id, failureMessage);
+    }
+});
+
 const client = new TrueVault({apiKey: TEST_USER_API_KEY}, TEST_TRUEVAULT_HOST);
 
 describe('TrueVaultClient', function () {
@@ -657,6 +668,9 @@ describe('TrueVaultClient', function () {
 
             const docsInSchema = await client.listDocumentsInSchema(vaultId, newSchema.id, true);
             docsInSchema.should.matchSchema(docListSchema);
+
+            // Ensure the document was actually added to the schema
+            docsInSchema.items.should.containItemWithId(indexedDoc.id);
 
             const searchResultsNotFull = await client.searchDocuments(vaultId, {
                 schema_id: newSchema.id,
