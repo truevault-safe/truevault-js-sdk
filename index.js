@@ -1383,7 +1383,7 @@ class TrueVaultClient {
      * @returns {Promise.<undefined>}
      */
     async linkScopedAccessTokenToPasswordResetFlow(flowId, tokenId) {
-        await this.performJSONRequest(`v1/password_reset_flows/${flowId}/link_sat`, {
+        return await this.performJSONRequest(`v1/password_reset_flows/${flowId}/link_sat`, {
             method: 'POST',
             body: JSON.stringify({
                 scoped_access_token_id: tokenId
@@ -1413,10 +1413,12 @@ class TrueVaultClient {
             jsonPayload['allowed_uses'] = allowedUses;
         }
 
-        await this.performJSONRequest(`v1/scoped_access_tokens`, {
+        const response = await this.performJSONRequest(`v1/scoped_access_tokens`, {
             method: 'POST',
             body: JSON.stringify(jsonPayload)
         });
+
+        return response.scoped_access_token;
     }
 
     /**
@@ -1426,7 +1428,7 @@ class TrueVaultClient {
      */
     async getScopedAccessToken(tokenId) {
         const response = await this.performJSONRequest(`v1/scoped_access_tokens/${tokenId}`);
-        return resonse.scoped_access_token;
+        return response.scoped_access_token;
     }
 
     /**
@@ -1444,7 +1446,7 @@ class TrueVaultClient {
      * @returns {Promise.<undefined>}
      */
     async deleteScopedAccessToken(tokenId) {
-        await this.performJSONRequest(`v1/scoped_access_tokens/${tokenId}`, {
+        return await this.performJSONRequest(`v1/scoped_access_tokens/${tokenId}`, {
             method: 'DELETE'
         });
     }
