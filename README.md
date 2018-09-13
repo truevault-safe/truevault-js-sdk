@@ -125,3 +125,46 @@ This SDK is released under the [BSD 3-Clause License](LICENSE).
 - Commit
 - `npm publish`
 - Tag
+
+## CHANGELOG
+
+### v1.3.0
+* FEATURE: Add support for managing scoped access tokens
+
+### v1.2.1
+* BUGFIX: Correct issue that prevented setting schema id or owner id when creating documents
+* FEATURE: Add support for configuring access token expiration
+
+### v1.1.0
+* FEATURE: Get blob methods return the blob's content type and filename, in addition to the blob itself
+
+### v1.0.2
+* FEATURE: Minify production builds to reduce file size
+
+### v1.0.1
+* FEATURE: Add JSDoc to blob methods
+
+### v1.0.0
+* BUGFIX: Fix error in `readUserSchema` method
+* CHANGE: `listUsers` now defaults to `full=false`, rather than `full=true`
+* CHANGE: `TrueVaultClient` constructor no longer accepts a string parameter; authentication information must be provided as an object
+* CHANGE: `removeUsersFromGroup` renamed to `removeUsersFromGroupReturnUserIds`
+* CHANGE: `deleteGroup` returns the deleted group, rather than the top-level TrueVault API response
+* CHANGE: `deleteBlob`, `updateBlobOwner`, `updateBlob`, `createBlob`, `createBlobWithProgress` return the blob's info, rather than the top-level TrueVault API response
+* CHANGE: `getBlob` and `getBlobWithProgress` return an object with a blob property, rather than just the blob
+* CHANGE: `startUserMfaEnrollment` now returns the mfa response object rather than the top-level TrueVault API response
+* CHANGE: `createVault` now returns the vault object rather than the top-level TrueVault API response
+* CHANGE: `createDocument`, `updateDocument` and `updateDocumentOwner` now return the document rather than the top-level TrueVault API response
+* CHANGE: `getFullGroup` renamed to `readFull` group, and it now returns the group rather than the top-level TrueVault API response
+* CHANGE: `createSchema`, `createUserSchema`, `readUserSchema`, `updateUserSchema` and `deleteUserSchema` now return the schema rather than the top-level TrueVault API response
+* CHANGE: `searchUsers`, `searchDocuments`, and `readUsers` now decode attributes
+* CHANGE: `listPasswordResetFlows` returns an array of password reset flows rather than the top-level TrueVault API response
+* CHANGE: `sendPasswordResetEmail` returns undefined rather than the top-level TrueVault API response
+* CHANGE: `deleteDocument` returns an object with the deleted document's info, rather than the top-level TrueVault API response
+* FEATURE: Add support AWS Lambda, NodeJS, and React Native
+* FEATURE: Allow specifying status when creating user
+* FEATURE: Access token and auth header exposed as properties
+* FEATURE: Error objects from failed requests include transaction_id
+* FEATURE: `readCurrentUser` now allows setting `full=false`
+* FEATURE: `listDocuments` now supports specifying `full` parameter
+* FEATURE: Add `updateCurrentUser`, `listUsersWithStatus`, `removeUsersFromGroup`, `listVaults`, `readVault`, `updateVault`, `deleteVault`, `updateSchema`, `readSchema`, `listSchema`, `deleteSchema`, `listDocumentsInSchema` methods
