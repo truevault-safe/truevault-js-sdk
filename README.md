@@ -119,7 +119,8 @@ This SDK is released under the [BSD 3-Clause License](LICENSE).
 
 ## Releasing a new version
 
-- Update version in `package.json`, update the version in the Readme.
+- Update version in `package.json`, update the version in README.md.
+- Update the changelog in README.md
 - Rebuild distribution files; see above
 - Rebuild documentation; see above
 - Commit
