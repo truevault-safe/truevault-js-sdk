@@ -3,7 +3,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     target: "web",
-    entry: ["babel-polyfill", "./index.js"],
+    entry: ["./index.js"],
     output: {
         path: path.join(__dirname, 'build'),
         publicPath: './build',

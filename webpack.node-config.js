@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     target: "node",
-    entry: ["babel-polyfill", "./index.js"],
+    entry: ["./index.js"],
     output: {
         path: path.join(__dirname, 'build'),
         publicPath: './build',
