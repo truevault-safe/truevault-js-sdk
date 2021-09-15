@@ -8,7 +8,7 @@ _Note: This SDK is supported on Node JS, AWS Lambda, React Native, and modern br
 
 Simply copy this line into your HTML:
 ```html
-<script src="https://unpkg.com/truevault@1.3.0/build/index-web.js"></script>
+<script src="https://unpkg.com/truevault@1.3.1/build/index-web.js"></script>
 ```
 
 ## Install using yarn / npm
@@ -128,6 +128,9 @@ This SDK is released under the [BSD 3-Clause License](LICENSE).
 - Tag
 
 ## CHANGELOG
+
+### v1.3.1
+* CHANGE: `getDocument` updated to support v2 of the Document API
 
 ### v1.3.0
 * FEATURE: Add support for managing scoped access tokens

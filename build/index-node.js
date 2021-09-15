@@ -6930,15 +6930,7 @@ var TrueVaultClient = function () {
                                 return _context48.abrupt('return', []);
 
                             case 5:
-                                if (documentIds.length === 1) {
-                                    // Sending a single ID to the API will only return the document's contents. In order to
-                                    // retrieve a proper multiget response with `id` and `owner_id`, we need to send a
-                                    // request with two instances of the same document ID. We will then only return the
-                                    // first result from the response.
-                                    requestDocumentIds = [documentIds[0], documentIds[0]];
-                                } else {
-                                    requestDocumentIds = documentIds;
-                                }
+                                requestDocumentIds = documentIds;
 
                             case 6:
                                 _context48.next = 8;
@@ -27395,7 +27387,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 module.exports = {
 	"name": "truevault",
 	"description": "The official TrueVault JavaScript SDK",
-	"version": "1.3.0",
+	"version": "1.3.1",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/truevault/truevault-js-sdk"
