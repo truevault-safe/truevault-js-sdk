@@ -993,12 +993,6 @@ class TrueVaultClient {
         let requestDocumentIds;
         if (documentIds.length === 0) {
             return [];
-        } else if (documentIds.length === 1) {
-            // Sending a single ID to the API will only return the document's contents. In order to
-            // retrieve a proper multiget response with `id` and `owner_id`, we need to send a
-            // request with two instances of the same document ID. We will then only return the
-            // first result from the response.
-            requestDocumentIds = [documentIds[0], documentIds[0]];
         } else {
             requestDocumentIds = documentIds;
         }
